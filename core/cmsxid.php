@@ -309,19 +309,17 @@ class cmsxid
         // URL should be sanitized at this point
         
         $oResult = $this->_getXmlSourceFromCache( $sUrl );
-        $sXml = '';
         
-        if ( !$oResult ) {
+        if ( !is_object($oResult) ) {
             // If false, we need to fetch from remote
             $oResult = $this->_fetchXmlSourceFromRemote( $sUrl );
             
-            $sXml = $oResult->content;
-            $sXml = $this->_sanitizeXmlSource( $sXml );
+            $oResult->content = $this->_sanitizeXmlSource( $oResult->content );
             
             $this->_saveXmlSourceToCache( $oResult, $sUrl );
-        } else {
-            $sXml = $oResult->content;
         }
+        
+        $sXml = is_object($oResult) ? $oResult->content : '';
         
         return $sXml;
     }
@@ -378,9 +376,11 @@ class cmsxid
         
         $sMetadataValue = false;
         
-        $aXpathResults = $oXml->xpath( '/' . $oXml->getName() . '/metadata/' . $sMetadata );
-        if ( count($aXpathResults) == 1 ) {
-            $sMetadataValue = $this->_getTextContentFromXmlObject( $aXpathResults[0] );
+        if ( is_object($oXml) ) {
+            $aXpathResults = $oXml->xpath( '/' . $oXml->getName() . '/metadata/' . $sMetadata );
+            if ( count($aXpathResults) == 1 ) {
+                $sMetadataValue = $this->_getTextContentFromXmlObject( $aXpathResults[0] );
+            }
         }
         
         return $sMetadataValue;
