@@ -1,0 +1,192 @@
+#+++localconf.php+++#
+$TYPO3_CONF_VARS['BE']['forceCharset'] = 'utf-8';
+
+config {
+   # Use "Language: All" content elements
+   sys_language_overlay = 1
+   linkVars = L
+}
+[globalVar = GP:L= {$lang_de_L}]
+config {
+   sys_language_uid = {$lang_de_sysuid}
+   language = de
+   locale_all = de
+   metaCharset = utf-8
+   htmlTag_langKey = de
+}
+[globalVar = GP:L = {$lang_en_L}]
+config {
+   sys_language_uid = {$lang_en_sysuid}
+   language = en
+   locale_all = en_GB
+   metaCharset = utf-8
+   htmlTag_langKey = en
+}
+[globalVar = GP:L = {$lang_fr_L}]
+config {
+   sys_language_uid = {$lang_fr_sysuid}
+   language = fr
+   locale_all = fr
+   metaCharset = utf-8
+   htmlTag_langKey = fr
+}
+[globalVar = GP:L = {$lang_es_L}]
+config {
+   sys_language_uid = {$lang_es_sysuid}
+   language = es
+   locale_all = es
+   metaCharset = utf-8
+   htmlTag_langKey = es
+}
+[globalVar = GP:L = {$lang_it_L}]
+config {
+   sys_language_uid = {$lang_it_sysuid}
+   language = it
+   locale_all = it
+   metaCharset = utf-8
+   htmlTag_langKey = it
+}
+
+[global]
+########## MAIN NAVIGATION ##########
+lib.mainnav = HMENU
+lib.mainnav {
+  entryLevel = 1
+  wrap = <navigation><![CDATA[|]]></navigation>
+  
+  1 = TMENU
+  1 {
+    wrap = <ul class="lvl-1">|</ul>
+    expAll = 1
+    noBlur = 1
+    
+    NO = 1
+    NO {
+      expAll = 1
+      wrapItemAndSub = <li>|</li>
+      stdWrap.htmlSpecialChars = 1
+    }
+    
+    ACT < .NO
+    ACT {
+      expAll = 1
+      wrapItemAndSub = <li class="expanded">|</li>
+      stdWrap.htmlSpecialChars = 1
+    }
+    
+    CUR < .NO
+    CUR {
+      expAll = 1
+      wrapItemAndSub = <li class="active">|</li>
+      stdWrap.htmlSpecialChars = 1
+    }
+  }
+  
+  2 < .1
+  2.wrap = <ul class="lvl-2">|</ul>
+  
+  3 < .1
+  3.wrap = <ul class="lvl-3">|</ul>
+  
+  4 < .1
+  4.wrap = <ul class="lvl-4">|</ul>
+  
+  5 < .1
+  5.wrap = <ul class="lvl-5">|</ul>
+}
+
+########## CONTENT ##########
+lib.left = COA
+print.10 = COA
+lib.left.wrap = <left><![CDATA[|]]></left>
+lib.left.10 < styles.content.getLeft
+
+lib.content = COA
+print.20 = COA
+lib.content.wrap = <content><![CDATA[|]]></content>
+lib.content.10 < styles.content.get
+
+lib.right = COA
+print.30 = COA
+lib.right.wrap = <right><![CDATA[|]]></right>
+lib.right.10 < styles.content.getRight
+
+lib.border = COA
+print.30 = COA
+lib.border.wrap = <border><![CDATA[|]]></border>
+lib.border.10 < styles.content.getBorder
+
+lib.metadata = COA
+lib.metadata {
+  wrap = <metadata>|</metadata>
+  10 = TEXT
+  10.cObject = TEXT
+  10.cObject {
+    data = register:newsKeywords
+    ifEmpty.field = keywords
+    wrap = <keywords><![CDATA[|]]></keywords>
+    stdWrap.htmlSpecialChars = 1
+  }
+  20 = TEXT
+  20.cObject = TEXT
+  20.cObject {
+    data = register:newsTitle
+    ifEmpty.field = title
+    wrap = <title><![CDATA[|]]></title>
+    stdWrap.htmlSpecialChars = 1
+  }
+  30 = TEXT
+  30.cObject = TEXT
+  30.cObject {
+    data = register:newsSubheader
+    ifEmpty.field = description
+    wrap = <description><![CDATA[|]]></description>
+    stdWrap.htmlSpecialChars = 1
+  }
+}
+
+########## BREADCRUMBS ##########
+lib.breadcrumb = HMENU
+lib.breadcrumb {
+  wrap = <breadcrumb>|</breadcrumb>
+
+  includeNotInMenu = 1
+  special = rootline
+  special.range = 1|-1
+  1 = TMENU
+  1 {
+    NO.linkWrap = | >
+    NO.stdWrap2.noTrimWrap = | | |
+    CUR < .NO
+    CUR = 1
+    CUR {
+      linkWrap = |
+      doNotLinkIt = 1
+    }
+  }
+}
+
+########## OUTPUT ##########
+page = PAGE
+page.typeNum = 0
+page.config {
+  renderCharset = utf-8
+  metaCharset = utf-8
+  disableAllHeaderCode = 1
+  additionalHeaders = Content-type:text/xml;charset=utf-8
+  absRefPrefix = {$bUrl}
+  simulateStaticDocuments = 0
+  baseURL = {$bUrl}
+  tx_realurl_enable = 1
+  xhtml_cleaning = all
+}
+
+page.10 < lib.mainnav
+page.20 < lib.left
+page.30 < lib.content
+page.40 < lib.right
+page.50 < lib.border
+page.60 < lib.metadata
+page.70 < lib.breadcrumb
+
+page.wrap = <?xml version="1.0" encoding="utf-8"?><toxid>|</toxid>

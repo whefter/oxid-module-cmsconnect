@@ -1,0 +1,12 @@
+bUrl = http://typo3.url
+
+lang_de_L      = 0
+lang_de_sysuid = 0
+lang_en_L      = 1
+lang_en_sysuid = 1
+lang_fr_L      = 2
+lang_fr_sysuid = 2
+lang_es_L      = 3
+lang_es_sysuid = 3
+lang_it_L      = 4
+lang_it_sysuid = 4

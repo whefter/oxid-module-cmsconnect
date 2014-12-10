@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OX>
+  <OXMENU id="NAVIGATION_ESHOPADMIN">
+      <MAINMENU id="mxextensions">
+            <SUBMENU id="cmsxid_setup" cl="cmsxid_setup" list="cmsxid_setup_list">
+                <TAB id="cmsxid_setup_main" cl="cmsxid_setup_main" />
+            </SUBMENU>
+        </MAINMENU>
+  </OXMENU>
+</OX>
