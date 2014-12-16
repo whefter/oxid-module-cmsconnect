@@ -763,12 +763,12 @@ class cmsxid
                 $sFullTargetUrl     = $this->_sanitizeUrl( $sTargetBaseUrl . '/' . $sTargetSeoIdent . '/' );
                 
                 // Replace all links
-                $sLinkPattern = '/href=(\'|")' . preg_quote($sFullBaseUrl, '/') . '[^"\']*(.|\/|\.html|\.php|\.asp)(\?[^"\']*)?(\'|")/';
                 unset($aMatches);
+                $sLinkPattern = '/href=(\'|")' . preg_quote($sFullBaseUrl, '/') . '[^"\']*(.|\/|\.html|\.php|\.asp)(\?[^"\']*)?(\'|")/';
                 preg_match_all( $sLinkPattern, $sContent, $aMatches, PREG_SET_ORDER );
                 
                 foreach ( $aMatches as $aMatch ) {
-                    $sContent = str_replace( $aMatch[0], str_replace($sSourceUrl, $sFullTargetUrl, $aMatch[0]), $sContent );
+                    $sContent = str_replace( $aMatch[0], str_replace($sFullBaseUrl, $sFullTargetUrl, $aMatch[0]), $sContent );
                 }
             }
                 
