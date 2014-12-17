@@ -72,6 +72,7 @@ class cmsxid
                 $oSnippetXml = $aSnippets[0];
                 
                 $sContentSource = $this->_getTextContentFromXmlObject( $oSnippetXml );
+                // var_dump($sContentSource);
                 $sContentSource = $this->_processContent( $sContentSource );
                 
                 $sReturnSource = $sContentSource;
@@ -211,8 +212,9 @@ class cmsxid
     {
         $sXml = $this->_getXmlSourceByUrl( $sUrl );
         $sXml = $this->_unwrapCDATA( $sXml );
+        $sXml = $this->_fixXmlSourceEntities( $sXml );
         
-        $oXml = $this->_parseXmlSource( $sXml );
+        $oXml = $this->_getXmlObjectFromSource( $sXml );
         
         return $oXml;
     }
@@ -274,8 +276,9 @@ class cmsxid
                 $oSnippetXml = $aSnippets[0];
                 
                 $sContentSource = $this->_unwrapCDATA( $oSnippetXml->asXml() );
+                $sContentSource = $this->_fixXmlSourceEntities( $sContentSource );
                 
-                $oReturnXml = $this->_parseXmlSource( $sContentSource );
+                $oReturnXml = $this->_getXmlObjectFromSource( $sContentSource );
             }
         }
         
@@ -294,7 +297,7 @@ class cmsxid
     {
         $sXml = $this->_getXmlSourceByUrl( $sUrl );
         
-        return $this->_parseXmlSource( $sXml );
+        return $this->_getXmlObjectFromSource( $sXml );
     }
     
     /**
@@ -314,11 +317,10 @@ class cmsxid
             // If false, we need to fetch from remote
             $oResult = $this->_fetchXmlSourceFromRemote( $sUrl );
             
-            $oResult->content = $this->_sanitizeXmlSource( $oResult->content );
-            
             $this->_saveXmlSourceToCache( $oResult, $sUrl );
         }
         
+        // Return an empty string so as not to break anything upstream
         $sXml = is_object($oResult) ? $oResult->content : '';
         
         return $sXml;
@@ -464,7 +466,9 @@ class cmsxid
     {
         $sContent = $this->_rewriteContentUrls ( $sContent );
         $sContent = $this->_fixContentEncoding ( $sContent );
+        // var_dump(htmlentities($sContent));
         $sContent = $this->_decodeContentEntities ( $sContent );
+        // var_dump(htmlentities($sContent));
         $sContent = $this->_parseContentThroughSmarty ( $sContent );
         
         return $sContent;
@@ -485,6 +489,8 @@ class cmsxid
         // else return empty string.
         if ( $oXml !== false ) {
             $sText = trim( $oXml->asXML() );
+            
+            // var_dump(__METHOD__.':'.htmlentities($sText));
             
             // Remove CDATA tag
             $sText = $this->_unwrapCDATA( $sText );
@@ -674,7 +680,7 @@ class cmsxid
      * 
      * @return string
      */
-    protected function _sanitizeXmlSource ( $sXml )
+    protected function _fixXmlSourceEntities ( $sXml )
     {
         $sXml = str_replace('&nbsp;', '&#160;', $sXml);
         
@@ -691,14 +697,13 @@ class cmsxid
      * 
      * @return string
      */
-    protected function _parseXmlSource ( $sXml )
+    protected function _getXmlObjectFromSource ( $sXml )
     {
-        $sXml = $this->_sanitizeXmlSource( $sXml );
-        
         $oXml = false;
         
         try {
-            $oXml = simplexml_load_string($sXml, null, LIBXML_NOCDATA);
+            // $oXml = simplexml_load_string($sXml, null, LIBXML_NOCDATA);
+            $oXml = simplexml_load_string($sXml);
         } catch ( Exception $e ) {
             return false;
         }
