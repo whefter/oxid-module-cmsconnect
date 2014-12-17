@@ -780,12 +780,15 @@ class cmsxid
             // If the shop is in SSL mode, replace all links and sources to the non-SSL CMS with references to the SSL source,
             // if configured, to prevent browser complaints about mixed modes
             if ( $oxConfig->isSsl() ) {
-                // We can safely do this crude replace since, in theory, all URLs left on the page should be to
-                // non-page CMS content
-                $sSourceBaseUrl     = $this->_sanitizeUrl( $this->_getConfigredSourceBaseUrl($sLang) . '/' );
-                $sSourceSslBaseUrl  = $this->_sanitizeUrl( $this->_getConfigredSourceSslBaseUrl($sLang) . '/' );
+                // Do this ONLY if an SSL source URL has actually been configured
+                if ( $this->_getConfiguredSourceSslBaseUrl($sLang) ) {
+                    // We can safely do this crude replace since, in theory, all URLs left on the page should be to
+                    // non-page CMS content
+                    $sSourceBaseUrl     = $this->_sanitizeUrl( $this->_getConfiguredSourceBaseUrl($sLang) . '/' );
+                    $sSourceSslBaseUrl  = $this->_sanitizeUrl( $this->_getConfiguredSourceSslBaseUrl($sLang) . '/' );
                 
-                $sContent = str_replace( $sSourceBaseUrl, $sSourceSslBaseUrl );
+                    $sContent = str_replace( $sSourceBaseUrl, $sSourceSslBaseUrl );
+                }
             }
         }
 
