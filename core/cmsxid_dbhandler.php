@@ -48,7 +48,7 @@ class cmsxid_dbhandler
             ),
             'CMSXIDPAGEID' => array(
                 'multilang' => false,
-                'schema'    => 'varchar(32) NULL',
+                'schema'    => 'varchar(32) NOT NULL',
             ),
         ),
     );
