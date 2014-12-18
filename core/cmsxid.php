@@ -670,7 +670,16 @@ class cmsxid
      */
     protected function _getCacheFilenameFromUrl ( $sUrl )
     {
-        return 'cmsxid_' . md5($sUrl);
+        $oStr = getStr();
+        
+        // Strip extra slashes etc.
+        $sUrl = $this->_sanitizeUrl( $sUrl );
+        
+        // Only keep word characters
+        $sUrl = $oStr->preg_replace( '/[^a-zA-Z0-9-]/', '_', $sUrl );
+        
+        // Apend checksum for safety
+        return 'cmsxid_' . $sUrl . '_' . substr( md5($sUrl), 0, 8 );
     }
     
     /**
