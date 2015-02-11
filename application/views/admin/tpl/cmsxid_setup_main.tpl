@@ -141,6 +141,7 @@
         <legend>[{ oxmultilang ident="CMSXID_ADMIN_SETTINGS_GENERAL" }]</legend>
         
         <p>
+            <input type="hidden" name="editval[blCmsxidLeaveUrls]" value="0" />
             <input type="checkbox" name="editval[blCmsxidLeaveUrls]" value="1" [{ if $blCmsxidLeaveUrls }]checked="checked"[{ /if }] />
             [{ oxmultilang ident="CMSXID_ADMIN_SETTINGS_blCmsxidLeaveUrls" }]
             [{ oxinputhelp ident="CMSXID_ADMIN_SETTINGS_blCmsxidLeaveUrls_HELP" }]
@@ -153,7 +154,7 @@
                 </td>
                 <td class="edittext">
                     <input type="text" name="editval[iCmsxidTtlDefault]" value="[{ $iCmsxidTtlDefault }]" />
-            [{ oxinputhelp ident="CMSXID_ADMIN_SETTINGS_iCmsxidTtlDefault_HELP" }]
+                    [{ oxinputhelp ident="CMSXID_ADMIN_SETTINGS_iCmsxidTtlDefault_HELP" }]
                 </td>
             </tr>
             <tr>
