@@ -15,6 +15,18 @@
 class cmsxid
 {
     /**
+     * GET/POST parameters that should never get passed along to 
+     * the CMS (known to belong to OXID or simply troublesome)
+     *
+     * @var string[]
+     */
+    protected $_aRequestParamBlacklist = array(
+        'cl',
+        'fn',
+        'shp',
+    );
+        
+    /**
      * Returns the processed text content of the requested snippet on the requested TYPO3
      * page and the requested OXID language ID
      *
@@ -412,7 +424,9 @@ class cmsxid
         $sFullPageUrl   =     $sBaseUrlSsl ? $sBaseUrlSsl : $sBaseUrl
                             . '/' . $sPagePath
                             . '/' . $this->_sanitizePageTitle($sPage)
-                            . '/' . '?' . $sParams
+                            . '/' . '?'
+                                . $sParams
+                                . '&' . http_build_query( $this->_getSanitizedPassedHttpGetParameters($sLang) );
                         ;
         
         return $this->_sanitizeUrl($sFullPageUrl);
@@ -449,7 +463,9 @@ class cmsxid
         
         
         $sFullPageUrl =     $sBaseUrlSsl ? $sBaseUrlSsl : $sBaseUrl
-                            . '/?' . $sParams
+                            . '/' . '?'
+                                . $sParams
+                                . '&' . http_build_query( $this->_getSanitizedPassedHttpGetParameters($sLang) );
                         ;
         
         return $this->_sanitizeUrl($sFullPageUrl);
@@ -529,6 +545,10 @@ class cmsxid
         // Put through PHP's functions to ensure standardized URL
         // $sUrl = http_build_url( parse_url( $sUrl ) );
         
+        // Remove ending '&' or '?'
+        // Do this without regular expressions (which are expensive)
+        rtrim( $sUrl, '&?' );
+        
         return $sUrl;
     }
     
@@ -582,16 +602,33 @@ class cmsxid
      * Returns an object containing the curl information array (->info) and, on success,
      * the page content (->content) for the requested URL.
      *
-     * @param string    $sUrl       URL
+     * @param string    $sUrl           URL
+     * @param string    $blPost         Use POST instead of GET
      * 
      * @return object
      */
-    protected function _fetchXmlSourceFromRemote ( $sUrl )
+    protected function _fetchXmlSourceFromRemote ( $sUrl, $blPost = false )
     {
         $curl_handle = curl_init();
         curl_setopt( $curl_handle, CURLOPT_URL, $sUrl );
         curl_setopt( $curl_handle, CURLOPT_FOLLOWLOCATION, 1 );
         curl_setopt( $curl_handle, CURLOPT_RETURNTRANSFER, 1 );
+        // curl_setopt( $curl_handle, CURLOPT_HEADER, 0 );
+        
+        // For POST
+        if ( $blPost ) {
+            curl_setopt( $curl_handle, CURLOPT_POST, $blPost );
+            
+            curl_setopt( $curl_handle, CURLOPT_HTTPHEADER, array(
+                'Content-Type: application/x-www-form-urlencoded'
+            ) );
+            // curl_setopt( $curl_handle, CURLOPT_POSTFIELDS, 
+                // 'code_url=' . urlencode($sTmpFileUrl)
+                // . '&output_info=compiled_code'
+                // . '&compilation_level=SIMPLE_OPTIMIZATIONS'
+                // . '&output_format=text'
+            // );
+        }
         
         $oResult = new stdClass();
         
@@ -709,6 +746,8 @@ class cmsxid
     protected function _getXmlObjectFromSource ( $sXml )
     {
         $oXml = false;
+        
+        // var_dump(htmlentities($sXml));
         
         try {
             // $oXml = simplexml_load_string($sXml, null, LIBXML_NOCDATA);
@@ -1067,6 +1106,87 @@ class cmsxid
     protected function _getConfiguredSourceSeoIdentifier ( $sLang )
     {
         return $this->_getConfiguredSourceProperty( $sLang, 'sSeoIdent' );
+    }
+    
+    /**
+     * Returns extra GET parameters that have been passed to the page call. The idea being
+     * that (e.g.) TYPO3 plugins that rely on GET parameters being passed along the request
+     * will still work when being surfed via OXID
+     * 
+     * @return array
+     */
+    protected function _getPassedHttpGetParameters ()
+    {
+        return $_GET;
+    }
+    
+    /**
+     * Returns extra POST parameters that have been passed to the page call. The idea being
+     * that (e.g.) TYPO3 plugins that rely on POST parameters being passed along the request
+     * will still work when being surfed via OXID
+     * 
+     * @return array
+     */
+    protected function _getPassedHttpPostParameters ()
+    {
+        return $_POST;
+    }
+    
+    /**
+     * Returns extra GET parameters after having unset the configured id / language parameters
+     * for the passed language
+     * 
+     * @param string        $sLang          Language to sanitize the parameter array for
+     * 
+     * @return array
+     */
+    protected function _getSanitizedPassedHttpGetParameters ( $sLang )
+    {
+        $aParams = $this->_getPassedHttpGetParameters();
+        $aParams = $this->_sanitizeHttpParameterArray( $aParams, $sLang );
+        
+        return $aParams;
+    }
+    
+    /**
+     * Returns extra POST parameters after having unset the configured id / language parameters
+     * for the passed language
+     * 
+     * @return array
+     */
+    protected function _getSanitizedPassedHttpPostParameters ( $sLang )
+    {
+        $aParams = $this->_getPassedHttpPostParameters();
+        $aParams = $this->_sanitizeHttpParameterArray( $aParams, $sLang );
+        
+        return $aParams;
+    }
+    
+    /**
+     * Unsets the configured id / language parameters for the passed language in the passed parameter array
+     * 
+     * @param array         $aParams        Associative HTTP parameter array
+     * @param string        $sLang          Language to sanitize the parameter array for
+     * 
+     * @return array
+     */
+    protected function _sanitizeHttpParameterArray ( $aParams, $sLang )
+    {
+        // Remove parameters specified in the static blacklist
+        foreach ( $this->_aRequestParamBlacklist as $sBlacklistedParam ) {
+            unset( $aParams[$sBlacklistedParam] );
+        }      
+        
+        $sIdParam = $this->_getConfiguredSourceIdParam($sLang);
+        unset( $aParams[$sIdParam] );
+        
+        // Obtain the name of the language parameter so we can unset it
+        $aLangParam = array();
+        parse_str( $this->_getConfiguredSourceLangParam($sLang), $aLangParam );
+        $sLangParam = implode( '', array_keys($aLangParam) );
+        unset( $aParams[$sLangParam] );
+        
+        return $aParams;
     }
     
     /**
