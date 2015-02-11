@@ -715,8 +715,11 @@ class cmsxid
         // Only keep word characters
         $sUrl = $oStr->preg_replace( '/[^a-zA-Z0-9-]/', '_', $sUrl );
         
+        // Cut off at 200 chars to prevent problems with filename length
+        $sUrl = substr( $sUrl, 0, 200 );
+        
         // Apend checksum for safety
-        return 'cmsxid_' . $sUrl . '_' . substr( md5($sUrl), 0, 8 );
+        return 'cmsxid_' . $sUrl . '_' . substr( md5($sUrl), 0, 12 );
     }
     
     /**
