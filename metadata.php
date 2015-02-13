@@ -35,6 +35,9 @@ $aModule = array(
         'cmsxid'                    => 'wh/cmsxid/core/cmsxid.php',
         'cmsxid_fe'                 => 'wh/cmsxid/application/controllers/cmsxid_fe.php',
         
+        'CmsxidPage'                => 'wh/cmsxid/core/CmsxidPage.php',
+        'CmsxidUtils'               => 'wh/cmsxid/core/CmsxidUtils.php',
+        
         'cmsxid_dbhandler'          => 'wh/cmsxid/core/cmsxid_dbhandler.php',
         'cmsxid_events'             => 'wh/cmsxid/core/cmsxid_events.php',
         
