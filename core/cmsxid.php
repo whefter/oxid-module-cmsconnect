@@ -39,10 +39,8 @@ class cmsxid
             $sPage = CmsxidUtils::getCurrentSeoPage();
         }
         
-        // $sUrl = CmsxidUtils::getFullPageUrl( $sPage, $sLang );
         $oPage = CmsxidPathPage::getInstance($sPage, $sLang);
         
-        // return $this->_getContent( $sUrl, $sSnippet );
         return $this->_getContent( $oPage, $sSnippet );
     }
     
@@ -58,17 +56,6 @@ class cmsxid
      */
     public function getContentById ( $sSnippet, $sPageId, $sLang = null )
     {
-        // $sUrl = CmsxidUtils::getFullPageUrlById( $sPageId, $sLang );
-        // $oxConfig = oxRegistry::getConfig();
-        // echo "<pre>";
-        // var_dump(__METHOD__,
-        // $oxConfig->getConfigParam('aModuleFiles'),
-        // "separator",
-        // $oxConfig->getShopConfVar('aModuleFiles')
-        // );
-        
-        // echo "</pre>";
-        
         $oPage = CmsxidIdPage::getInstance($sPageId, $sLang);
         
         return $this->_getContent( $oPage, $sSnippet );
@@ -77,18 +64,13 @@ class cmsxid
     /**
      * Processes the passed content XML and returns a string
      *
-     // * @param   string      $sUrl       Page URL
      * @param   CmsxidPage  $oPage      Page object
      * @param   string      $sSnippet   Content snippet name
      *
      * @return string
      */
-    // public function _getContent ( $sUrl, $sSnippet )
     public function _getContent ( $oPage, $sSnippet )
     {
-        // $sUrl = $oPage->getBaseUrl();
-        
-        // $oXml = $this->_getXmlByUrl( $sUrl );
         $oXml = $this->_getXmlByPage( $oPage );
         
         $sReturnSource = false;
@@ -99,7 +81,6 @@ class cmsxid
                 $oSnippetXml = $aSnippets[0];
                 
                 $sContentSource = CmsxidUtils::getTextContentFromXmlObject( $oSnippetXml );
-                // var_dump($sContentSource);
                 $sContentSource = $this->_processContent( $sContentSource );
                 
                 $sReturnSource = $sContentSource;
@@ -125,10 +106,8 @@ class cmsxid
             $sPage = CmsxidUtils::getCurrentSeoPage();
         }
         
-        // $sUrl = CmsxidUtils::getFullPageUrl( $sPage, $sLang );
         $oPage = CmsxidPathPage::getInstance($sPage, $sLang);
         
-        // return $this->_getContentArray( $sUrl, $blOnlyContentColumns );
         return $this->_getContentArray( $oPage, $blOnlyContentColumns );
     }
     
@@ -144,28 +123,21 @@ class cmsxid
      */
     public function getContentArrayById ( $sPageId, $sLang = null, $blOnlyContentColumns = true )
     {
-        // $sUrl = CmsxidUtils::getFullPageUrlById( $sPageId, $sLang );
         $oPage = CmsxidIdPage::getInstance( $sPageId, $sLang );
         
-        // return $this->_getContentArray( $sUrl, $blOnlyContentColumns );
         return $this->_getContentArray( $oPage, $blOnlyContentColumns );
     }
     
     /**
      * Internally processes the passed XML to extract the snippet contents
      *
-     // * @param string        $sUrl                   Page URL
      * @param CmsxidPage    $oPage                  Page object
      * @param bool          $blOnlyContentColumns   Only return actual content columns (true by default)
      *
      * @return string[]
      */
-    // public function _getContentArray ( $sUrl, $blOnlyContentColumns )
     public function _getContentArray ( $oPage, $blOnlyContentColumns )
     {
-        // $sUrl = $oPage->getBaseUrl();
-        
-        // $oXml = $this->_getXmlByUrl( $sUrl );
         $oXml = $this->_getXmlByPage( $oPage );
         
         $aSnippets = array();
@@ -176,7 +148,6 @@ class cmsxid
             $aXpathSnippets = $oXml->xpath('/' . $oXml->getName()); 
             foreach ( $aXpathSnippets[0] as $sSnippet => $oSnippetXml ) {
                 // Let _getContent do the work here
-                // $sSnippetContent = $this->_getContent( $sUrl, $sSnippet );
                 $sSnippetContent = $this->_getContent( $oPage, $sSnippet );
             
                 switch ( $sSnippet ) {
@@ -217,10 +188,8 @@ class cmsxid
             $sPage = CmsxidUtils::getCurrentSeoPage();
         }
         
-        // $sUrl = CmsxidUtils::getFullPageUrl( $sPage, $sLang );
         $oPage = CmsxidPathPage::getInstance($sPage, $sLang);
         
-        // return $this->_getXml( $sUrl );
         return $this->_getXml( $oPage );
     }
     
@@ -234,10 +203,8 @@ class cmsxid
      */
     public function getXmlById ( $sPageId, $sLang = null )
     {
-        // $sUrl = CmsxidUtils::getFullPageUrlById( $sPageId, $v );
         $oPage = CmsxidIdPage::getInstance($sPageId, $sLang);
         
-        // return $this->_getXml( $sUrl );
         return $this->_getXml( $oPage );
     }
     
@@ -245,15 +212,12 @@ class cmsxid
      * Fetches the XML source associated with the passed URL, removes all CDATA tags 
      * and parses it, returning the resulting object
      *
-     // * @param string        $sUrl       XML source URL
      * @param CmsxidPage    $oPage                  Page object
      *
      * @return SimpleXMLObject
      */
-    // public function _getXml ( $sUrl )
     public function _getXml ( $oPage )
     {
-        // $sXml = $this->_getXmlSourceByUrl( $sUrl );
         $sXml = $this->_getXmlSourceByPage( $oPage );
         $sXml = CmsxidUtils::unwrapCDATA( $sXml );
         $sXml = CmsxidUtils::fixXmlSourceEntities( $sXml );
@@ -278,10 +242,8 @@ class cmsxid
             $sPage = CmsxidUtils::getCurrentSeoPage();
         }
         
-        // $sUrl = CmsxidUtils::getFullPageUrl( $sPage, $sLang );
         $oPage = CmsxidPathPage::getInstance($sPage, $sLang);
         
-        // return $this->_getContentXml( $sUrl, $sSnippet );
         return $this->_getContentXml( $oPage, $sSnippet );
     }
     
@@ -296,10 +258,8 @@ class cmsxid
      */
     public function getContentXmlById ( $sSnippet, $sPageId, $sLang = null )
     {
-        // $sUrl = CmsxidUtils::getFullPageUrlById( $sPageId, $sLang );
         $oPage = CmsxidIdPage::getInstance($sPageId, $sLang);
         
-        // return $this->_getContentXml( $sUrl, $sSnippet );
         return $this->_getContentXml( $oPage, $sSnippet );
     }
     
@@ -307,16 +267,13 @@ class cmsxid
      * Fetches the XML source associated with the passed URL, removes all CDATA tags 
      * from the requested content snippet and parses it, returning the resulting object
      *
-     // * @param string        $sUrl       Page URL
      * @param CmsxidPage    $oPage      Page object
      * @param string        $sSnippet   Snippet to fetch and parse
      *
      * @return SimpleXMLObject
      */
-    // public function _getContentXml ( $sUrl, $sSnippet )
     public function _getContentXml ( $oPage, $sSnippet )
     {
-        // $oXml = $this->_getXmlByUrl( $sUrl );
         $oXml = $this->_getXmlByPage( $oPage );
         
         $oReturnXml = false;
@@ -340,15 +297,12 @@ class cmsxid
      * Fetch the XML object associated with a URL. The children's text content might
      * still be wrapped in CDATA!
      *
-     // * @param string    $sUrl       Page URL
      * @param CmsxidPage    $oPage      Page object
      * 
      * @return SimpleXMLObject
      */
-    // protected function _getXmlByUrl ( $sUrl )
     protected function _getXmlByPage ( $oPage )
     {
-        // $sXml = $this->_getXmlSourceByUrl( $sUrl );
         $sXml = $this->_getXmlSourceByPage( $oPage );
         
         return CmsxidUtils::getXmlObjectFromSource( $sXml );
@@ -358,12 +312,10 @@ class cmsxid
      * Fetch the XML source associated with a URL. This should be the only actual source of freshly
      * fetched XML in this class.
      *
-     // * @param string    $sUrl       Page URL
      * @param CmsxidPage    $oPage      Page object
      * 
      * @return SimpleXMLObject
      */
-    // protected function _getXmlSourceByUrl ( $sUrl )
     protected function _getXmlSourceByPage ( $oPage )
     {
         // URL should be sanitized at this point
@@ -457,10 +409,8 @@ class cmsxid
             $sPage = CmsxidUtils::getCurrentSeoPage();
         }
         
-        // $sUrl = CmsxidUtils::getFullPageUrl( $sPage, $sLang );
         $oPage = CmsxidPathPage::getInstance($sPage, $sLang);
         
-        // return $this->_getPageMetadataByUrl( $sUrl, $sMetadata );
         return $this->_getPageMetadataByPage( $oPage, $sMetadata );
     }
     
@@ -476,26 +426,21 @@ class cmsxid
      */
     public function getPageMetadataById ( $sMetadata, $sPageId, $sLang = null )
     {
-        // $sUrl = CmsxidUtils::getFullPageUrlById( $sPageId, $sLang );
         $oPage = CmsxidIdPage::getInstance($sPageId, $sLang);
         
-        // return $this->_getPageMetadataByUrl( $sUrl, $sMetadata );
         return $this->_getPageMetadataByPage( $oPage, $sMetadata );
     }
     
     /**
      * Returns the value of the passed metadata field on the passed page URL
      *
-     // * @param string    $sUrl       Page URL
      * @param CmsxidPage    $oPage      Page object
      * @param string        $sMetadata  Metadata field name
      * 
      * @return string
      */
-    // protected function _getPageMetadataByUrl ( $sUrl, $sMetadata )
     protected function _getPageMetadataByPage ( $oPage, $sMetadata )
     {
-        // $oXml = $this->_getXmlByUrl( $sUrl );
         $oXml = $this->_getXmlByPage( $oPage );
         
         $sMetadataValue = false;
@@ -521,9 +466,7 @@ class cmsxid
     {
         $sContent = CmsxidUtils::rewriteContentUrls( $sContent );
         $sContent = CmsxidUtils::fixContentEncoding( $sContent );
-        // var_dump(htmlentities($sContent));
         $sContent = CmsxidUtils::decodeContentEntities( $sContent );
-        // var_dump(htmlentities($sContent));
         $sContent = CmsxidUtils::parseContentThroughSmarty( $sContent );
         
         return $sContent;
@@ -619,7 +562,6 @@ class cmsxid
      */
     public function getSearchResult($sKeywords)
     {
-    
     }
     
     /**
