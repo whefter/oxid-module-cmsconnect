@@ -8,7 +8,7 @@
 /**
  * CmsxidPage
  */
-class CmsxidPage
+abstract class CmsxidPage
 {
     /**
      * _sLang
@@ -30,6 +30,13 @@ class CmsxidPage
      * @var array
      */
     protected $_aPostParams;
+    
+    /**
+     * __construct
+     */
+    function __construct ()
+    {
+    }
     
     /**
      * General function, inherited in child classes. Creates and returns an instance of a Cmsxid Page object
@@ -65,8 +72,25 @@ class CmsxidPage
     public function getFullUrl ()
     {
         $sBaseQuery     = parse_url( $this->getBaseUrl(), PHP_URL_QUERY );
-        $sAddQuery      = http_build_query( $this->getGetParams() );
+        $sAddQuery      = http_build_query( CmsxidUtils::getExplicitQueryParams() );
+
+        $sFullUrl = $this->getBaseUrl();
+        $sFullUrl = preg_replace( '/' . preg_quote($sBaseQuery, '/') . '$/', '', $sFullUrl );
+        $sFullUrl = rtrim( $sFullUrl, '?&' );
+        $sFullUrl .= '?' . $sBaseQuery . '&' . $sAddQuery;
+        $sFullUrl = rtrim( $sFullUrl, '?&' );
         
-        $sFullUrl = str_replace( $sBaseQuery, )
+        return $sFullUrl;
+    }
+    
+    /**
+     * Returns the type identifier for the current page object. This is essentially a variable
+     * set in the child classes
+     *
+     * @return string
+     */
+    public function getType ()
+    {
+        return $this->_sType;
     }
 }

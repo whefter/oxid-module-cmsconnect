@@ -10,6 +10,9 @@
  */
 class CmsxidUtils
 {
+    const TYPE_IDENTIFIER_PATH  = 1;
+    const TYPE_IDENTIFIER_ID    = 2;
+    
     /**
      * GET/POST parameters that should never get passed along to 
      * the CMS (known to belong to OXID or simply troublesome)
@@ -48,17 +51,7 @@ class CmsxidUtils
                             . '/' . self::sanitizePageTitle($sPage)
                             . '/' . '?'
                                 . $sParams
-                                . '&' . http_build_query( self::getSanitizedPassedHttpGetParameters($sLang) );
                         ;
-        
-        $oPage = new stdClass();
-        $oPage->sBaseUrl = $sBaseUrlSsl ? $sBaseUrlSsl : $sBaseUrl
-                            . '/' . $sPagePath
-                            . '/' . self::sanitizePageTitle($sPage)
-                            . '/' . '?'
-                                . $sParams
-                        ;
-        
         
         return self::sanitizeUrl($sFullPageUrl);
     }
@@ -96,7 +89,6 @@ class CmsxidUtils
         $sFullPageUrl =     $sBaseUrlSsl ? $sBaseUrlSsl : $sBaseUrl
                             . '/' . '?'
                                 . $sParams
-                                . '&' . http_build_query( self::getSanitizedPassedHttpGetParameters($sLang) );
                         ;
         
         return self::sanitizeUrl($sFullPageUrl);
@@ -348,7 +340,7 @@ class CmsxidUtils
     {
         // Only path-based pages can be SEO pages at all
         // Mainly this check ensures the call to getPagePath() below does not cause a fatal error
-        if ( $oPage->getIdentifierType() != self::IDENTIFIER_TYPE_PATH ) {
+        if ( $oPage->getType() != self::TYPE_IDENTIFIER_PATH ) {
             return false;
         }
         
@@ -363,29 +355,25 @@ class CmsxidUtils
     }
     
     /**
-     * Checks if the passed page is the page called implicitly on the CMSxid SEO page
+     * Returns an array of explicit query parameters, i.e. parameters that could have been
+     * passed by CMS plugins. Excludes all implicit parameters set by OXID when it resolves
+     * SEO URLs and excludes well-known OXID parameters (see top of file)
      *
-     * @param CmsxidPage    $oPage      Page object
-     * 
-     * @return bool
+     * @return array()
      */
-    public static function checkHasQueryParams ()
+    public static function getExplicitQueryParams ()
     {
         // These are the explicit query params, not the one OXID set after looking up the SEO
         // URL
         $aExplicitQueryParams = array();
-        parse_str( $_SERVER['QUERY_STRING'], $aGetQuery );
+        parse_str( $_SERVER['QUERY_STRING'], $aExplicitQueryParams );
         
         // Remove parameters specified in the static blacklist
         foreach ( self::$_aRequestParamBlacklist as $sBlacklistedParam ) {
             unset( $aExplicitQueryParams[$sBlacklistedParam] );
         }
         
-        if ( count($aExplicitQueryParams) ) {
-            return true;
-        }
-        
-        return false;
+        return $aExplicitQueryParams;
     }
     
     /**

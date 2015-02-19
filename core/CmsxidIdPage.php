@@ -8,8 +8,15 @@
 /**
  * CmsxidIdPage
  */
-class CmsxidIdPage
+class CmsxidIdPage extends CmsxidPage
 {
+    /**
+     * _sType
+     *
+     * @var string
+     */
+    protected $_sType = CmsxidUtils::TYPE_IDENTIFIER_ID;
+    
     /**
      * _sPageId
      *
@@ -18,14 +25,16 @@ class CmsxidIdPage
     protected $_sPageId = null;
     
     /**
-     * Creator for the id-based page object
+     * Constructor for the id-based page object
      *
      * @param string        $sPageId        Requested page id
      * @param string        $sLang          Requested language
      */
     function __construct ( $sPageId, $sLang )
     {
-        $this->sPageId  = $sPageId;
+        parent::__construct();
+        
+        $this->_sPageId  = $sPageId;
         $this->_sLang   = $sLang;
     }
     

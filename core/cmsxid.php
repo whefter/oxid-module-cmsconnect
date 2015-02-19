@@ -15,6 +15,15 @@
 class cmsxid
 {
     /**
+     * "Level one" cache. Pages retrieved from remote or from cache are
+     * cached here to reduce the hits to file cache or to prevent multiple
+     * fetches of a remote page if the cache isn't used.
+     *
+     * @var CmsxidResult[]
+     */
+    protected static $_aSessionCache = array();
+    
+    /**
      * Returns the processed text content of the requested snippet on the requested TYPO3
      * page and the requested OXID language ID
      *
@@ -50,6 +59,16 @@ class cmsxid
     public function getContentById ( $sSnippet, $sPageId, $sLang = null )
     {
         // $sUrl = CmsxidUtils::getFullPageUrlById( $sPageId, $sLang );
+        // $oxConfig = oxRegistry::getConfig();
+        // echo "<pre>";
+        // var_dump(__METHOD__,
+        // $oxConfig->getConfigParam('aModuleFiles'),
+        // "separator",
+        // $oxConfig->getShopConfVar('aModuleFiles')
+        // );
+        
+        // echo "</pre>";
+        
         $oPage = CmsxidIdPage::getInstance($sPageId, $sLang);
         
         return $this->_getContent( $oPage, $sSnippet );
@@ -67,9 +86,10 @@ class cmsxid
     // public function _getContent ( $sUrl, $sSnippet )
     public function _getContent ( $oPage, $sSnippet )
     {
-        $sUrl = $oPage->getBaseUrl();
+        // $sUrl = $oPage->getBaseUrl();
         
-        $oXml = $this->_getXmlByUrl( $sUrl );
+        // $oXml = $this->_getXmlByUrl( $sUrl );
+        $oXml = $this->_getXmlByPage( $oPage );
         
         $sReturnSource = false;
         
@@ -146,7 +166,7 @@ class cmsxid
         // $sUrl = $oPage->getBaseUrl();
         
         // $oXml = $this->_getXmlByUrl( $sUrl );
-        $oXml = $this->_getXmlByUrl( $oPage );
+        $oXml = $this->_getXmlByPage( $oPage );
         
         $aSnippets = array();
         
@@ -348,40 +368,74 @@ class cmsxid
     {
         // URL should be sanitized at this point
         
-        $blCache = true;
+        echo "<pre>";
+        var_dump(__METHOD__);
+        var_dump("Base URL: " . $oPage->getBaseUrl());
+        var_dump("Full URL: " . $oPage->getFullUrl());
+        
+        $sBaseUrl       = $oPage->getBaseUrl();
+        $sFullUrl       = $oPage->getFullUrl();
+        
+        $blUseFileCache     = true;
+        $sSessionCacheUrl   = $sBaseUrl;
         
         if ( CmsxidUtils::checkIsImplicitSeoPage($oPage) ) {
+            var_dump("Detected implicit page");
             // The implicit SEO page is exempt from caching IF
             // any query parameters at all have been passed along, since
             // we have to assume some plugin or similar on the page needs these.
             // We have no way of identifying which parameters belong to OXID and
             // which don't, so, to prevent cache flooding, cache ONLY if a plain page
             // has been requested.
-            if ( CmsxidUtils::checkHasQueryParams() ) {
-                $blCache = false;
+            //
+            // Additionally, we now use the full page URL for session cache
+            if ( count(CmsxidUtils::getExplicitQueryParams()) )  {
+                var_dump("Detected custom query params");
+                var_dump("Disabling file cache and setting session cache identifier to full URL");
+                $blUseFileCache     = false;
+                $sSessionCacheUrl   = $sFullUrl;
             }
         }
         
-        $oResult = false;
+        // Determine which URL to use for session cache based on file
+        $sUrl       = $oPage->getFullUrl();
         
-        if ( $blCache ) {
+        var_dump("Retrieving " . $sSessionCacheUrl . " from session cache");
+        $oResult    = $this->_getResultFromSessionCache( $sSessionCacheUrl );
+        
+        // No result so far and caching enabled for this page, attempt to read from file cache
+        if ( !is_object($oResult) && $blUseFileCache ) {
+            var_dump("Retrieving " . $oPage->getBaseUrl() . " from file cache");
+            
             // This is URL-based. We want our cache to be dumb; in turn, we have
             // to be smart about which URL to pass it (see above)
-            $oResult = CmsxidUtils::getXmlSourceFromCache( $sUrl );
+            $oResult = CmsxidUtils::getXmlSourceFromCache( $sBaseUrl );
             // $oResult = CmsxidUtils::getXmlSourceFromCache( $oPage );
         }
         
+        // Still no result, fetch from remote
         if ( !is_object($oResult) ) {
-            // If false, we need to fetch from remote
-            $oResult = CmsxidUtils::fetchXmlSourceFromRemote( $sUrl );
+            var_dump("No cache result, fetching " . $oPage->getBaseUrl() . " from remote");
             
-            if ( $blCache ) {
-                CmsxidUtils::saveXmlSourceToCache( $oResult, $sUrl );
+            // If false, we need to fetch from remote
+            // $oResult = CmsxidUtils::fetchXmlSourceFromRemote( $sUrl );
+            $oResult = CmsxidUtils::fetchXmlSourceFromRemote( $oPage );
+            
+            if ( $blUseFileCache ) {
+                CmsxidUtils::saveXmlSourceToCache( $oResult, $sBaseUrl );
+                
+                var_dump("Saving " . $oPage->getBaseUrl() . " to file cache");
             }
         }
         
+        // Save to session cache
+        var_dump("Saving " . $sSessionCacheUrl . " to session cache");
+        $this->_saveResultToSessionCache( $sSessionCacheUrl, $oResult );
+        
         // Return an empty string so as not to break anything upstream
         $sXml = is_object($oResult) ? $oResult->content : '';
+        
+        echo "</pre>";
         
         return $sXml;
     }
@@ -403,7 +457,7 @@ class cmsxid
         }
         
         // $sUrl = CmsxidUtils::getFullPageUrl( $sPage, $sLang );
-        $oPage = CmsxidPage::getInstance($sPage, $sLang);
+        $oPage = CmsxidPathPage::getInstance($sPage, $sLang);
         
         // return $this->_getPageMetadataByUrl( $sUrl, $sMetadata );
         return $this->_getPageMetadataByPage( $oPage, $sMetadata );
@@ -472,6 +526,39 @@ class cmsxid
         $sContent = CmsxidUtils::parseContentThroughSmarty( $sContent );
         
         return $sContent;
+    }
+    
+    /**
+     * Returns the result object associated with a URL
+     *
+     * @param string    $sUrl       Full URL of the page
+     * 
+     * @return CmsxidResult
+     */
+    protected function _getResultFromSessionCache ( $sUrl )
+    {
+        $sKey = md5($sUrl);
+        
+        if ( array_key_exists($sKey, self::$_aSessionCache) ) {
+            return self::$_aSessionCache[$sKey];
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Returns the result object associated with a URL
+     *
+     * @param string        $sUrl           Full URL of the page
+     * @param CmsxidResult  $oResult        Result object
+     * 
+     * @return void
+     */
+    protected function _saveResultToSessionCache ( $sUrl, $oResult )
+    {
+        $sKey = md5($sUrl);
+        
+        self::$_aSessionCache[$sKey] = $oResult;
     }
     
     /**

@@ -8,8 +8,15 @@
 /**
  * CmsxidPathPage
  */
-class CmsxidPathPage
+class CmsxidPathPage extends CmsxidPage
 {
+    /**
+     * _sType
+     *
+     * @var string
+     */
+    protected $_sType = CmsxidUtils::TYPE_IDENTIFIER_PATH;
+    
     /**
      * _sPagePath
      *
@@ -18,14 +25,16 @@ class CmsxidPathPage
     protected $_sPagePath = null;
     
     /**
-     * Creator for the page path-based page object
+     * Constructor for the page path-based page object
      *
      * @param string        $sPagePath      Requested page path
      * @param string        $sLang          Requested language
      */
     function __construct ( $sPagePath, $sLang )
     {
-        $this->_sPagePath   = $sPage;
+        parent::__construct();
+        
+        $this->_sPagePath   = $sPagePath;
         $this->_sLang       = $sLang;
     }
     
@@ -46,6 +55,6 @@ class CmsxidPathPage
      */
     public function getBaseUrl ()
     {
-        return CmsxidUtils::getFullPageUrl( $this->_sPage, $this->_sLang );
+        return CmsxidUtils::getFullPageUrl( $this->_sPagePath, $this->_sLang );
     }
 }
