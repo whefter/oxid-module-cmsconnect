@@ -36,6 +36,11 @@ class CmsxidUtils
      */
     public static function getFullPageUrl ( $sPage = null, $sLang = null )
     {
+        // Requesting the root page must be done by passing '/'
+        if ( !$sPage ) {
+            return false;
+        }
+        
         $sBaseUrl       = self::getConfiguredSourceBaseUrl($sLang);
         $sBaseUrlSsl    = self::getConfiguredSourceSslBaseUrl($sLang);
         $sPagePath      = self::getConfiguredSourcePagePath($sLang);
@@ -57,16 +62,22 @@ class CmsxidUtils
     }
     
     /**
-     * Build full TYPO3 URL for the passed page ID and OXID lang ID. The lang ID is mapped to the
-     * corresponding TYPO3 language ID.
+     * Build full CMS URL for the passed page ID and OXID lang ID. The lang ID is mapped to the
+     * corresponding CMS language ID.
      *
-     * @param int           $sPageId    TYPO3 page ID
+     * @param int           $sPageId    Page ID
      * @param int|string    $sLang      OXID language ID/Abbrev.
      *
      * @return string
      */
     public static function getFullPageUrlById ( $sPageId, $sLang = null )
     {
+        // This checks for empty values but also makes sure the passed page ID isn't just 0; in other words,
+        // this checks for empty strings, null, false, etc.
+        if ( empty($sPageId) && !is_numeric($sPageId) ) {
+            return false;
+        }
+        
         $sBaseUrl       = self::getConfiguredSourceBaseUrl($sLang);
         $sBaseUrlSsl    = self::getConfiguredSourceSslBaseUrl($sLang);
         $sIdParam       = self::getConfiguredSourceIdParam($sLang);
@@ -218,41 +229,45 @@ class CmsxidUtils
         // We know nothing about caching here, so we always use the full URL.
         $sUrl = $oPage->getFullUrl();
         
-        $curl_handle = curl_init();
-        curl_setopt( $curl_handle, CURLOPT_URL, $sUrl );
-        curl_setopt( $curl_handle, CURLOPT_FOLLOWLOCATION, 1 );
-        curl_setopt( $curl_handle, CURLOPT_RETURNTRANSFER, 1 );
-        // curl_setopt( $curl_handle, CURLOPT_HEADER, 0 );
-        
-        // For POST
-        if ( $blPost ) {
-            curl_setopt( $curl_handle, CURLOPT_POST, $blPost );
-            
-            curl_setopt( $curl_handle, CURLOPT_HTTPHEADER, array(
-                'Content-Type: application/x-www-form-urlencoded'
-            ) );
-            // curl_setopt( $curl_handle, CURLOPT_POSTFIELDS, 
-                // 'code_url=' . urlencode($sTmpFileUrl)
-                // . '&output_info=compiled_code'
-                // . '&compilation_level=SIMPLE_OPTIMIZATIONS'
-                // . '&output_format=text'
-            // );
-        }
-        
         $oResult = new stdClass();
+        $oResult->content   = '';
+        $oResult->info      = array();
         
-        $oResult->content   = curl_exec( $curl_handle );
-        $oResult->info      = curl_getinfo( $curl_handle );
-        
-        // $sContent = curl_exec( $curl_handle );
-        // $aInfo    = curl_getinfo( $curl_handle );
-        
-        curl_close( $curl_handle );
-        
-        // var_dump("info: ", $aResult['info']);
-        
-        if ( $oResult->info['http_code'] != 200 ) {
-            $oResult->content = '';
+        if ( $sUrl ) {
+            $curl_handle = curl_init();
+            curl_setopt( $curl_handle, CURLOPT_URL, $sUrl );
+            curl_setopt( $curl_handle, CURLOPT_FOLLOWLOCATION, 1 );
+            curl_setopt( $curl_handle, CURLOPT_RETURNTRANSFER, 1 );
+            // curl_setopt( $curl_handle, CURLOPT_HEADER, 0 );
+            
+            // For POST
+            if ( $blPost ) {
+                curl_setopt( $curl_handle, CURLOPT_POST, $blPost );
+                
+                curl_setopt( $curl_handle, CURLOPT_HTTPHEADER, array(
+                    'Content-Type: application/x-www-form-urlencoded'
+                ) );
+                // curl_setopt( $curl_handle, CURLOPT_POSTFIELDS, 
+                    // 'code_url=' . urlencode($sTmpFileUrl)
+                    // . '&output_info=compiled_code'
+                    // . '&compilation_level=SIMPLE_OPTIMIZATIONS'
+                    // . '&output_format=text'
+                // );
+            }
+            
+            $oResult->content   = curl_exec( $curl_handle );
+            $oResult->info      = curl_getinfo( $curl_handle );
+            
+            // $sContent = curl_exec( $curl_handle );
+            // $aInfo    = curl_getinfo( $curl_handle );
+            
+            curl_close( $curl_handle );
+            
+            // var_dump("info: ", $aResult['info']);
+            
+            if ( $oResult->info['http_code'] != 200 ) {
+                $oResult->content = '';
+            }
         }
         
         return $oResult;
