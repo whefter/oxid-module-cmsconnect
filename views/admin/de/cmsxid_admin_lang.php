@@ -8,8 +8,10 @@ $aLang = array(
 'cmsxid_setup'                                          => 'CMSxid',
 'cmsxid_setup_main'                                     => 'CMSxid-Einstellungen',
 
-'CMSXID_ADMIN_SETTINGS_DEMO_PATH'                       => 'Vorschau Pfad-basierter Abruf',
-'CMSXID_ADMIN_SETTINGS_DEMO_ID'                         => 'Vorschau ID-basierter Abruf',
+'CMSXID_ADMIN_SETTINGS_SOURCE'                          => 'Quelle',
+'CMSXID_ADMIN_SETTINGS_DEMO'                            => 'Vorschau',
+'CMSXID_ADMIN_SETTINGS_DEMO_PATH'                       => 'Pfad-basierter Abruf',
+'CMSXID_ADMIN_SETTINGS_DEMO_ID'                         => 'ID-basierter Abruf',
 'CMSXID_ADMIN_SETTINGS_DEMO_EXAMPLE'                    => 'beispiel',
 
 'CMSXID_ADMIN_SETTINGS_aCmsxidBaseUrls'                 => 'Basis-URL zur CMS-Installation',

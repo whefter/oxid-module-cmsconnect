@@ -28,24 +28,30 @@
     <input type="hidden" name="language" value="[{ $actlang }]">
     
     <h1>
-        [{ oxmultilang ident="cmsxid_setup" }]
+        [{ oxmultilang ident="cmsxid_setup_main" }]
     </h1>
     
 <script type="text/javascript">
 (function ($) {
     var displayDemos = function () {
         $('.demo').each( function () {
-            $el     = $(this);
-            $parent = $el.closest('fieldset');
+            var $el     = $(this),
+                $parent = $el.closest("fieldset[class!='demo']");
             
-            sBaseUrl    = $("[name*='aCmsxidBaseUrls']", $parent).val();
-            sPagePath   = $("[name*='aCmsxidPagePaths']", $parent).val();
-            sIdParam    = $("[name*='aCmsxidIdParams']", $parent).val();
-            sLangParam  = $("[name*='aCmsxidLangParams']", $parent).val();
-            sParams     = $("[name*='aCmsxidParams']", $parent).val();
+            var sBaseUrl    = $("[name*='aCmsxidBaseUrls']", $parent).val(),
+                sPagePath   = $("[name*='aCmsxidPagePaths']", $parent).val(),
+                sIdParam    = $("[name*='aCmsxidIdParams']", $parent).val(),
+                sLangParam  = $("[name*='aCmsxidLangParams']", $parent).val(),
+                sParams     = $("[name*='aCmsxidParams']", $parent).val();
             
-            $('.path span', $el).text( sBaseUrl + '/' + sPagePath + '/[{ oxmultilang ident="CMSXID_ADMIN_SETTINGS_DEMO_EXAMPLE" }]/?' + sParams );
-            $('.id span', $el).text( sBaseUrl + '/?' + sIdParam + '=123&' + sLangParam + '&' + sParams );
+            var sPathUrl    = sBaseUrl + '/' + sPagePath + '/[{ oxmultilang ident="CMSXID_ADMIN_SETTINGS_DEMO_EXAMPLE" }]/?' + sParams,
+                sIdUrl      = sBaseUrl + '/?' + sIdParam + '=123&' + sLangParam + '&' + sParams;
+            
+            sPathUrl    = sPathUrl.replace(/\/+/g, '/').replace(/^([\w-]+:)\/(\w)/, '$1//$2').replace(/[?&]$/, '');
+            sIdUrl      = sIdUrl.replace(/\/+/g, '/').replace(/^([\w-]+:)\/(\w)/, '$1//$2').replace(/[?&]$/, '');
+            
+            $('.path td:last-child', $el).text( sPathUrl );
+            $('.id td:last-child',   $el).text( sIdUrl );
         } );
     }
     
@@ -58,24 +64,49 @@
     
     [{ foreach from=$languages key=iLang item=oLang }]
         <fieldset>
-            <legend>[{ $oLang->name }]</legend>
-            <div class="demo">
-                <p class="path">
-                    [{ oxmultilang ident="CMSXID_ADMIN_SETTINGS_DEMO_PATH" }]:
-                    <span></span>
-                </p>
-                <p class="id">
-                    [{ oxmultilang ident="CMSXID_ADMIN_SETTINGS_DEMO_ID" }]:
-                    <span></span>
-                </p>
-            </div>
+            <legend>
+                [{ oxmultilang ident="CMSXID_ADMIN_SETTINGS_SOURCE" }]:
+                <b>
+                    [{ $oLang->name }]
+                </b>
+            </legend>
+            
+            <br />
+            
+            <fieldset class="demo">
+                <legend>
+                    <b>
+                        [{ oxmultilang ident="CMSXID_ADMIN_SETTINGS_DEMO" }]
+                    </b>
+                </legend>
+                
+                <table>
+                    <tr class="path">
+                        <td>
+                            [{ oxmultilang ident="CMSXID_ADMIN_SETTINGS_DEMO_PATH" }]:
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                    <tr class="id">
+                        <td>
+                            [{ oxmultilang ident="CMSXID_ADMIN_SETTINGS_DEMO_ID" }]:
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                </table>
+            </fieldset>
+            
+            <br />
+            
             <table>
                 <tr>
                     <td valign="top" class="edittext">
                         [{ oxmultilang ident="CMSXID_ADMIN_SETTINGS_aCmsxidBaseUrls" }]: 
                     </td>
                     <td valign="top" class="edittext">
-                        <input type="text" name="editval[aCmsxidBaseUrls][[{ $iLang }]]" value="[{ $aCmsxidBaseUrls.$iLang }]" />
+                        <input type="text" name="editval[aCmsxidBaseUrls][[{ $iLang }]]" value="[{ $aCmsxidBaseUrls.$iLang }]" size="75" />
                         [{ oxinputhelp ident="CMSXID_ADMIN_SETTINGS_aCmsxidBaseUrls_HELP" }]
                     </td>
                 </tr>
@@ -84,7 +115,7 @@
                         [{ oxmultilang ident="CMSXID_ADMIN_SETTINGS_aCmsxidBaseSslUrls" }]: 
                     </td>
                     <td valign="top" class="edittext">
-                        <input type="text" name="editval[aCmsxidBaseSslUrls][[{ $iLang }]]" value="[{ $aCmsxidBaseSslUrls.$iLang }]" />
+                        <input type="text" name="editval[aCmsxidBaseSslUrls][[{ $iLang }]]" value="[{ $aCmsxidBaseSslUrls.$iLang }]" size="75" />
                         [{ oxinputhelp ident="CMSXID_ADMIN_SETTINGS_aCmsxidBaseSslUrls_HELP" }]
                     </td>
                 </tr>
@@ -93,7 +124,7 @@
                         [{ oxmultilang ident="CMSXID_ADMIN_SETTINGS_aCmsxidPagePaths" }]: 
                     </td>
                     <td valign="top" class="edittext">
-                        <input type="text" name="editval[aCmsxidPagePaths][[{ $iLang }]]" value="[{ $aCmsxidPagePaths.$iLang }]" />
+                        <input type="text" name="editval[aCmsxidPagePaths][[{ $iLang }]]" value="[{ $aCmsxidPagePaths.$iLang }]" size="50" />
                         [{ oxinputhelp ident="CMSXID_ADMIN_SETTINGS_aCmsxidPagePaths_HELP" }]
                     </td>
                 </tr>
@@ -120,7 +151,7 @@
                         [{ oxmultilang ident="CMSXID_ADMIN_SETTINGS_aCmsxidParams" }]: 
                     </td>
                     <td valign="top" class="edittext">
-                        <input type="text" name="editval[aCmsxidParams][[{ $iLang }]]" value="[{ $aCmsxidParams.$iLang }]" />
+                        <input type="text" name="editval[aCmsxidParams][[{ $iLang }]]" value="[{ $aCmsxidParams.$iLang }]" size="50" />
                         [{ oxinputhelp ident="CMSXID_ADMIN_SETTINGS_aCmsxidParams_HELP" }]
                     </td>
                 </tr>
@@ -135,6 +166,7 @@
                 </tr>
             </table>
         </fieldset>
+        <br />
     [{ /foreach }]
     
     <fieldset>

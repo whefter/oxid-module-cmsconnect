@@ -8,8 +8,10 @@ $aLang = array(
 'cmsxid_setup'                                          => 'CMSxid',
 'cmsxid_setup_main'                                     => 'CMSxid settings',
 
-'CMSXID_ADMIN_SETTINGS_DEMO_PATH'                       => 'Preview path-based fetching:',
-'CMSXID_ADMIN_SETTINGS_DEMO_ID'                         => 'Preview ID-based fetching:',
+'CMSXID_ADMIN_SETTINGS_SOURCE'                          => 'Source',
+'CMSXID_ADMIN_SETTINGS_DEMO'                            => 'Preview',
+'CMSXID_ADMIN_SETTINGS_DEMO_PATH'                       => 'Path-based fetching',
+'CMSXID_ADMIN_SETTINGS_DEMO_ID'                         => 'ID-based fetching',
 'CMSXID_ADMIN_SETTINGS_DEMO_EXAMPLE'                    => 'example',
 
 'CMSXID_ADMIN_SETTINGS_aCmsxidBaseUrls'                 => 'Base URL to the CMS',
