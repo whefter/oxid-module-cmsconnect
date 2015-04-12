@@ -31,7 +31,7 @@ class cmsxid
      * @param string        $sPage          TYPO3 page
      * @param int|string    $sLang          OXID language ID/Abbrev.
      *
-     * @return SimpleXMLObject
+     * @return string
      */
     public function getContent ( $sSnippet, $sPage = null, $sLang = null )
     {
@@ -52,7 +52,7 @@ class cmsxid
      * @param int           $sPageId        TYPO3 page ID
      * @param int|string    $sLang          OXID language ID/Abbrev.
      *
-     * @return SimpleXMLObject
+     * @return string
      */
     public function getContentById ( $sSnippet, $sPageId, $sLang = null )
     {
@@ -503,6 +503,30 @@ class cmsxid
         $sKey = md5($sUrl);
         
         self::$_aSessionCache[$sKey] = $oResult;
+    }
+    
+    /**
+     * Public access to sanitizePageTitle helper function
+     *
+     * @param string    $sUrl   Page page to sanitize
+     *
+     * @return string
+     */
+    public function sanitizePagePath( $sUrl )
+    {
+        return CmsxidUtils::sanitizePageTitle( $sUrl );
+    }
+    
+    /**
+     * Public access to rewriteContentUrls helper function
+     *
+     * @param string    $sContent   Content to rewrite URLs in
+     *
+     * @return string
+     */
+    public function rewriteContentUrls($sContent)
+    {
+        return CmsxidUtils::rewriteContentUrls( $sContent );
     }
     
     /**
