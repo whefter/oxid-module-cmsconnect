@@ -28,8 +28,8 @@ class cmsxid
      * page and the requested OXID language ID
      *
      * @param string        $sSnippet       Snippet name
-     * @param string        $sPage          TYPO3 page
-     * @param int|string    $sLang          OXID language ID/Abbrev.
+     * @param string        $sPage          TYPO3 page. When omitted, CMSxid will attempt to determine from current SEO page.
+     * @param int|string    $sLang          OXID language ID/abbreviation.
      *
      * @return string
      */
@@ -50,7 +50,7 @@ class cmsxid
      *
      * @param string        $sSnippet       Snippet name
      * @param int           $sPageId        TYPO3 page ID
-     * @param int|string    $sLang          OXID language ID/Abbrev.
+     * @param int|string    $sLang          OXID language ID/abbreviation.
      *
      * @return string
      */
@@ -69,7 +69,7 @@ class cmsxid
      *
      * @return string
      */
-    public function _getContent ( $oPage, $sSnippet )
+    protected function _getContent ( $oPage, $sSnippet )
     {
         $oXml = $this->_getXmlByPage( $oPage );
         
@@ -91,16 +91,16 @@ class cmsxid
     }
     
     /**
-     * Returns an array with the text content of all content columns for the passed TYPO3 page path and OXID language ID.
-     * Can be forced to return all columns by setting $blOnlyContentColumns to false
+     * Returns an array with the text content of all content nodes for the passed TYPO3 page path and OXID language ID.
+     * Specific nodes can be returned by passing the $aNodes argument.
      *
-     * @param string        $sPage                  TYPO3 page path
-     * @param int|string    $sLang                  OXID language ID/Abbrev.
-     * @param bool          $blOnlyContentColumns   Only return actual content columns (true by default)
+     * @param string        $sPage                  TYPO3 page. When omitted, CMSxid will attempt to determine from current SEO page.
+     * @param int|string    $sLang                  OXID language ID/abbreviation.
+     * @param string[]      $aNodes                 List of nodes names to return (empty array for all: default)
      *
      * @return string[]
      */
-    public function getContentArray ( $sPage = null, $sLang = null, $blOnlyContentColumns = true )
+    public function getContentArray ( $sPage = null, $sLang = null, $aNodes = array() )
     {
         if ( $sPage === null ) {
             $sPage = CmsxidUtils::getCurrentSeoPage();
@@ -108,36 +108,47 @@ class cmsxid
         
         $oPage = CmsxidPathPage::getInstance($sPage, $sLang);
         
-        return $this->_getContentArray( $oPage, $blOnlyContentColumns );
+        return $this->_getContentArray( $oPage, $aNodes );
     }
     
     /**
-     * Returns an array with the text content of all content columns for the passed TYPO3 page ID and OXID language ID.
-     * Can be forced to return all columns by setting $blOnlyContentColumns to false
+     * Returns an array with the text content of all content nodes for the passed TYPO3 page ID and OXID language ID.
+     * Specific nodes can be returned by passing the $aNodes argument.
      *
      * @param int           $sPageId                TYPO3 page ID
-     * @param int|string    $sLang                  OXID language ID/Abbrev.
-     * @param bool          $blOnlyContentColumns   Only return actual content columns (true by default)
+     * @param int|string    $sLang                  OXID language ID/abbreviation.
+     * @param string[]      $aNodes                 List of nodes names to return (empty array for all: default)
      *
      * @return string[]
      */
-    public function getContentArrayById ( $sPageId, $sLang = null, $blOnlyContentColumns = true )
+    public function getContentArrayById ( $sPageId, $sLang = null, $aNodes = array() )
     {
         $oPage = CmsxidIdPage::getInstance( $sPageId, $sLang );
         
-        return $this->_getContentArray( $oPage, $blOnlyContentColumns );
+        return $this->_getContentArray( $oPage, $aNodes );
     }
     
     /**
      * Internally processes the passed XML to extract the snippet contents
      *
      * @param CmsxidPage    $oPage                  Page object
-     * @param bool          $blOnlyContentColumns   Only return actual content columns (true by default)
+     * @param string[]      $aNodes                 List of nodes names to return (empty array for all: default)
      *
      * @return string[]
      */
-    public function _getContentArray ( $oPage, $blOnlyContentColumns )
+    protected function _getContentArray ( $oPage, $aNodes )
     {
+        if ( !is_array($aNodes) && $aNodes !== false && $aNodes !== null ) {
+            return array();
+        }
+        
+        // Covers false and null as well
+        if ( empty($aNodes) ) {
+            $aNodes = array();
+        }
+        
+        var_dump(__METHOD__, $aNodes);
+        
         $oXml = $this->_getXmlByPage( $oPage );
         
         $aSnippets = array();
@@ -148,20 +159,15 @@ class cmsxid
             $aXpathSnippets = $oXml->xpath('/' . $oXml->getName()); 
             foreach ( $aXpathSnippets[0] as $sSnippet => $oSnippetXml ) {
                 // Let _getContent do the work here
-                $sSnippetContent = $this->_getContent( $oPage, $sSnippet );
-            
+                
                 switch ( $sSnippet ) {
-                    case 'left':
-                    case 'normal': case 'content':
-                    case 'right':
-                    case 'border':
-                        if ( $sSnippetContent ) {
-                            $aSnippets[$sSnippet] = $sSnippetContent;
-                        }
+                    case 'metadata';
                     break;
                     
                     default:
-                        if ( !$blOnlyContentColumns ) {
+                        if ( !count($aNodes) || in_array($sSnippet, $aNodes) ) {
+                            $sSnippetContent = $this->_getContent( $oPage, $sSnippet );
+                            
                             if ( $sSnippetContent ) {
                                 $aSnippets[$sSnippet] = $sSnippetContent;
                             }
@@ -177,8 +183,8 @@ class cmsxid
     /**
      * Returns the full XML object for the requested TYPO3 page and OXID language ID.
      *
-     * @param int           $sPage      TYPO3 page path
-     * @param int|string    $sLang      OXID language ID/Abbrev.
+     * @param int           $sPage      TYPO3 page. When omitted, CMSxid will attempt to determine from current SEO page.
+     * @param int|string    $sLang      OXID language ID/abbreviation.
      *
      * @return SimpleXMLObject
      */
@@ -197,7 +203,7 @@ class cmsxid
      * Returns the full XML object for the requested TYPO3 page ID and OXID language ID.
      *
      * @param int           $sPageId                TYPO3 page ID
-     * @param int|string    $sLang                  OXID language ID/Abbrev.
+     * @param int|string    $sLang                  OXID language ID/abbreviation.
      *
      * @return SimpleXMLObject
      */
@@ -216,7 +222,7 @@ class cmsxid
      *
      * @return SimpleXMLObject
      */
-    public function _getXml ( $oPage )
+    protected function _getXml ( $oPage )
     {
         $sXml = $this->_getXmlSourceByPage( $oPage );
         $sXml = CmsxidUtils::unwrapCDATA( $sXml );
@@ -231,8 +237,8 @@ class cmsxid
      * Returns an XML object for the requested snippet, TYPO3 page and OXID language ID
      *
      * @param string        $sSnippet   Snippet name
-     * @param int           $sPage      TYPO3 page path
-     * @param int|string    $sLang      OXID language ID/Abbrev.
+     * @param int           $sPage      TYPO3 page. When omitted, CMSxid will attempt to determine from current SEO page.
+     * @param int|string    $sLang      OXID language ID/abbreviation.
      *
      * @return SimpleXMLObject
      */
@@ -252,7 +258,7 @@ class cmsxid
      *
      * @param string        $sSnippet               Snippet name
      * @param int           $sPageId                TYPO3 page ID
-     * @param int|string    $sLang                  OXID language ID/Abbrev.
+     * @param int|string    $sLang                  OXID language ID/abbreviation.
      *
      * @return SimpleXMLObject
      */
@@ -272,7 +278,7 @@ class cmsxid
      *
      * @return SimpleXMLObject
      */
-    public function _getContentXml ( $oPage, $sSnippet )
+    protected function _getContentXml ( $oPage, $sSnippet )
     {
         $oXml = $this->_getXmlByPage( $oPage );
         
@@ -398,8 +404,8 @@ class cmsxid
      * requested TYPO3 page and the requested OXID language ID
      *
      * @param string        $sMetadata      Metadata field name
-     * @param string        $sPage          TYPO3 page
-     * @param int|string    $sLang          OXID language ID/Abbrev.
+     * @param string        $sPage          TYPO3 page. When omitted, CMSxid will attempt to determine from current SEO page.
+     * @param int|string    $sLang          OXID language ID/abbreviation.
      *
      * @return string
      */
@@ -420,7 +426,7 @@ class cmsxid
      *
      * @param string        $sMetadata      Metadata field name
      * @param int           $sPageId        TYPO3 page ID
-     * @param int|string    $sLang          OXID language ID/Abbrev.
+     * @param int|string    $sLang          OXID language ID/abbreviation.
      *
      * @return string
      */
@@ -544,9 +550,9 @@ class cmsxid
     /**
      * TOXID compatibility function
      */
-    public function getSnippetList( $sCustomPage = null, $blOnlyContentColumns = true )
+    public function getSnippetList( $sCustomPage = null, $blOnlyContentNodes = true )
     {
-        return $this->getContentArray( $sCustomPage, null, $blOnlyContentColumns );
+        return $this->getContentArray( $sCustomPage, null, $blOnlyContentNodes );
     }
     
     /**

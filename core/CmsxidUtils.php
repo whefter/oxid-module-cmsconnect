@@ -217,13 +217,11 @@ class CmsxidUtils
      * Returns an object containing the curl information array (->info) and, on success,
      * the page content (->content) for the requested URL.
      *
-     // * @param string    $sUrl           URL
      * @param CmsxidPage    $oPage      Page object
      * @param string        $blPost     Use POST instead of GET
      * 
      * @return object
      */
-    // public static function fetchXmlSourceFromRemote ( $sUrl, $blPost = false )
     public static function fetchXmlSourceFromRemote ( $oPage, $blPost = false )
     {
         // We know nothing about caching here, so we always use the full URL.
@@ -878,13 +876,13 @@ class CmsxidUtils
      * 
      * @return array
      */
-    public static function getSanitizedPassedHttpPostParameters ( $sLang )
-    {
-        $aParams = self::getPassedHttpPostParameters();
-        $aParams = self::sanitizeHttpParameterArray( $aParams, $sLang );
+    // public static function getSanitizedPassedHttpPostParameters ( $sLang )
+    // {
+        // $aParams = self::getPassedHttpPostParameters();
+        // $aParams = self::sanitizeHttpParameterArray( $aParams, $sLang );
         
-        return $aParams;
-    }
+        // return $aParams;
+    // }
     
     /**
      * Unsets the configured id / language parameters for the passed language in the passed parameter array

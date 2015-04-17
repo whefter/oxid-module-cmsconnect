@@ -14,6 +14,7 @@
  * [{ cmsxid_load page="service/legal_information" content="normal" lang=2 }]
  * [{ cmsxid_load page="service/legal_information" content="normal" lang="de" }]
  * [{ cmsxid_load page="service/legal_information" content="normal" lang="de" assign="sLegalInfoContent" }]
+ * [{ cmsxid_load page="service/legal_information" nodes="left,right" }]
  *
  * [{ cmsxid_load id=213 content="normal" }]
  * [{ cmsxid_load id=213 content="normal" lang="de" }]
@@ -31,15 +32,21 @@ function smarty_function_cmsxid_load( $aParams, &$oSmarty )
     $oCMSxid = oxRegistry::get('oxViewConfig')->getCMSxid();
     
     // Check requested language
-    $sLang =    ( array_key_exists('lang', $aParams) && $aParams['lang'] !== false ) 
-                    ? $aParams['lang']
-                    : null
-            ;
+    $sLang      =    ( array_key_exists('lang', $aParams) && $aParams['lang'] !== false ) 
+                        ? $aParams['lang']
+                        : null
+                ;
     
     // Check requested content snippet (specific or all)
-    $sContent =     ( array_key_exists('content', $aParams) && $aParams['content'] )
+    $sContent   =     ( array_key_exists('content', $aParams) && $aParams['content'] )
                         ? $aParams['content']
                         : ''
+                ;
+    
+    // Check for specific nodes
+    $aNodes     =     ( array_key_exists('nodes', $aParams) && $aParams['nodes'] )
+                        ? explode(',', $aParams['nodes'])
+                        : array()
                 ;
                 
     $blXml = ( array_key_exists('type', $aParams) && $aParams['type'] == 'xml' );
@@ -65,7 +72,7 @@ function smarty_function_cmsxid_load( $aParams, &$oSmarty )
                         )
                     :   (   $sContent
                                 ? $oCMSxid->{ 'getContent' . $sFunctionSuffix }( $sContent, $sPageIdentifier, $sLang )
-                                : $oCMSxid->{ 'getContentArray' . $sFunctionSuffix }( $sPageIdentifier, $sLang )
+                                : $oCMSxid->{ 'getContentArray' . $sFunctionSuffix }( $sPageIdentifier, $sLang, $aNodes )
                         )
                 ;
     

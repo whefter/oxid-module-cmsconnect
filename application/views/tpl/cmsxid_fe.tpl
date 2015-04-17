@@ -1,13 +1,13 @@
 [{ cmsxid_load content="navigation" assign="sNavigation" }]
-[{capture append="oxidBlock_sidebar"}]
+[{ capture append="oxidBlock_sidebar" }]
     [{ if $sNavigation }]
         <div class="cms-navigation tree">
             [{ $sNavigation }]
         </div>
     [{ /if }]
-[{/capture}]
+[{ /capture }]
 
-[{capture append="oxidBlock_content"}]
+[{ capture append="oxidBlock_content" }]
     [{ cmsxid_load content="breadcrumb" assign="sBreadcrumb" }]
     [{ if $sBreadcrumb }]
         <div id="cms-breadcrumb-wrap">
@@ -18,7 +18,7 @@
     [{ /if }]
     
     <div class="cms-content">
-        [{ cmsxid_load assign="aCmsContent" }]
+        [{ cmsxid_load nodes="left,content,right,border" assign="aCmsContent" }]
         [{ assign var="iSnippetCount" value=$aCmsContent|@count }]
         
         [{ foreach from=$aCmsContent item=sSnippet name=fCmsSnippets }]
@@ -28,7 +28,7 @@
         [{ /foreach }]
     </div>
     
-    [{insert name="oxid_tracker" title=$template_title }]
-[{/capture}]
+    [{ insert name="oxid_tracker" title=$template_title }]
+[{ /capture }]
 
-[{include file="layout/page.tpl" sidebar=$sNavigation}]  
+[{ include file="layout/page.tpl" sidebar=$sNavigation }]  
