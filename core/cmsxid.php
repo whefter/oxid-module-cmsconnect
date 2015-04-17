@@ -147,8 +147,6 @@ class cmsxid
             $aNodes = array();
         }
         
-        var_dump(__METHOD__, $aNodes);
-        
         $oXml = $this->_getXmlByPage( $oPage );
         
         $aSnippets = array();
