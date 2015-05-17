@@ -107,7 +107,7 @@ class cmsxid
         }
         
         $oPage = CmsxidPathPage::getInstance($sPage, $sLang);
-        
+
         return $this->_getContentArray( $oPage, $aNodes );
     }
     
@@ -550,7 +550,19 @@ class cmsxid
      */
     public function getSnippetList( $sCustomPage = null, $blOnlyContentNodes = true )
     {
-        return $this->getContentArray( $sCustomPage, null, $blOnlyContentNodes );
+        $aNodes = array();
+        
+        if ( $blOnlyContentNodes ) {
+            // Default TYPO3 column names
+            $aNodes = array(
+                'left',
+                'normal', 'content',
+                'right',
+                'border',
+            );
+        }
+        
+        return $this->getContentArray( $sCustomPage, null, $aNodes );
     }
     
     /**
