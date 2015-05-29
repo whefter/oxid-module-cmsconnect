@@ -2,7 +2,7 @@
 /**
  * @author      William Hefter <william@whefter.de>
  * @link        http://www.whefter.de
- * @copyright   2014 William Hefter
+ * @copyright   2014-2015 William Hefter
  */
 
 /**
@@ -26,7 +26,6 @@ class cmsxid
      */
     public function getContent ( $sSnippet, $sPage = null, $sLang = null )
     {
-        // var_dump(__METHOD__, func_get_args());
         if ( $sPage === null ) {
             $sPage = CmsxidUtils::getCurrentSeoPage();
         }
@@ -63,6 +62,10 @@ class cmsxid
      */
     protected function _getContent ( $oPage, $sSnippet )
     {
+        if ( false !== ($sDummyContent = $this->_getDummyContent($oPage, $sSnippet)) ) {
+            return $sDummyContent;
+        }
+        
         $oXml = $this->_getXmlByPage( $oPage );
         
         $sReturnSource = false;
@@ -130,13 +133,19 @@ class cmsxid
      */
     protected function _getContentArray ( $oPage, $aNodes )
     {
+        // Invalid parameter, return nothing.
+        // TODO: throw exception
         if ( !is_array($aNodes) && $aNodes !== false && $aNodes !== null ) {
             return array();
         }
         
-        // Covers false and null as well
+        // Default to return all nodes. Covers false and null as well.
         if ( empty($aNodes) ) {
             $aNodes = array();
+        }
+        
+        if ( false !== ($aDummyContentArray = $this->_getDummyContentArray($oPage, $aNodes)) ) {
+            return $aDummyContentArray;
         }
         
         $oXml = $this->_getXmlByPage( $oPage );
@@ -214,6 +223,10 @@ class cmsxid
      */
     protected function _getXml ( $oPage )
     {
+        if ( false !== ($oDummyXml = $this->_getDummyXml($oPage)) ) {
+            return $oDummyXml;
+        }
+
         $sXml = $this->_getXmlSourceByPage( $oPage );
         $sXml = CmsxidUtils::unwrapCDATA( $sXml );
         $sXml = CmsxidUtils::fixXmlSourceEntities( $sXml );
@@ -270,6 +283,10 @@ class cmsxid
      */
     protected function _getContentXml ( $oPage, $sSnippet )
     {
+        if ( false !== ($oDummyContentXml = $this->_getDummyContentXml($oPage, $sSnippet)) ) {
+            return $oDummyContentXml;
+        }
+        
         $oXml = $this->_getXmlByPage( $oPage );
         
         $oReturnXml = false;
@@ -437,6 +454,10 @@ class cmsxid
      */
     protected function _getPageMetadataByPage ( $oPage, $sMetadata )
     {
+        if ( false !== ($sDummyMetadata = $this->_getDummyMetadata($oPage, $sMetadata)) ) {
+            return $sDummyMetadata;
+        }
+        
         $oXml = $this->_getXmlByPage( $oPage );
         
         $sMetadataValue = false;
@@ -466,6 +487,103 @@ class cmsxid
         $sContent = CmsxidUtils::parseContentThroughSmarty( $sContent );
         
         return $sContent;
+    }
+    
+    /**
+     * Return dummy content
+     *
+     * @param CmsxidPage    $oPage      Page object
+     * @param string        $sSnippet   Snippet name
+     * 
+     * @return string
+     */
+    protected function _getDummyContent ( $oPage, $sSnippet )
+    {
+        if ( CmsxidUtils::getConfiguredDummyContentValue() ) {
+            return CmsxidUtils::getDummyString($oPage, $sSnippet);
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * Return dummy content array
+     *
+     * @param CmsxidPage    $oPage      Page object
+     * @param string        $aNodes     Snippet name
+     * 
+     * @return string
+     */
+    protected function _getDummyContentArray ( $oPage, $aNodes = array() )
+    {
+        if ( CmsxidUtils::getConfiguredDummyContentValue() ) {
+            if ( empty($aNodes) ) {
+                $aNodes = array(
+                    'left',
+                    'normal',
+                    'right',
+                    'border',
+                );
+            }
+            
+            $aContentArray = array();
+            
+            foreach ( $aNodes as $sSnippet ) {
+                $aContentArray[$sSnippet] = CmsxidUtils::getDummyString($oPage, $sSnippet);
+            }
+            
+            return $aContentArray;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * Return dummy XML
+     *
+     * @param CmsxidPage    $oPage      Page object
+     * 
+     * @return string
+     */
+    protected function _getDummyXml ( $oPage )
+    {
+        return $this->_getDummyContentXml($oPage, 'page');
+    }
+    
+    /**
+     * Return dummy content XML
+     *
+     * @param CmsxidPage    $oPage      Page object
+     * @param string        $sSnippet   Snippet name
+     * 
+     * @return string
+     */
+    protected function _getDummyContentXml ( $oPage, $sSnippet )
+    {
+        if ( CmsxidUtils::getConfiguredDummyContentValue() ) {
+            $sDummyString = CmsxidUtils::getDummyString($oPage, $sSnippet);
+            
+            return CmsxidUtils::getXmlObjectFromSource('<xml>' . $sDummyString . '</xml>');
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * Return dummy metadata
+     *
+     * @param CmsxidPage    $oPage      Page object
+     * @param string        $sMetadata  Metadata key
+     * 
+     * @return string
+     */
+    protected function _getDummyMetadata ( $oPage, $sMetadata )
+    {
+        if ( CmsxidUtils::getConfiguredDummyContentValue() ) {
+            return CmsxidUtils::getDummyString($oPage, $sMetadata);
+        } else {
+            return false;
+        }
     }
     
     /**

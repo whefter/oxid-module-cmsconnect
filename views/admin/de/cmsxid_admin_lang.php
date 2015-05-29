@@ -1,5 +1,4 @@
 <?php
-
 $sLangName  = "Deutsch";
 
 $aLang = array(
@@ -26,6 +25,8 @@ $aLang = array(
 'CMSXID_ADMIN_SETTINGS_aCmsxidSeoIdents'                => 'SEO-Schnipsel für OXID-URLs',
 'CMSXID_ADMIN_SETTINGS_iCmsxidCurlConnectTimeout'       => 'Connect-Timeout für cURL-Aufrufe in Sekunden (Standard: 1 s)',
 'CMSXID_ADMIN_SETTINGS_iCmsxidCurlExecuteTimeout'       => 'Execute-Timeout für cURL-Aufrufe in Sekunden (Standard: 3 s)',
+'CMSXID_ADMIN_SETTINGS_blCmsxidEnableDummyContent'      => 'Dummy-Content ausliefern',
+'CMSXID_ADMIN_SETTINGS_blCmsxidEnableDummyContent_HELP' => 'Es werden keine Inhalte mittels cURL abgerufen, sondern Platzhalter zurückgegeben. Für Debug-Zwecke gedacht.',
 
 'CMSXID_ADMIN_SETTINGS_blCmsxidLeaveUrls'               => 'URLs nicht umschreiben',
 

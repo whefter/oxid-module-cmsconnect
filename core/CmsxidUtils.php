@@ -2,7 +2,7 @@
 /**
  * @author      William Hefter <william@whefter.de>
  * @link        http://www.whefter.de
- * @copyright   2014 William Hefter
+ * @copyright   2014-2015 William Hefter
  */
 
 /**
@@ -430,8 +430,6 @@ class CmsxidUtils
     {
         $oXml = false;
         
-        // var_dump(htmlentities($sXml));
-        
         try {
             // $oXml = simplexml_load_string($sXml, null, LIBXML_NOCDATA);
             $oXml = simplexml_load_string($sXml);
@@ -709,6 +707,20 @@ class CmsxidUtils
         $mVal = $oxConfig->getShopConfVar('iCmsxidCurlExecuteTimeout', $oxConfig->getShopId(), 'module:cmsxid');
         
         return $mVal ?: 3;
+    }
+    
+    /**
+     * Configuration: return the configuration value for blCmsxidEnableDummyContent
+     * 
+     * @return bool
+     */
+    public static function getConfiguredDummyContentValue ()
+    {
+        $oxConfig = oxRegistry::getConfig();
+        
+        $mVal = $oxConfig->getShopConfVar('blCmsxidEnableDummyContent', $oxConfig->getShopId(), 'module:cmsxid');
+        
+        return $mVal ?: false;
     }
     
     /**
@@ -1007,5 +1019,18 @@ class CmsxidUtils
                 'results' => array(),
             );
         }
+    }
+    
+    /**
+     * Return a dummy string with a few page infos for debug purposes
+     *
+     * @param CmsxidPage    $oPage      Page object
+     * @param string        $sSnippet   Snippet name
+     * 
+     * @return string
+     */
+    public static function getDummyString ($oPage, $sSnippet)
+    {
+        return '<span class="cmsxid-dummy">Cmsxid dummy content for URL: ' . $oPage->getFullUrl() . ', argument: ' . $sSnippet . '</span>';
     }
 }

@@ -64,6 +64,10 @@ class cmsxid_setup_main extends oxAdminView
                 'type'      => 'str',
                 'global'    => false,
             ),
+        array(  'name'      => 'blCmsxidEnableDummyContent',
+                'type'      => 'bool',
+                'global'    => false,
+            ),
     );
 
     /**

@@ -2,7 +2,7 @@
 /**
  * @author      William Hefter <william@whefter.de>
  * @link        http://www.whefter.de
- * @copyright   2014 William Hefter
+ * @copyright   2014-2015 William Hefter
  */
 
 /**

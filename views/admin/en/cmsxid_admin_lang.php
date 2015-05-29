@@ -1,5 +1,4 @@
 <?php
-
 $sLangName  = "English";
 
 $aLang = array(
@@ -26,6 +25,8 @@ $aLang = array(
 'CMSXID_ADMIN_SETTINGS_aCmsxidSeoIdents'                => 'SEO-Snippet for OXID URLs',
 'CMSXID_ADMIN_SETTINGS_iCmsxidCurlConnectTimeout'       => 'Connect-Timeout for cURL calls in seconds (default: 1 s)',
 'CMSXID_ADMIN_SETTINGS_iCmsxidCurlExecuteTimeout'       => 'Execute-Timeout for cURL calls in seconds (default: 3 s)',
+'CMSXID_ADMIN_SETTINGS_blCmsxidEnableDummyContent'      => 'Server dummy content',
+'CMSXID_ADMIN_SETTINGS_blCmsxidEnableDummyContent_HELP' => 'Nothing is fetched from remote servers, and dummy content is returned by all functions. For debug purposes.',
 
 'CMSXID_ADMIN_SETTINGS_blCmsxidLeaveUrls'               => 'Do not rewrite URLs',
 
