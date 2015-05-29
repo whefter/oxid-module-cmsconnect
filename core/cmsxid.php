@@ -15,15 +15,6 @@
 class cmsxid
 {
     /**
-     * "Level one" cache. Pages retrieved from remote or from cache are
-     * cached here to reduce the hits to file cache or to prevent multiple
-     * fetches of a remote page if the cache isn't used.
-     *
-     * @var CmsxidResult[]
-     */
-    protected static $_aSessionCache = array();
-    
-    /**
      * Returns the processed text content of the requested snippet on the requested TYPO3
      * page and the requested OXID language ID
      *
@@ -35,6 +26,7 @@ class cmsxid
      */
     public function getContent ( $sSnippet, $sPage = null, $sLang = null )
     {
+        // var_dump(__METHOD__, func_get_args());
         if ( $sPage === null ) {
             $sPage = CmsxidUtils::getCurrentSeoPage();
         }
@@ -358,7 +350,7 @@ class cmsxid
         $sUrl       = $oPage->getFullUrl();
         
         // var_dump("Retrieving " . $sSessionCacheUrl . " from session cache");
-        $oResult    = $this->_getResultFromSessionCache( $sSessionCacheUrl );
+        $oResult    = CmsxidUtils::getResultFromSessionCache( $sSessionCacheUrl );
         
         // No result so far and caching enabled for this page, attempt to read from file cache
         if ( !is_object($oResult) && $blUseFileCache ) {
@@ -387,7 +379,7 @@ class cmsxid
         
         // Save to session cache
         // var_dump("Saving " . $sSessionCacheUrl . " to session cache");
-        $this->_saveResultToSessionCache( $sSessionCacheUrl, $oResult );
+        CmsxidUtils::saveResultToSessionCache( $sSessionCacheUrl, $oResult );
         
         // Return an empty string so as not to break anything upstream
         $sXml = is_object($oResult) ? $oResult->content : '';
@@ -474,39 +466,6 @@ class cmsxid
         $sContent = CmsxidUtils::parseContentThroughSmarty( $sContent );
         
         return $sContent;
-    }
-    
-    /**
-     * Returns the result object associated with a URL
-     *
-     * @param string    $sUrl       Full URL of the page
-     * 
-     * @return CmsxidResult
-     */
-    protected function _getResultFromSessionCache ( $sUrl )
-    {
-        $sKey = md5($sUrl);
-        
-        if ( array_key_exists($sKey, self::$_aSessionCache) ) {
-            return self::$_aSessionCache[$sKey];
-        }
-        
-        return false;
-    }
-    
-    /**
-     * Returns the result object associated with a URL
-     *
-     * @param string        $sUrl           Full URL of the page
-     * @param CmsxidResult  $oResult        Result object
-     * 
-     * @return void
-     */
-    protected function _saveResultToSessionCache ( $sUrl, $oResult )
-    {
-        $sKey = md5($sUrl);
-        
-        self::$_aSessionCache[$sKey] = $oResult;
     }
     
     /**

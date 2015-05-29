@@ -24,6 +24,8 @@ $aLang = array(
 'CMSXID_ADMIN_SETTINGS_aCmsxidParams'                   => 'Zusätzliche Query-Parameter',
 'CMSXID_ADMIN_SETTINGS_aCmsxidSearchUrls'               => 'Such-URL',
 'CMSXID_ADMIN_SETTINGS_aCmsxidSeoIdents'                => 'SEO-Schnipsel für OXID-URLs',
+'CMSXID_ADMIN_SETTINGS_iCmsxidCurlConnectTimeout'       => 'Connect-Timeout für cURL-Aufrufe in Sekunden (Standard: 1 s)',
+'CMSXID_ADMIN_SETTINGS_iCmsxidCurlExecuteTimeout'       => 'Execute-Timeout für cURL-Aufrufe in Sekunden (Standard: 3 s)',
 
 'CMSXID_ADMIN_SETTINGS_blCmsxidLeaveUrls'               => 'URLs nicht umschreiben',
 

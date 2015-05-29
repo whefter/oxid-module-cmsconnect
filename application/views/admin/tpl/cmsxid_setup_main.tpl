@@ -198,6 +198,24 @@
                     [{ oxinputhelp ident="CMSXID_ADMIN_SETTINGS_iCmsxidTtlDefaultRnd_HELP" }]
                 </td>
             </tr>
+            <tr>
+                <td class="edittext">
+                    [{ oxmultilang ident="CMSXID_ADMIN_SETTINGS_iCmsxidCurlConnectTimeout" }]:
+                </td>
+                <td class="edittext">
+                    <input type="text" name="editval[iCmsxidCurlConnectTimeout]" value="[{ $iCmsxidCurlConnectTimeout }]" size="5" />%
+                    [{ oxinputhelp ident="CMSXID_ADMIN_SETTINGS_iCmsxidCurlConnectTimeout_HELP" }]
+                </td>
+            </tr>
+            <tr>
+                <td class="edittext">
+                    [{ oxmultilang ident="CMSXID_ADMIN_SETTINGS_iCmsxidCurlExecuteTimeout" }]:
+                </td>
+                <td class="edittext">
+                    <input type="text" name="editval[iCmsxidCurlExecuteTimeout]" value="[{ $iCmsxidCurlExecuteTimeout }]" size="5" />%
+                    [{ oxinputhelp ident="CMSXID_ADMIN_SETTINGS_iCmsxidCurlExecuteTimeout_HELP" }]
+                </td>
+            </tr>
         </table>
     </fieldset>
     

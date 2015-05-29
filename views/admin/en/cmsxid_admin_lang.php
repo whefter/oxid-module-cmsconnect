@@ -24,10 +24,12 @@ $aLang = array(
 'CMSXID_ADMIN_SETTINGS_aCmsxidParams'                   => 'Additional query parameters',
 'CMSXID_ADMIN_SETTINGS_aCmsxidSearchUrls'               => 'Search URL',
 'CMSXID_ADMIN_SETTINGS_aCmsxidSeoIdents'                => 'SEO-Snippet for OXID URLs',
+'CMSXID_ADMIN_SETTINGS_iCmsxidCurlConnectTimeout'       => 'Connect-Timeout for cURL calls in seconds (default: 1 s)',
+'CMSXID_ADMIN_SETTINGS_iCmsxidCurlExecuteTimeout'       => 'Execute-Timeout for cURL calls in seconds (default: 3 s)',
 
 'CMSXID_ADMIN_SETTINGS_blCmsxidLeaveUrls'               => 'Do not rewrite URLs',
 
-'CMSXID_ADMIN_SETTINGS_iCmsxidTtlDefault'               => 'Cache lifetime (Default: 3600 s)',
+'CMSXID_ADMIN_SETTINGS_iCmsxidTtlDefault'               => 'Cache lifetime (default: 3600 s)',
 'CMSXID_ADMIN_SETTINGS_iCmsxidTtlDefaultRnd'            => 'Randomize cache lifetime by',
 'CMSXID_ADMIN_SETTINGS_iCmsxidTtlDefaultRnd_HELP'       => 'To prevent large amounts of request being sent to the CMS when the cache expires in shops with numerous CMSxid calls, the cache lifetime should be randomized for each content object. A randomization of 10% means a cache lifetime of 600 seconds would result in effective lifetimes between 540 and 660 seconds.',
 

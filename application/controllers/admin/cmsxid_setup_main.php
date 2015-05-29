@@ -56,6 +56,14 @@ class cmsxid_setup_main extends oxAdminView
                 'type'      => 'str',
                 'global'    => false,
             ),
+        array(  'name'      => 'iCmsxidCurlConnectTimeout',
+                'type'      => 'str',
+                'global'    => false,
+            ),
+        array(  'name'      => 'iCmsxidCurlExecuteTimeout',
+                'type'      => 'str',
+                'global'    => false,
+            ),
     );
 
     /**

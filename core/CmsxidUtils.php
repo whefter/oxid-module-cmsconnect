@@ -14,6 +14,15 @@ class CmsxidUtils
     const TYPE_IDENTIFIER_ID    = 2;
     
     /**
+     * "Level one" cache. Pages retrieved from remote or from cache are
+     * cached here to reduce the hits to file cache or to prevent multiple
+     * fetches of a remote page if the cache isn't used.
+     *
+     * @var CmsxidResult[]
+     */
+    protected static $_aSessionCache = array();
+    
+    /**
      * GET/POST parameters that should never get passed along to 
      * the CMS (known to belong to OXID or simply troublesome)
      *
@@ -232,10 +241,15 @@ class CmsxidUtils
         $oResult->info      = array();
         
         if ( $sUrl ) {
+            // var_dump('Connect: ', self::getConfiguredCurlConnectTimeout());
+            // var_dump('Execute: ', self::getConfiguredCurlExecuteTimeout());
+            
             $curl_handle = curl_init();
-            curl_setopt( $curl_handle, CURLOPT_URL, $sUrl );
-            curl_setopt( $curl_handle, CURLOPT_FOLLOWLOCATION, 1 );
-            curl_setopt( $curl_handle, CURLOPT_RETURNTRANSFER, 1 );
+            curl_setopt( $curl_handle, CURLOPT_URL,             $sUrl );
+            curl_setopt( $curl_handle, CURLOPT_FOLLOWLOCATION,  1 );
+            curl_setopt( $curl_handle, CURLOPT_RETURNTRANSFER,  1 );
+            // curl_setopt( $curl_handle, CURLOPT_CONNECTTIMEOUT,  2 );
+            // curl_setopt( $curl_handle, CURLOPT_TIMEOUT,         1 );
             // curl_setopt( $curl_handle, CURLOPT_HEADER, 0 );
             
             // For POST
@@ -255,13 +269,12 @@ class CmsxidUtils
             
             $oResult->content   = curl_exec( $curl_handle );
             $oResult->info      = curl_getinfo( $curl_handle );
-            
-            // $sContent = curl_exec( $curl_handle );
-            // $aInfo    = curl_getinfo( $curl_handle );
+
+            // var_dump("<pre>errno: ", curl_error($curl_handle), "</pre>");
             
             curl_close( $curl_handle );
             
-            // var_dump("info: ", $aResult['info']);
+            // var_dump("<pre>info: ", $oResult->info, "</pre>");
             
             if ( $oResult->info['http_code'] != 200 ) {
                 $oResult->content = '';
@@ -641,7 +654,9 @@ class CmsxidUtils
      */
     public static function getConfiguredDefaultCacheTTL ()
     {
-        return oxRegistry::getConfig()->getShopConfVar('iCmsxidTtlDefault');
+        $oxConfig = oxRegistry::getConfig();
+        
+        return $oxConfig::getConfig()->getShopConfVar('iCmsxidTtlDefault', $oxConfig->getShopId(), 'module:cmsxid');
     }
     
     /**
@@ -651,7 +666,9 @@ class CmsxidUtils
      */
     public static function getConfiguredDefaultCacheTTLRandomization ()
     {
-        return oxRegistry::getConfig()->getShopConfVar('iCmsxidTtlDefaultRnd');
+        $oxConfig = oxRegistry::getConfig();
+        
+        return $oxConfig::getConfig()->getShopConfVar('iCmsxidTtlDefaultRnd', $oxConfig->getShopId(), 'module:cmsxid');
     }
     
     /**
@@ -661,7 +678,37 @@ class CmsxidUtils
      */
     public static function getConfiguredNoUrlRewriteSetting ()
     {
-        return oxRegistry::getConfig()->getShopConfVar('blCmsxidLeaveUrls');
+        $oxConfig = oxRegistry::getConfig();
+        
+        return $oxConfig->getShopConfVar('blCmsxidLeaveUrls', $oxConfig->getShopId(), 'module:cmsxid');
+    }
+    
+    /**
+     * Configuration: return configured cURL connect timeout and default to 1
+     * 
+     * @return int
+     */
+    public static function getConfiguredCurlConnectTimeout ()
+    {
+        $oxConfig = oxRegistry::getConfig();
+        
+        $mVal = $oxConfig->getShopConfVar('iCmsxidCurlConnectTimeout', $oxConfig->getShopId(), 'module:cmsxid');
+        
+        return $mVal ?: 1;
+    }
+    
+    /**
+     * Configuration: return configured cURL fetch timeout and default to 3
+     * 
+     * @return int
+     */
+    public static function getConfiguredCurlExecuteTimeout ()
+    {
+        $oxConfig = oxRegistry::getConfig();
+        
+        $mVal = $oxConfig->getShopConfVar('iCmsxidCurlExecuteTimeout', $oxConfig->getShopId(), 'module:cmsxid');
+        
+        return $mVal ?: 3;
     }
     
     /**
@@ -674,13 +721,13 @@ class CmsxidUtils
         $oxLang     = oxRegistry::getLang();
         $oxConfig   = oxRegistry::getConfig();
         
-        $aCmsxidBaseUrls    = $oxConfig->getShopConfVar('aCmsxidBaseUrls');
-        $aCmsxidBaseSslUrls = $oxConfig->getShopConfVar('aCmsxidBaseSslUrls');
-        $aCmsxidPagePaths   = $oxConfig->getShopConfVar('aCmsxidPagePaths');
-        $aCmsxidParams      = $oxConfig->getShopConfVar('aCmsxidParams');
-        $aCmsxidIdParams    = $oxConfig->getShopConfVar('aCmsxidIdParams');
-        $aCmsxidLangParams  = $oxConfig->getShopConfVar('aCmsxidLangParams');
-        $aCmsxidSeoIdents   = $oxConfig->getShopConfVar('aCmsxidSeoIdents');
+        $aCmsxidBaseUrls    = $oxConfig->getShopConfVar('aCmsxidBaseUrls',      $oxConfig->getShopId(), 'module:cmsxid');
+        $aCmsxidBaseSslUrls = $oxConfig->getShopConfVar('aCmsxidBaseSslUrls',   $oxConfig->getShopId(), 'module:cmsxid');
+        $aCmsxidPagePaths   = $oxConfig->getShopConfVar('aCmsxidPagePaths',     $oxConfig->getShopId(), 'module:cmsxid');
+        $aCmsxidParams      = $oxConfig->getShopConfVar('aCmsxidParams',        $oxConfig->getShopId(), 'module:cmsxid');
+        $aCmsxidIdParams    = $oxConfig->getShopConfVar('aCmsxidIdParams',      $oxConfig->getShopId(), 'module:cmsxid');
+        $aCmsxidLangParams  = $oxConfig->getShopConfVar('aCmsxidLangParams',    $oxConfig->getShopId(), 'module:cmsxid');
+        $aCmsxidSeoIdents   = $oxConfig->getShopConfVar('aCmsxidSeoIdents',     $oxConfig->getShopId(), 'module:cmsxid');
         
         $aLanguages = $oxLang->getLanguageArray();
         $aSources = array();
@@ -909,5 +956,56 @@ class CmsxidUtils
         unset( $aParams[$sLangParam] );
         
         return $aParams;
+    }
+    
+    /**
+     * Returns the result object associated with a URL
+     *
+     * @param string    $sUrl       Full URL of the page
+     * 
+     * @return CmsxidResult
+     */
+    public static function getResultFromSessionCache ( $sUrl )
+    {
+        self::_initializeSessionCache();
+        
+        $sKey = md5($sUrl);
+        
+        if ( array_key_exists($sKey, self::$_aSessionCache['results']) ) {
+            return self::$_aSessionCache['results'][$sKey];
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Returns the result object associated with a URL
+     *
+     * @param string        $sUrl           Full URL of the page
+     * @param CmsxidResult  $oResult        Result object
+     * 
+     * @return void
+     */
+    public static function saveResultToSessionCache ( $sUrl, $oResult )
+    {
+        self::_initializeSessionCache();
+        
+        $sKey = md5($sUrl);
+        
+        self::$_aSessionCache['results'][$sKey] = $oResult;
+    }
+    
+    /**
+     * Initialize the session cache
+     * 
+     * @return bool
+     */
+    protected static function _initializeSessionCache ()
+    {
+        if ( empty(self::$_aSessionCache) ) {
+            self::$_aSessionCache = array(
+                'results' => array(),
+            );
+        }
     }
 }
