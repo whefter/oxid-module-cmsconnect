@@ -25,9 +25,11 @@ $aModule = array(
     ),
     
     'extend' => array(
+        'oxconfig'                  => 'wh/cmsxid/application/models/cmsxid_oxconfig',
         'oxcontent'                 => 'wh/cmsxid/application/models/cmsxid_oxcontent',
         'oxutilsview'               => 'wh/cmsxid/application/models/cmsxid_oxutilsview',
         'oxseodecoder'              => 'wh/cmsxid/application/models/cmsxid_oxseodecoder',
+        'oxseoencoder'              => 'wh/cmsxid/application/models/cmsxid_oxseoencoder',
         'oxviewconfig'              => 'wh/cmsxid/application/models/cmsxid_oxviewconfig',
     ),
     

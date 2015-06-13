@@ -22,8 +22,6 @@ class cmsxid_oxseodecoder extends cmsxid_oxseodecoder_parent
         $oxLang     = oxRegistry::getLang();
         $oxConfig   = oxRegistry::getConfig();
         
-        $oCmsxid = oxRegistry::get('oxViewConfig')->getCMSxid();
-        
         $aSeoInfo = CmsxidUtils::getPageSeoInfoByUrl( $sSeoUrl );
         
         if ( $aSeoInfo ) {
