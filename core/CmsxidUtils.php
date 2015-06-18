@@ -50,6 +50,9 @@ class CmsxidUtils
             return false;
         }
         
+        $oxConfig       = oxRegistry::getConfig();
+        $blSsl          = $oxConfig->isSsl();
+        
         $sBaseUrl       = self::getConfiguredSourceBaseUrl($sLang);
         $sBaseUrlSsl    = self::getConfiguredSourceSslBaseUrl($sLang);
         $sPagePath      = self::getConfiguredSourcePagePath($sLang);
@@ -60,11 +63,11 @@ class CmsxidUtils
         parse_str( $sParams, $aParams );
         $sParams = http_build_query( $aParams );
         
-        $sFullPageUrl   =     $sBaseUrlSsl ? $sBaseUrlSsl : $sBaseUrl
+        $sFullPageUrl   =     ($sBaseUrlSsl ? $sBaseUrlSsl : $sBaseUrl)
                             . '/' . $sPagePath
                             . '/' . self::sanitizePageTitle($sPage)
-                            . '/' . '?'
-                                . $sParams
+                            . '/?'
+                            . $sParams
                         ;
         
         return self::sanitizeUrl($sFullPageUrl);
@@ -87,6 +90,9 @@ class CmsxidUtils
             return false;
         }
         
+        $oxConfig       = oxRegistry::getConfig();
+        $blSsl          = $oxConfig->isSsl();
+        
         $sBaseUrl       = self::getConfiguredSourceBaseUrl($sLang);
         $sBaseUrlSsl    = self::getConfiguredSourceSslBaseUrl($sLang);
         $sIdParam       = self::getConfiguredSourceIdParam($sLang);
@@ -105,10 +111,9 @@ class CmsxidUtils
         );
         $sParams = http_build_query( $aParams );
         
-        
-        $sFullPageUrl =     $sBaseUrlSsl ? $sBaseUrlSsl : $sBaseUrl
-                            . '/' . '?'
-                                . $sParams
+        $sFullPageUrl =  ($blSsl ? $sBaseUrlSsl : $sBaseUrl)
+                            . '/?'
+                            . $sParams
                         ;
         
         return self::sanitizeUrl($sFullPageUrl);
@@ -248,6 +253,9 @@ class CmsxidUtils
             curl_setopt( $curl_handle, CURLOPT_URL,             $sUrl );
             curl_setopt( $curl_handle, CURLOPT_FOLLOWLOCATION,  1 );
             curl_setopt( $curl_handle, CURLOPT_RETURNTRANSFER,  1 );
+            
+            curl_setopt( $curl_handle, CURLOPT_SSL_VERIFYPEER,  !self::getConfiguredSslVerifyPeerValue() );
+            
             // curl_setopt( $curl_handle, CURLOPT_CONNECTTIMEOUT,  2 );
             // curl_setopt( $curl_handle, CURLOPT_TIMEOUT,         1 );
             // curl_setopt( $curl_handle, CURLOPT_HEADER, 0 );
@@ -572,7 +580,7 @@ class CmsxidUtils
                     $sSourceBaseUrl     = self::sanitizeUrl( self::getConfiguredSourceBaseUrl($sLang) . '/' );
                     $sSourceSslBaseUrl  = self::sanitizeUrl( self::getConfiguredSourceSslBaseUrl($sLang) . '/' );
                 
-                    $sContent = str_replace( $sSourceBaseUrl, $sSourceSslBaseUrl );
+                    $sContent = str_replace( $sSourceBaseUrl, $sSourceSslBaseUrl, $sContent );
                 }
             }
         }
@@ -654,7 +662,7 @@ class CmsxidUtils
     {
         $oxConfig = oxRegistry::getConfig();
         
-        return $oxConfig::getConfig()->getShopConfVar('iCmsxidTtlDefault', $oxConfig->getShopId(), 'module:cmsxid');
+        return $oxConfig->getShopConfVar('iCmsxidTtlDefault', $oxConfig->getShopId(), 'module:cmsxid');
     }
     
     /**
@@ -666,7 +674,7 @@ class CmsxidUtils
     {
         $oxConfig = oxRegistry::getConfig();
         
-        return $oxConfig::getConfig()->getShopConfVar('iCmsxidTtlDefaultRnd', $oxConfig->getShopId(), 'module:cmsxid');
+        return $oxConfig->getShopConfVar('iCmsxidTtlDefaultRnd', $oxConfig->getShopId(), 'module:cmsxid');
     }
     
     /**
@@ -721,6 +729,20 @@ class CmsxidUtils
         $mVal = $oxConfig->getShopConfVar('blCmsxidEnableDummyContent', $oxConfig->getShopId(), 'module:cmsxid');
         
         return $mVal ?: false;
+    }
+    
+    /**
+     * Configuration: return the configuration value for blCmsxidEnableDummyContent
+     * 
+     * @return bool
+     */
+    public static function getConfiguredSslVerifyPeerValue ()
+    {
+        $oxConfig = oxRegistry::getConfig();
+        
+        $mVal = $oxConfig->getShopConfVar('blCmsxidSslDontVerifyPeer', $oxConfig->getShopId(), 'module:cmsxid');
+        
+        return (bool)$mVal;
     }
     
     /**

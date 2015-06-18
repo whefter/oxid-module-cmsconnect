@@ -68,6 +68,10 @@ class cmsxid_setup_main extends oxAdminView
                 'type'      => 'bool',
                 'global'    => false,
             ),
+        array(  'name'      => 'blCmsxidSslDontVerifyPeer',
+                'type'      => 'bool',
+                'global'    => false,
+            ),
     );
 
     /**
