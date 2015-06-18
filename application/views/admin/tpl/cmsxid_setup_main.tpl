@@ -188,7 +188,7 @@
         
         <p>
             <input type="hidden" name="editval[blCmsxidSslDontVerifyPeer]" value="0" />
-            <input type="checkbox" name="editval[blCmsxidSslDontVerifyPeer]" value="1" [{ if $blCmsxidEnableDummyContent }]checked="checked"[{ /if }] />
+            <input type="checkbox" name="editval[blCmsxidSslDontVerifyPeer]" value="1" [{ if $blCmsxidSslDontVerifyPeer }]checked="checked"[{ /if }] />
             [{ oxmultilang ident="CMSXID_ADMIN_SETTINGS_blCmsxidSslDontVerifyPeer" }]
             [{ oxinputhelp ident="CMSXID_ADMIN_SETTINGS_blCmsxidSslDontVerifyPeer_HELP" }]
         </p>
