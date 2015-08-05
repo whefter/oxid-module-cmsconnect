@@ -63,7 +63,7 @@ class CmsxidUtils
         parse_str( $sParams, $aParams );
         $sParams = http_build_query( $aParams );
         
-        $sFullPageUrl   =     ($sBaseUrlSsl ? $sBaseUrlSsl : $sBaseUrl)
+        $sFullPageUrl   =     ($sBaseUrlSsl && $blSsl ? $sBaseUrlSsl : $sBaseUrl)
                             . '/' . $sPagePath
                             . '/' . self::sanitizePageTitle($sPage)
                             . '/?'
@@ -111,7 +111,7 @@ class CmsxidUtils
         );
         $sParams = http_build_query( $aParams );
         
-        $sFullPageUrl =  ($blSsl ? $sBaseUrlSsl : $sBaseUrl)
+        $sFullPageUrl =  ($sBaseUrlSsl && $blSsl ? $sBaseUrlSsl : $sBaseUrl)
                             . '/?'
                             . $sParams
                         ;
