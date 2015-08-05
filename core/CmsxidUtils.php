@@ -254,7 +254,7 @@ class CmsxidUtils
             curl_setopt( $curl_handle, CURLOPT_FOLLOWLOCATION,  1 );
             curl_setopt( $curl_handle, CURLOPT_RETURNTRANSFER,  1 );
             
-            curl_setopt( $curl_handle, CURLOPT_SSL_VERIFYPEER,  !self::getConfiguredSslVerifyPeerValue() );
+            curl_setopt( $curl_handle, CURLOPT_SSL_VERIFYPEER,  self::getConfiguredSslVerifyPeerValue() );
             
             // curl_setopt( $curl_handle, CURLOPT_CONNECTTIMEOUT,  2 );
             // curl_setopt( $curl_handle, CURLOPT_TIMEOUT,         1 );
@@ -742,7 +742,7 @@ class CmsxidUtils
         
         $mVal = $oxConfig->getShopConfVar('blCmsxidSslDontVerifyPeer', $oxConfig->getShopId(), 'module:cmsxid');
         
-        return (bool)$mVal;
+        return !(bool)$mVal;
     }
     
     /**
