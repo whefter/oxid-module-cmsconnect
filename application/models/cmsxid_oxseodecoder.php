@@ -19,10 +19,15 @@ class cmsxid_oxseodecoder extends cmsxid_oxseodecoder_parent
      */
     public function decodeUrl( $sSeoUrl )
     {   
+        startProfile(__METHOD__);
+        
         $oxLang     = oxRegistry::getLang();
         $oxConfig   = oxRegistry::getConfig();
+        $oUtils     = CmsxidUtils::getInstance();
         
-        $aSeoInfo = CmsxidUtils::getPageSeoInfoByUrl( $sSeoUrl );
+        $aSeoInfo = $oUtils->getPageSeoInfoByUrl( $sSeoUrl );
+        
+        stopProfile(__METHOD__);
         
         if ( $aSeoInfo ) {
             $oxLang->setBaseLanguage( $aSeoInfo['lang'] );

@@ -6,7 +6,7 @@
  */
 
 /**
- * cmsxid_oxcontent
+ * cmsxid_oxconfig
  */
 class cmsxid_oxconfig extends cmsxid_oxconfig_parent
 {
@@ -21,10 +21,19 @@ class cmsxid_oxconfig extends cmsxid_oxconfig_parent
      */
     public function getRequestParameter($sName, $blRaw = false)
     {
-        if ( $sName == 'page' ) {
-            if ( $sCmsxidSeoPage = CmsxidUtils::getCurrentSeoPage() ) {
-                if ( $sCmsxidSeoPage !== '' ) {
-                    return urlencode($sCmsxidSeoPage);
+        // This method is called at such an early point in the execution that
+        // not all module classes have been loaded. Skip our checks until after
+        // the CMSxid classes have been loaded, we don't need them before that 
+        // anyway.
+        
+        if ( class_exists('CmsxidUtils') ) {
+            $oUtils = CmsxidUtils::getInstance();
+            
+            if ( $sName == 'page' ) {
+                if ( $sCmsxidSeoPage = $oUtils->getCurrentSeoPage() ) {
+                    if ( $sCmsxidSeoPage !== '' ) {
+                        return urlencode($sCmsxidSeoPage);
+                    }
                 }
             }
         }

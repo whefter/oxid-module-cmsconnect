@@ -71,12 +71,16 @@ abstract class CmsxidPage
      */
     public function getFullUrl ()
     {
+        startProfile(__METHOD__);
+        
+        $oUtils = CmsxidUtils::getInstance();
+        
         $sBaseUrl = $this->getBaseUrl();
         $sFullUrl = false;
         
         if ( $sBaseUrl ) {
             $sBaseQuery     = parse_url( $sBaseUrl, PHP_URL_QUERY );
-            $sAddQuery      = http_build_query( CmsxidUtils::getExplicitQueryParams() );
+            $sAddQuery      = http_build_query( $oUtils->getExplicitQueryParams() );
 
             $sFullUrl = $sBaseUrl;
             $sFullUrl = preg_replace( '/' . preg_quote($sBaseQuery, '/') . '$/', '', $sFullUrl );
@@ -84,6 +88,8 @@ abstract class CmsxidPage
             $sFullUrl .= '?' . $sBaseQuery . '&' . $sAddQuery;
             $sFullUrl = rtrim( $sFullUrl, '?&' );
         }
+        
+        stopProfile(__METHOD__);
         
         return $sFullUrl;
     }

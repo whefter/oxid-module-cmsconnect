@@ -1,5 +1,7 @@
 <?php
 function smarty_modifier_cmsxid_rewriteurl ($string)
 {
-    return CmsxidUtils::rewriteContentUrls($string);
+    $oUtils = CmsxidUtils::getInstance();
+        
+    return $oUtils->rewriteContentUrls($string);
 }

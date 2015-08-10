@@ -26,8 +26,10 @@ class cmsxid
      */
     public function getContent ( $sSnippet, $sPage = null, $sLang = null )
     {
+        $oUtils = CmsxidUtils::getInstance();
+        
         if ( $sPage === null ) {
-            $sPage = CmsxidUtils::getCurrentSeoPage();
+            $sPage = $oUtils->getCurrentSeoPage();
         }
         
         $oPage = CmsxidPathPage::getInstance($sPage, $sLang);
@@ -47,6 +49,8 @@ class cmsxid
      */
     public function getContentById ( $sSnippet, $sPageId, $sLang = null )
     {
+        // $oUtils = CmsxidUtils::getInstance();
+        
         $oPage = CmsxidIdPage::getInstance($sPageId, $sLang);
         
         return $this->_getContent( $oPage, $sSnippet );
@@ -62,6 +66,8 @@ class cmsxid
      */
     protected function _getContent ( $oPage, $sSnippet )
     {
+        $oUtils = CmsxidUtils::getInstance();
+        
         if ( false !== ($sDummyContent = $this->_getDummyContent($oPage, $sSnippet)) ) {
             return $sDummyContent;
         }
@@ -75,7 +81,7 @@ class cmsxid
             if ( count($aSnippets) ) {
                 $oSnippetXml = $aSnippets[0];
                 
-                $sContentSource = CmsxidUtils::getTextContentFromXmlObject( $oSnippetXml );
+                $sContentSource = $oUtils->getTextContentFromXmlObject( $oSnippetXml );
                 $sContentSource = $this->_processContent( $sContentSource );
                 
                 $sReturnSource = $sContentSource;
@@ -97,8 +103,10 @@ class cmsxid
      */
     public function getContentArray ( $sPage = null, $sLang = null, $aNodes = array() )
     {
+        $oUtils = CmsxidUtils::getInstance();
+        
         if ( $sPage === null ) {
-            $sPage = CmsxidUtils::getCurrentSeoPage();
+            $sPage = $oUtils->getCurrentSeoPage();
         }
         
         $oPage = CmsxidPathPage::getInstance($sPage, $sLang);
@@ -118,6 +126,8 @@ class cmsxid
      */
     public function getContentArrayById ( $sPageId, $sLang = null, $aNodes = array() )
     {
+        // $oUtils = CmsxidUtils::getInstance();
+        
         $oPage = CmsxidIdPage::getInstance( $sPageId, $sLang );
         
         return $this->_getContentArray( $oPage, $aNodes );
@@ -189,8 +199,10 @@ class cmsxid
      */
     public function getXml ( $sPage = null, $sLang = null )
     {
+        $oUtils = CmsxidUtils::getInstance();
+        
         if ( $sPage === null ) {
-            $sPage = CmsxidUtils::getCurrentSeoPage();
+            $sPage = $oUtils->getCurrentSeoPage();
         }
         
         $oPage = CmsxidPathPage::getInstance($sPage, $sLang);
@@ -223,15 +235,17 @@ class cmsxid
      */
     protected function _getXml ( $oPage )
     {
+        $oUtils = CmsxidUtils::getInstance();
+        
         if ( false !== ($oDummyXml = $this->_getDummyXml($oPage)) ) {
             return $oDummyXml;
         }
 
         $sXml = $this->_getXmlSourceByPage( $oPage );
-        $sXml = CmsxidUtils::unwrapCDATA( $sXml );
-        $sXml = CmsxidUtils::fixXmlSourceEntities( $sXml );
+        $sXml = $oUtils->unwrapCDATA( $sXml );
+        $sXml = $oUtils->fixXmlSourceEntities( $sXml );
         
-        $oXml = CmsxidUtils::getXmlObjectFromSource( $sXml );
+        $oXml = $oUtils->getXmlObjectFromSource( $sXml );
         
         return $oXml;
     }
@@ -247,8 +261,10 @@ class cmsxid
      */
     public function getContentXml ( $sSnippet, $sPage = null, $sLang = null )
     {
+        $oUtils = CmsxidUtils::getInstance();
+        
         if ( $sPage === null ) {
-            $sPage = CmsxidUtils::getCurrentSeoPage();
+            $sPage = $oUtils->getCurrentSeoPage();
         }
         
         $oPage = CmsxidPathPage::getInstance($sPage, $sLang);
@@ -267,6 +283,8 @@ class cmsxid
      */
     public function getContentXmlById ( $sSnippet, $sPageId, $sLang = null )
     {
+        // $oUtils = CmsxidUtils::getInstance();
+        
         $oPage = CmsxidIdPage::getInstance($sPageId, $sLang);
         
         return $this->_getContentXml( $oPage, $sSnippet );
@@ -283,6 +301,8 @@ class cmsxid
      */
     protected function _getContentXml ( $oPage, $sSnippet )
     {
+        $oUtils = CmsxidUtils::getInstance();
+        
         if ( false !== ($oDummyContentXml = $this->_getDummyContentXml($oPage, $sSnippet)) ) {
             return $oDummyContentXml;
         }
@@ -296,10 +316,10 @@ class cmsxid
             if ( count($aSnippets) ) {
                 $oSnippetXml = $aSnippets[0];
                 
-                $sContentSource = CmsxidUtils::unwrapCDATA( $oSnippetXml->asXml() );
-                $sContentSource = CmsxidUtils::fixXmlSourceEntities( $sContentSource );
+                $sContentSource = $oUtils->unwrapCDATA( $oSnippetXml->asXml() );
+                $sContentSource = $oUtils->fixXmlSourceEntities( $sContentSource );
                 
-                $oReturnXml = CmsxidUtils::getXmlObjectFromSource( $sContentSource );
+                $oReturnXml = $oUtils->getXmlObjectFromSource( $sContentSource );
             }
         }
         
@@ -316,9 +336,11 @@ class cmsxid
      */
     protected function _getXmlByPage ( $oPage )
     {
+        $oUtils = CmsxidUtils::getInstance();
+        
         $sXml = $this->_getXmlSourceByPage( $oPage );
         
-        return CmsxidUtils::getXmlObjectFromSource( $sXml );
+        return $oUtils->getXmlObjectFromSource( $sXml );
     }
     
     /**
@@ -331,6 +353,10 @@ class cmsxid
      */
     protected function _getXmlSourceByPage ( $oPage )
     {
+        startProfile(__METHOD__);
+        
+        $oUtils = CmsxidUtils::getInstance();
+        
         // URL should be sanitized at this point
         
         // echo "<pre>";
@@ -338,13 +364,16 @@ class cmsxid
         // var_dump("Base URL: " . $oPage->getBaseUrl());
         // var_dump("Full URL: " . $oPage->getFullUrl());
         
-        $sBaseUrl       = $oPage->getBaseUrl();
-        $sFullUrl       = $oPage->getFullUrl();
+        $sBaseUrl   = $oPage->getBaseUrl();
+        $sFullUrl   = $oPage->getFullUrl();
         
         $blUseFileCache     = true;
         $sSessionCacheUrl   = $sBaseUrl;
         
-        if ( CmsxidUtils::checkIsImplicitSeoPage($oPage) ) {
+        // startProfile
+        $blIsImplicitSeoPage = $oUtils->checkIsImplicitSeoPage($oPage);
+        
+        if ( $blIsImplicitSeoPage ) {
             // var_dump("Detected implicit page");
             
             // The implicit SEO page is exempt from caching IF
@@ -355,7 +384,10 @@ class cmsxid
             // has been requested.
             //
             // Additionally, we now use the full page URL for session cache
-            if ( count(CmsxidUtils::getExplicitQueryParams()) )  {
+            
+            $iExplicitQueryParamsCount = count($oUtils->getExplicitQueryParams());
+            
+            if ( $iExplicitQueryParamsCount )  {
                 // var_dump("Detected custom query params");
                 // var_dump("Disabling file cache and setting session cache identifier to full URL");
                 $blUseFileCache     = false;
@@ -367,7 +399,7 @@ class cmsxid
         $sUrl       = $oPage->getFullUrl();
         
         // var_dump("Retrieving " . $sSessionCacheUrl . " from session cache");
-        $oResult    = CmsxidUtils::getResultFromSessionCache( $sSessionCacheUrl );
+        $oResult    = $oUtils->getResultFromSessionCache( $sSessionCacheUrl );
         
         // No result so far and caching enabled for this page, attempt to read from file cache
         if ( !is_object($oResult) && $blUseFileCache ) {
@@ -375,7 +407,7 @@ class cmsxid
             
             // This is URL-based. We want our cache to be dumb; in turn, we have
             // to be smart about which URL to pass it (see above)
-            $oResult = CmsxidUtils::getXmlSourceFromCache( $sBaseUrl );
+            $oResult = $oUtils->getXmlSourceFromCache( $sBaseUrl );
             // $oResult = CmsxidUtils::getXmlSourceFromCache( $oPage );
         }
         
@@ -385,10 +417,10 @@ class cmsxid
             
             // If false, we need to fetch from remote
             // $oResult = CmsxidUtils::fetchXmlSourceFromRemote( $sUrl );
-            $oResult = CmsxidUtils::fetchXmlSourceFromRemote( $oPage );
+            $oResult = $oUtils->fetchXmlSourceFromRemote( $oPage );
             
             if ( $blUseFileCache ) {
-                CmsxidUtils::saveXmlSourceToCache( $oResult, $sBaseUrl );
+                $oUtils->saveXmlSourceToCache( $oResult, $sBaseUrl );
                 
                 // var_dump("Saving " . $oPage->getBaseUrl() . " to file cache");
             }
@@ -396,12 +428,14 @@ class cmsxid
         
         // Save to session cache
         // var_dump("Saving " . $sSessionCacheUrl . " to session cache");
-        CmsxidUtils::saveResultToSessionCache( $sSessionCacheUrl, $oResult );
+        $oUtils->saveResultToSessionCache( $sSessionCacheUrl, $oResult );
         
         // Return an empty string so as not to break anything upstream
         $sXml = is_object($oResult) ? $oResult->content : '';
         
         // echo "</pre>";
+        
+        stopProfile(__METHOD__);
         
         return $sXml;
     }
@@ -418,8 +452,10 @@ class cmsxid
      */
     public function getPageMetadata ( $sMetadata, $sPage = null, $sLang = null )
     {
+        $oUtils = CmsxidUtils::getInstance();
+        
         if ( $sPage === null ) {
-            $sPage = CmsxidUtils::getCurrentSeoPage();
+            $sPage = $oUtils->getCurrentSeoPage();
         }
         
         $oPage = CmsxidPathPage::getInstance($sPage, $sLang);
@@ -439,6 +475,8 @@ class cmsxid
      */
     public function getPageMetadataById ( $sMetadata, $sPageId, $sLang = null )
     {
+        // $oUtils = CmsxidUtils::getInstance();
+        
         $oPage = CmsxidIdPage::getInstance($sPageId, $sLang);
         
         return $this->_getPageMetadataByPage( $oPage, $sMetadata );
@@ -454,6 +492,8 @@ class cmsxid
      */
     protected function _getPageMetadataByPage ( $oPage, $sMetadata )
     {
+        $oUtils = CmsxidUtils::getInstance();
+        
         if ( false !== ($sDummyMetadata = $this->_getDummyMetadata($oPage, $sMetadata)) ) {
             return $sDummyMetadata;
         }
@@ -465,7 +505,7 @@ class cmsxid
         if ( is_object($oXml) ) {
             $aXpathResults = $oXml->xpath( '/' . $oXml->getName() . '/metadata/' . $sMetadata );
             if ( count($aXpathResults) == 1 ) {
-                $sMetadataValue = CmsxidUtils::getTextContentFromXmlObject( $aXpathResults[0] );
+                $sMetadataValue = $oUtils->getTextContentFromXmlObject( $aXpathResults[0] );
             }
         }
         
@@ -481,10 +521,12 @@ class cmsxid
      */
     protected function _processContent ( $sContent )
     {
-        $sContent = CmsxidUtils::rewriteContentUrls( $sContent );
-        $sContent = CmsxidUtils::fixContentEncoding( $sContent );
-        $sContent = CmsxidUtils::decodeContentEntities( $sContent );
-        $sContent = CmsxidUtils::parseContentThroughSmarty( $sContent );
+        $oUtils = CmsxidUtils::getInstance();
+        
+        $sContent = $oUtils->rewriteContentUrls( $sContent );
+        $sContent = $oUtils->fixContentEncoding( $sContent );
+        $sContent = $oUtils->decodeContentEntities( $sContent );
+        $sContent = $oUtils->parseContentThroughSmarty( $sContent );
         
         return $sContent;
     }
@@ -499,8 +541,10 @@ class cmsxid
      */
     protected function _getDummyContent ( $oPage, $sSnippet )
     {
-        if ( CmsxidUtils::getConfiguredDummyContentValue() ) {
-            return CmsxidUtils::getDummyString($oPage, $sSnippet);
+        $oUtils = CmsxidUtils::getInstance();
+        
+        if ( $oUtils->getConfiguredDummyContentValue() ) {
+            return $oUtils->getDummyString($oPage, $sSnippet);
         } else {
             return false;
         }
@@ -516,7 +560,9 @@ class cmsxid
      */
     protected function _getDummyContentArray ( $oPage, $aNodes = array() )
     {
-        if ( CmsxidUtils::getConfiguredDummyContentValue() ) {
+        $oUtils = CmsxidUtils::getInstance();
+        
+        if ( $oUtils->getConfiguredDummyContentValue() ) {
             if ( empty($aNodes) ) {
                 $aNodes = array(
                     'left',
@@ -529,7 +575,7 @@ class cmsxid
             $aContentArray = array();
             
             foreach ( $aNodes as $sSnippet ) {
-                $aContentArray[$sSnippet] = CmsxidUtils::getDummyString($oPage, $sSnippet);
+                $aContentArray[$sSnippet] = $oUtils->getDummyString($oPage, $sSnippet);
             }
             
             return $aContentArray;
@@ -560,10 +606,12 @@ class cmsxid
      */
     protected function _getDummyContentXml ( $oPage, $sSnippet )
     {
-        if ( CmsxidUtils::getConfiguredDummyContentValue() ) {
-            $sDummyString = CmsxidUtils::getDummyString($oPage, $sSnippet);
+        $oUtils = CmsxidUtils::getInstance();
+        
+        if ( $oUtils->getConfiguredDummyContentValue() ) {
+            $sDummyString = $oUtils->getDummyString($oPage, $sSnippet);
             
-            return CmsxidUtils::getXmlObjectFromSource('<xml>' . $sDummyString . '</xml>');
+            return $oUtils->getXmlObjectFromSource('<xml>' . $sDummyString . '</xml>');
         } else {
             return false;
         }
@@ -579,8 +627,10 @@ class cmsxid
      */
     protected function _getDummyMetadata ( $oPage, $sMetadata )
     {
-        if ( CmsxidUtils::getConfiguredDummyContentValue() ) {
-            return CmsxidUtils::getDummyString($oPage, $sMetadata);
+        $oUtils = CmsxidUtils::getInstance();
+        
+        if ( $oUtils->getConfiguredDummyContentValue() ) {
+            return $oUtils->getDummyString($oPage, $sMetadata);
         } else {
             return false;
         }
@@ -595,7 +645,9 @@ class cmsxid
      */
     public function sanitizePagePath( $sUrl )
     {
-        return CmsxidUtils::sanitizePageTitle( $sUrl );
+        $oUtils = CmsxidUtils::getInstance();
+        
+        return $oUtils->sanitizePageTitle( $sUrl );
     }
     
     /**
@@ -607,7 +659,9 @@ class cmsxid
      */
     public function rewriteContentUrls($sContent)
     {
-        return CmsxidUtils::rewriteContentUrls( $sContent );
+        $oUtils = CmsxidUtils::getInstance();
+        
+        return $oUtils->rewriteContentUrls( $sContent );
     }
     
     /**
@@ -655,7 +709,9 @@ class cmsxid
      */
     public function toxidRewriteUrls($sContent, $iLangId = null, $blMultiLang = false)
     {
-        return CmsxidUtils::rewriteContentUrls( $sContent );
+        $oUtils = CmsxidUtils::getInstance();
+        
+        return $oUtils->rewriteContentUrls( $sContent );
     }
     
     /**
@@ -663,7 +719,9 @@ class cmsxid
      */
     public function toxidRewriteUrl( $sUrl, $iLangId = null, $blMultiLang = false )
     {
-        return CmsxidUtils::rewriteContentUrls( $sContent );
+        $oUtils = CmsxidUtils::getInstance();
+        
+        return $oUtils->rewriteContentUrls( $sContent );
     }
     
     /**
@@ -671,7 +729,9 @@ class cmsxid
      */
     public function toxidEncodeTitle( $sUrl, $iLang = null )
     {
-        return CmsxidUtils::sanitizePageTitle( $sUrl );
+        $oUtils = CmsxidUtils::getInstance();
+        
+        return $oUtils->sanitizePageTitle( $sUrl );
     }
     
     /**

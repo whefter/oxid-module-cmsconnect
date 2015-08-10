@@ -55,6 +55,10 @@ class CmsxidIdPage extends CmsxidPage
      */
     public function getBaseUrl ()
     {
-        return CmsxidUtils::getFullPageUrlById( $this->getPageId(), $this->getLang() );
+        $oUtils = CmsxidUtils::getInstance();
+        
+        $sUrl = $oUtils->getFullPageUrlById( $this->getPageId(), $this->getLang() );
+        
+        return $sUrl;
     }
 }

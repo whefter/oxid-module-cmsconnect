@@ -21,8 +21,11 @@ class cmsxid_oxseoencoder extends cmsxid_oxseoencoder_parent
      */
     public function getStaticUrl($sStdUrl, $iLang = null, $iShopId = null)
     {
+        startProfile(__METHOD__);
+        
         $oxConfig   = oxRegistry::getConfig();
         $oxLang     = oxRegistry::getLang();
+        $oUtils     = CmsxidUtils::getInstance();
  
         if ( !isset($iShopId) ) {
             $iShopId = $oxConfig->getShopId();
@@ -45,14 +48,16 @@ class cmsxid_oxseoencoder extends cmsxid_oxseoencoder_parent
         if ( !empty($aQuery['cl']) && $aQuery['cl'] == 'cmsxid_fe' ) {
             // Construct an SEO URL that represents a call to CMSxid from the passed page
             $sPage      = urldecode($aQuery['page']);
-            $sSeoIdent  = CmsxidUtils::getConfiguredSourceSeoIdentifier($iLang);
+            $sSeoIdent  = $oUtils->getConfiguredSourceSeoIdentifier($iLang);
             $sShopUrl   = (strpos($sStdUrl, 'https:') === 0) ? $oxConfig->getSslShopUrl($iLang) : $oxConfig->getShopUrl($iLang);
             
-            $sSeoUrl = CmsxidUtils::sanitizeUrl( $sShopUrl . '/' . $sSeoIdent . '/' . $sPage );
+            $sSeoUrl = $oUtils->sanitizeUrl( $sShopUrl . '/' . $sSeoIdent . '/' . $sPage );
             
             $this->_aStaticUrlCache[$sStdUrl][$iLang][$iShopId] = $sSeoUrl;
         }
     
+        stopProfile(__METHOD__);
+        
         return parent::getStaticUrl($sStdUrl, $iLang, $iShopid);
     }
 }

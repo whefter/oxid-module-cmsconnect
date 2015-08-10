@@ -14,6 +14,13 @@ class CmsxidUtils
     const TYPE_IDENTIFIER_ID    = 2;
     
     /**
+     * The CmsxidUtils singleton instance.
+     *
+     * @var object
+     */
+    protected static $_oInstance = null;
+    
+    /**
      * "Level one" cache. Pages retrieved from remote or from cache are
      * cached here to reduce the hits to file cache or to prevent multiple
      * fetches of a remote page if the cache isn't used.
@@ -35,6 +42,32 @@ class CmsxidUtils
     );
     
     /**
+     * Cache variable for the sources configuration, prevents the system from having
+     * to fetch all configuration all the time
+     *
+     * @var array[]
+     */
+    protected static $_aConfiguredSources = array(
+        'cl',
+        'fn',
+        'shp',
+    );
+    
+    /**
+     * Return the Cmsxid singleton instance. Construct if not present.
+     *
+     * @return object
+     */
+    public static function getInstance ()
+    {
+        if ( null === self::$_oInstance ) {
+            self::$_oInstance = new CmsxidUtils();
+        }
+        
+        return self::$_oInstance;
+    }
+    
+    /**
      * Build full TYPO3 URL for the passed page and OXID lang ID. The lang ID is mapped to the
      * corresponding TYPO3 language ID.
      *
@@ -43,20 +76,22 @@ class CmsxidUtils
      *
      * @return string
      */
-    public static function getFullPageUrl ( $sPage = null, $sLang = null )
+    public function getFullPageUrl ( $sPage = null, $sLang = null )
     {
         // Requesting the root page must be done by passing '/'
         if ( !$sPage ) {
             return false;
         }
         
+        startProfile(__METHOD__);
+        
         $oxConfig       = oxRegistry::getConfig();
         $blSsl          = $oxConfig->isSsl();
         
-        $sBaseUrl       = self::getConfiguredSourceBaseUrl($sLang);
-        $sBaseUrlSsl    = self::getConfiguredSourceSslBaseUrl($sLang);
-        $sPagePath      = self::getConfiguredSourcePagePath($sLang);
-        $sParams        = self::getConfiguredSourceParams($sLang);
+        $sBaseUrl       = $this->getConfiguredSourceBaseUrl($sLang);
+        $sBaseUrlSsl    = $this->getConfiguredSourceSslBaseUrl($sLang);
+        $sPagePath      = $this->getConfiguredSourcePagePath($sLang);
+        $sParams        = $this->getConfiguredSourceParams($sLang);
         
         // We don't know how the user input his parameters, so parse them to be sure
         $aParams = array();
@@ -65,12 +100,14 @@ class CmsxidUtils
         
         $sFullPageUrl   =     ($sBaseUrlSsl && $blSsl ? $sBaseUrlSsl : $sBaseUrl)
                             . '/' . $sPagePath
-                            . '/' . self::sanitizePageTitle($sPage)
+                            . '/' . $this->sanitizePageTitle($sPage)
                             . '/?'
                             . $sParams
                         ;
         
-        return self::sanitizeUrl($sFullPageUrl);
+        stopProfile(__METHOD__);
+        
+        return $this->sanitizeUrl($sFullPageUrl);
     }
     
     /**
@@ -82,7 +119,7 @@ class CmsxidUtils
      *
      * @return string
      */
-    public static function getFullPageUrlById ( $sPageId, $sLang = null )
+    public function getFullPageUrlById ( $sPageId, $sLang = null )
     {
         // This checks for empty values but also makes sure the passed page ID isn't just 0; in other words,
         // this checks for empty strings, null, false, etc.
@@ -90,14 +127,16 @@ class CmsxidUtils
             return false;
         }
         
+        startProfile(__METHOD__);
+        
         $oxConfig       = oxRegistry::getConfig();
         $blSsl          = $oxConfig->isSsl();
         
-        $sBaseUrl       = self::getConfiguredSourceBaseUrl($sLang);
-        $sBaseUrlSsl    = self::getConfiguredSourceSslBaseUrl($sLang);
-        $sIdParam       = self::getConfiguredSourceIdParam($sLang);
-        $sLangParam     = self::getConfiguredSourceLangParam($sLang);
-        $sParams        = self::getConfiguredSourceParams($sLang);
+        $sBaseUrl       = $this->getConfiguredSourceBaseUrl($sLang);
+        $sBaseUrlSsl    = $this->getConfiguredSourceSslBaseUrl($sLang);
+        $sIdParam       = $this->getConfiguredSourceIdParam($sLang);
+        $sLangParam     = $this->getConfiguredSourceLangParam($sLang);
+        $sParams        = $this->getConfiguredSourceParams($sLang);
         
         // Parse the user-specified params and add the id and L parameters
         $aParams = array();
@@ -116,7 +155,9 @@ class CmsxidUtils
                             . $sParams
                         ;
         
-        return self::sanitizeUrl($sFullPageUrl);
+        stopProfile(__METHOD__);
+        
+        return $this->sanitizeUrl($sFullPageUrl);
     }
     
     /**
@@ -126,8 +167,10 @@ class CmsxidUtils
      * 
      * @return string
      */
-    public static function sanitizeUrl ( $sUrl )
+    public function sanitizeUrl ( $sUrl )
     {
+        startProfile(__METHOD__);
+        
         // Automatic encoding handling
         $oStr = getStr();
         
@@ -141,6 +184,8 @@ class CmsxidUtils
         // Do this without regular expressions (which are expensive)
         $sUrl = rtrim( $sUrl, '&?' );
         
+        stopProfile(__METHOD__);
+        
         return $sUrl;
     }
     
@@ -151,8 +196,10 @@ class CmsxidUtils
      * 
      * @return string
      */
-    public static function sanitizePageTitle ( $sTitle )
+    public function sanitizePageTitle ( $sTitle )
     {
+        startProfile(__METHOD__);
+        
         // Automatic encoding handling
         $oStr = getStr();
         
@@ -186,6 +233,7 @@ class CmsxidUtils
         
         $sTitle = implode('/', $aTitleParts);
 
+        stopProfile(__METHOD__);
         
         return $sTitle;
     }
@@ -197,8 +245,10 @@ class CmsxidUtils
      * 
      * @return string
      */
-    public static function getTextContentFromXmlObject ( $oXml )
+    public function getTextContentFromXmlObject ( $oXml )
     {
+        startProfile(__METHOD__);
+        
         $sText = '';
         
         // Check if returned object is actually valid and has not returned an error,
@@ -209,7 +259,7 @@ class CmsxidUtils
             // var_dump(__METHOD__.':'.htmlentities($sText));
             
             // Remove CDATA tag
-            $sText = self::unwrapCDATA( $sText );
+            $sText = $this->unwrapCDATA( $sText );
             
             // Detect empty tag
             if ( $sText == '<' . $oXml->getName() . '/>' ) {
@@ -224,6 +274,8 @@ class CmsxidUtils
             }
         }
         
+        stopProfile(__METHOD__);
+        
         return $sText;
     }
     
@@ -236,8 +288,10 @@ class CmsxidUtils
      * 
      * @return object
      */
-    public static function fetchXmlSourceFromRemote ( $oPage, $blPost = false )
+    public function fetchXmlSourceFromRemote ( $oPage, $blPost = false )
     {
+        startProfile(__METHOD__);
+        
         // We know nothing about caching here, so we always use the full URL.
         $sUrl = $oPage->getFullUrl();
         
@@ -246,15 +300,15 @@ class CmsxidUtils
         $oResult->info      = array();
         
         if ( $sUrl ) {
-            // var_dump('Connect: ', self::getConfiguredCurlConnectTimeout());
-            // var_dump('Execute: ', self::getConfiguredCurlExecuteTimeout());
+            // var_dump('Connect: ', $this->getConfiguredCurlConnectTimeout());
+            // var_dump('Execute: ', $this->getConfiguredCurlExecuteTimeout());
             
             $curl_handle = curl_init();
             curl_setopt( $curl_handle, CURLOPT_URL,             $sUrl );
             curl_setopt( $curl_handle, CURLOPT_FOLLOWLOCATION,  1 );
             curl_setopt( $curl_handle, CURLOPT_RETURNTRANSFER,  1 );
             
-            curl_setopt( $curl_handle, CURLOPT_SSL_VERIFYPEER,  self::getConfiguredSslVerifyPeerValue() );
+            curl_setopt( $curl_handle, CURLOPT_SSL_VERIFYPEER,  $this->getConfiguredSslVerifyPeerValue() );
             
             // curl_setopt( $curl_handle, CURLOPT_CONNECTTIMEOUT,  2 );
             // curl_setopt( $curl_handle, CURLOPT_TIMEOUT,         1 );
@@ -289,6 +343,8 @@ class CmsxidUtils
             }
         }
         
+        stopProfile(__METHOD__);
+        
         return $oResult;
     }
     
@@ -299,15 +355,19 @@ class CmsxidUtils
      * 
      * @return object
      */
-    public static function getXmlSourceFromCache ( $sUrl )
+    public function getXmlSourceFromCache ( $sUrl )
     {
-        $sCacheName = self::getCacheFilenameFromUrl($sUrl);
+        startProfile(__METHOD__);
+        
+        $sCacheName = $this->getCacheFilenameFromUrl($sUrl);
         
         $oResult = oxRegistry::get('oxUtils')->fromFileCache( $sCacheName );
         
         if ( $oResult  ) {
             return $oResult;
         }
+        
+        stopProfile(__METHOD__);
         
         return false;
     }
@@ -321,16 +381,18 @@ class CmsxidUtils
      * 
      * @return bool
      */
-    public static function saveXmlSourceToCache ( $oResult, $sUrl, $iTtl = null )
+    public function saveXmlSourceToCache ( $oResult, $sUrl, $iTtl = null )
     {
-        $sCacheName = self::getCacheFilenameFromUrl($sUrl);
+        startProfile(__METHOD__);
+        
+        $sCacheName = $this->getCacheFilenameFromUrl($sUrl);
         
         // Figure out cache TTL
         if ( null === $iTtl ) {
-            if ( !($iTtl = self::getConfiguredDefaultCacheTTL()) ) {
+            if ( !($iTtl = $this->getConfiguredDefaultCacheTTL()) ) {
                 $iTtl = 600;
             }
-            if ( !($iTtlRnd = self::getConfiguredDefaultCacheTTLRandomization()) ) {
+            if ( !($iTtlRnd = $this->getConfiguredDefaultCacheTTLRandomization()) ) {
                 $iTtlRnd = 10;
             }
         }
@@ -338,7 +400,11 @@ class CmsxidUtils
         // Randomize by $iCacheRandomize percentage
         $iTtl = mt_rand( floor( $iTtl * (1 - $iTtlRnd/100) ), ceil( $iTtl * (1 + $iTtlRnd/100) ) );
         
-        return oxRegistry::get('oxUtils')->toFileCache( $sCacheName, $oResult, (int)$iTtl );
+        $blSuccess = oxRegistry::get('oxUtils')->toFileCache( $sCacheName, $oResult, (int)$iTtl );
+        
+        stopProfile(__METHOD__);
+        
+        return $blSuccess;
     }
     
     /**
@@ -348,12 +414,12 @@ class CmsxidUtils
      * 
      * @return string
      */
-    public static function getCacheFilenameFromUrl ( $sUrl )
+    public function getCacheFilenameFromUrl ( $sUrl )
     {
         $oStr = getStr();
         
         // Strip extra slashes etc.
-        $sUrl = self::sanitizeUrl( $sUrl );
+        $sUrl = $this->sanitizeUrl( $sUrl );
         
         // Only keep word characters
         $sUrl = $oStr->preg_replace( '/[^a-zA-Z0-9-]/', '_', $sUrl );
@@ -370,20 +436,21 @@ class CmsxidUtils
      * 
      * @return bool
      */
-    public static function checkIsImplicitSeoPage ( $oPage )
+    public function checkIsImplicitSeoPage ( $oPage )
     {
         // Only path-based pages can be SEO pages at all
         // Mainly this check ensures the call to getPagePath() below does not cause a fatal error
-        if ( $oPage->getType() != self::TYPE_IDENTIFIER_PATH ) {
+        if ( $oPage->getType() != $this->TYPE_IDENTIFIER_PATH ) {
             return false;
         }
         
         // Since oPage's page path is set by a front-end function which, in turn,
         // calls CmsxidUtils::getCurrentSeoPage() when the requested page is null
         // this will return true when we are on an implicit seo page
-        if ( $oPage->getPagePath() != self::getCurrentSeoPage() ) {
+        if ( $oPage->getPagePath() != $this->getCurrentSeoPage() ) {
             return false;
         }
+        
         
         return true;
     }
@@ -395,7 +462,7 @@ class CmsxidUtils
      *
      * @return array()
      */
-    public static function getExplicitQueryParams ()
+    public function getExplicitQueryParams ()
     {
         // These are the explicit query params, not the one OXID set after looking up the SEO
         // URL
@@ -417,12 +484,16 @@ class CmsxidUtils
      * 
      * @return string
      */
-    public static function fixXmlSourceEntities ( $sXml )
+    public function fixXmlSourceEntities ( $sXml )
     {
+        startProfile(__METHOD__);
+        
         $sXml = str_replace('&nbsp;', '&#160;', $sXml);
         
         // Fix stray ampersands, lit. '& not followed by word characters and a semicolon will be replaced with &amp;'
         $sXml = preg_replace( '/&(?![\w#]+;)/', '&amp;', $sXml );
+
+        stopProfile(__METHOD__);
         
         return $sXml;
     }
@@ -434,20 +505,25 @@ class CmsxidUtils
      * 
      * @return string
      */
-    public static function getXmlObjectFromSource ( $sXml )
+    public function getXmlObjectFromSource ( $sXml )
     {
+        startProfile(__METHOD__);
+        
         $oXml = false;
         
         try {
             // $oXml = simplexml_load_string($sXml, null, LIBXML_NOCDATA);
             $oXml = simplexml_load_string($sXml);
         } catch ( Exception $e ) {
-            return false;
+            $oXml = false;
+            // return false;
         }
         
         if ( $oXml !== false ) {
             //return $oReturnXml->children();
         }
+        
+        stopProfile(__METHOD__);
         
         return $oXml;
     }
@@ -460,12 +536,16 @@ class CmsxidUtils
      * 
      * @return string
      */
-    public static function unwrapCDATA( $sXml )
+    public function unwrapCDATA( $sXml )
     {
+        startProfile(__METHOD__);
+        
         $oStr = getStr();
         
         // Remove CDATA tag
         $sXml = $oStr->preg_replace( '/<!\[CDATA\[(.*?)\]\]>/ms', '\\1', $sXml );
+        
+        stopProfile(__METHOD__);
         
         return $sXml;
     }
@@ -476,7 +556,7 @@ class CmsxidUtils
      *
      * @return string
      */
-    public static function getCurrentSeoPage ()
+    public function getCurrentSeoPage ()
     {
         return oxRegistry::getConfig()->getConfigParam( 'sCmsxidPage' );
     }
@@ -489,11 +569,14 @@ class CmsxidUtils
      * 
      * @return array
      */
-    public static function getPageSeoInfoByUrl ( $sSeoUrl )
+    public function getPageSeoInfoByUrl ( $sSeoUrl )
     {
-        $oxConfig = oxRegistry::getConfig();
+        startProfile(__METHOD__);
         
-        $aSources = CmsxidUtils::getConfiguredSources();
+        $oxConfig   = oxRegistry::getConfig();
+        $oUtils     = CmsxidUtils::getInstance();
+        
+        $aSources = $oUtils->getConfiguredSources();
         
         $aSeoInfo = false;
         
@@ -503,7 +586,7 @@ class CmsxidUtils
                 continue;
             }
             
-            $sSeoIdent  = CmsxidUtils::getConfiguredSourceSeoIdentifier($sLang);
+            $sSeoIdent  = $oUtils->getConfiguredSourceSeoIdentifier($sLang);
             
             // Either starts with SEO identifier and a slash (subpage of CMS is called)
             // or is just the plain SEO identifier
@@ -523,6 +606,8 @@ class CmsxidUtils
             }
         }
         
+        stopProfile(__METHOD__);
+        
         return $aSeoInfo;
     }
     
@@ -533,16 +618,20 @@ class CmsxidUtils
      * 
      * @return string
      */
-    public static function rewriteContentUrls ( $sContent )
+    public function rewriteContentUrls ( $sContent )
     {
+        startProfile(__METHOD__);
+        
         $oxConfig = oxRegistry::getConfig();
         
-        if ( self::getConfiguredNoUrlRewriteSetting() == true ) {
+        if ( $this->getConfiguredNoUrlRewriteSetting() == true ) {
+            stopProfile(__METHOD__);
+            
             return $sContent;
         }
         
         // We want to replace URLs for all configured sources
-        $aLanguages = array_keys( self::getConfiguredSources() );
+        $aLanguages = array_keys( $this->getConfiguredSources() );
 
         foreach ( $aLanguages as $sLang ) {
             // Deal only with numeric language IDs, since all OXID functions only take those
@@ -551,14 +640,14 @@ class CmsxidUtils
             }
             
             // No matter what URLs the CMS returns, the URLs schema needs to be rewritten to the current shop's schema
-            foreach ( array(self::getConfiguredSourceBaseUrl($sLang), self::getConfiguredSourceSslBaseUrl($sLang)) as $sSourceBaseUrl ) {
-                $sSourcePagePath    = self::getConfiguredSourcePagePath($sLang);
-                $sFullBaseUrl       = self::sanitizeUrl( $sSourceBaseUrl . '/' . $sSourcePagePath . '/' );
+            foreach ( array($this->getConfiguredSourceBaseUrl($sLang), $this->getConfiguredSourceSslBaseUrl($sLang)) as $sSourceBaseUrl ) {
+                $sSourcePagePath    = $this->getConfiguredSourcePagePath($sLang);
+                $sFullBaseUrl       = $this->sanitizeUrl( $sSourceBaseUrl . '/' . $sSourcePagePath . '/' );
                 
                 // The target is defined by the current shop's SSL setting
                 $sTargetBaseUrl     = $oxConfig->isSsl() ? $oxConfig->getSslShopUrl($sLang) : $oxConfig->getShopUrl($sLang);
-                $sTargetSeoIdent    = self::getConfiguredSourceSeoIdentifier( $sLang );
-                $sFullTargetUrl     = self::sanitizeUrl( $sTargetBaseUrl . '/' . $sTargetSeoIdent . '/' );
+                $sTargetSeoIdent    = $this->getConfiguredSourceSeoIdentifier( $sLang );
+                $sFullTargetUrl     = $this->sanitizeUrl( $sTargetBaseUrl . '/' . $sTargetSeoIdent . '/' );
                 
                 // Replace all links
                 unset($aMatches);
@@ -574,16 +663,18 @@ class CmsxidUtils
             // if configured, to prevent browser complaints about mixed modes
             if ( $oxConfig->isSsl() ) {
                 // Do this ONLY if an SSL source URL has actually been configured
-                if ( self::getConfiguredSourceSslBaseUrl($sLang) ) {
+                if ( $this->getConfiguredSourceSslBaseUrl($sLang) ) {
                     // We can safely do this crude replace since, in theory, all URLs left on the page should be to
                     // non-page CMS content
-                    $sSourceBaseUrl     = self::sanitizeUrl( self::getConfiguredSourceBaseUrl($sLang) . '/' );
-                    $sSourceSslBaseUrl  = self::sanitizeUrl( self::getConfiguredSourceSslBaseUrl($sLang) . '/' );
+                    $sSourceBaseUrl     = $this->sanitizeUrl( $this->getConfiguredSourceBaseUrl($sLang) . '/' );
+                    $sSourceSslBaseUrl  = $this->sanitizeUrl( $this->getConfiguredSourceSslBaseUrl($sLang) . '/' );
                 
                     $sContent = str_replace( $sSourceBaseUrl, $sSourceSslBaseUrl, $sContent );
                 }
             }
         }
+        
+        stopProfile(__METHOD__);
 
         return $sContent;
     }
@@ -595,8 +686,10 @@ class CmsxidUtils
      * 
      * @return string
      */
-    public static function fixContentEncoding ( $sContent )
+    public function fixContentEncoding ( $sContent )
     {
+        startProfile(__METHOD__);
+        
         $oxConfig = oxRegistry::getConfig();
         
         $sShopCharset = oxRegistry::getLang()->translateString( 'charset' );
@@ -613,6 +706,8 @@ class CmsxidUtils
             $sContent = mb_convert_encoding( $sContent, $sContentEncoding, 'UTF-8' );
         }
         
+        stopProfile(__METHOD__);
+        
         return $sContent;
     }
     
@@ -624,7 +719,7 @@ class CmsxidUtils
      * 
      * @return string
      */
-    public static function decodeContentEntities ( $sContent )
+    public function decodeContentEntities ( $sContent )
     {
         // Decode entities to allow inclusion of Smarty tags in fetched content
         return html_entity_decode( $sContent );
@@ -637,8 +732,10 @@ class CmsxidUtils
      * 
      * @return string
      */
-    public static function parseContentThroughSmarty ( $sContent )
+    public function parseContentThroughSmarty ( $sContent )
     {
+        startProfile(__METHOD__);
+        
         $oxUtilsView = oxRegistry::get('oxUtilsView');
         
         $sContent = $oxUtilsView->parseThroughSmarty(
@@ -650,6 +747,8 @@ class CmsxidUtils
             true
         );
         
+        stopProfile(__METHOD__);
+        
         return $sContent;
     }
     
@@ -658,7 +757,7 @@ class CmsxidUtils
      * 
      * @return int
      */
-    public static function getConfiguredDefaultCacheTTL ()
+    public function getConfiguredDefaultCacheTTL ()
     {
         $oxConfig = oxRegistry::getConfig();
         
@@ -670,7 +769,7 @@ class CmsxidUtils
      * 
      * @return int
      */
-    public static function getConfiguredDefaultCacheTTLRandomization ()
+    public function getConfiguredDefaultCacheTTLRandomization ()
     {
         $oxConfig = oxRegistry::getConfig();
         
@@ -682,7 +781,7 @@ class CmsxidUtils
      * 
      * @return bool
      */
-    public static function getConfiguredNoUrlRewriteSetting ()
+    public function getConfiguredNoUrlRewriteSetting ()
     {
         $oxConfig = oxRegistry::getConfig();
         
@@ -694,7 +793,7 @@ class CmsxidUtils
      * 
      * @return int
      */
-    public static function getConfiguredCurlConnectTimeout ()
+    public function getConfiguredCurlConnectTimeout ()
     {
         $oxConfig = oxRegistry::getConfig();
         
@@ -708,7 +807,7 @@ class CmsxidUtils
      * 
      * @return int
      */
-    public static function getConfiguredCurlExecuteTimeout ()
+    public function getConfiguredCurlExecuteTimeout ()
     {
         $oxConfig = oxRegistry::getConfig();
         
@@ -722,7 +821,7 @@ class CmsxidUtils
      * 
      * @return bool
      */
-    public static function getConfiguredDummyContentValue ()
+    public function getConfiguredDummyContentValue ()
     {
         $oxConfig = oxRegistry::getConfig();
         
@@ -736,7 +835,7 @@ class CmsxidUtils
      * 
      * @return bool
      */
-    public static function getConfiguredSslVerifyPeerValue ()
+    public function getConfiguredSslVerifyPeerValue ()
     {
         $oxConfig = oxRegistry::getConfig();
         
@@ -750,45 +849,53 @@ class CmsxidUtils
      * 
      * @return object[]
      */
-    public static function getConfiguredSources ()
+    public function getConfiguredSources ()
     {
-        $oxLang     = oxRegistry::getLang();
-        $oxConfig   = oxRegistry::getConfig();
+        startProfile(__METHOD__);
         
-        $aCmsxidBaseUrls    = $oxConfig->getShopConfVar('aCmsxidBaseUrls',      $oxConfig->getShopId(), 'module:cmsxid');
-        $aCmsxidBaseSslUrls = $oxConfig->getShopConfVar('aCmsxidBaseSslUrls',   $oxConfig->getShopId(), 'module:cmsxid');
-        $aCmsxidPagePaths   = $oxConfig->getShopConfVar('aCmsxidPagePaths',     $oxConfig->getShopId(), 'module:cmsxid');
-        $aCmsxidParams      = $oxConfig->getShopConfVar('aCmsxidParams',        $oxConfig->getShopId(), 'module:cmsxid');
-        $aCmsxidIdParams    = $oxConfig->getShopConfVar('aCmsxidIdParams',      $oxConfig->getShopId(), 'module:cmsxid');
-        $aCmsxidLangParams  = $oxConfig->getShopConfVar('aCmsxidLangParams',    $oxConfig->getShopId(), 'module:cmsxid');
-        $aCmsxidSeoIdents   = $oxConfig->getShopConfVar('aCmsxidSeoIdents',     $oxConfig->getShopId(), 'module:cmsxid');
-        
-        $aLanguages = $oxLang->getLanguageArray();
-        $aSources = array();
-        
-        foreach ( $aLanguages as $oLang ) {
-            $iLang = $oLang->id;
+        if ( null === self::$_aConfiguredSources ) {
+            $oxLang     = oxRegistry::getLang();
+            $oxConfig   = oxRegistry::getConfig();
             
-            // No URLs configured; invalid source, ignore
-            if ( !$aCmsxidBaseUrls[$iLang] && !$aCmsxidBaseSslUrls[$iLang] ) {
-                continue;
+            $aCmsxidBaseUrls    = $oxConfig->getShopConfVar('aCmsxidBaseUrls',      $oxConfig->getShopId(), 'module:cmsxid');
+            $aCmsxidBaseSslUrls = $oxConfig->getShopConfVar('aCmsxidBaseSslUrls',   $oxConfig->getShopId(), 'module:cmsxid');
+            $aCmsxidPagePaths   = $oxConfig->getShopConfVar('aCmsxidPagePaths',     $oxConfig->getShopId(), 'module:cmsxid');
+            $aCmsxidParams      = $oxConfig->getShopConfVar('aCmsxidParams',        $oxConfig->getShopId(), 'module:cmsxid');
+            $aCmsxidIdParams    = $oxConfig->getShopConfVar('aCmsxidIdParams',      $oxConfig->getShopId(), 'module:cmsxid');
+            $aCmsxidLangParams  = $oxConfig->getShopConfVar('aCmsxidLangParams',    $oxConfig->getShopId(), 'module:cmsxid');
+            $aCmsxidSeoIdents   = $oxConfig->getShopConfVar('aCmsxidSeoIdents',     $oxConfig->getShopId(), 'module:cmsxid');
+            
+            $aLanguages = $oxLang->getLanguageArray();
+            $aSources = array();
+            
+            foreach ( $aLanguages as $oLang ) {
+                $iLang = $oLang->id;
+                
+                // No URLs configured; invalid source, ignore
+                if ( !$aCmsxidBaseUrls[$iLang] && !$aCmsxidBaseSslUrls[$iLang] ) {
+                    continue;
+                }
+                
+                $o = new stdClass();
+                
+                $o->sBaseUrl    = $aCmsxidBaseUrls[$iLang];
+                $o->sBaseUrlSsl = $aCmsxidBaseSslUrls[$iLang];
+                $o->sPagePath   = $aCmsxidPagePaths[$iLang];
+                $o->sParams     = $aCmsxidParams[$iLang];
+                $o->sIdParam    = $aCmsxidIdParams[$iLang];
+                $o->sLangParam  = $aCmsxidLangParams[$iLang];
+                $o->sSeoIdent   = $aCmsxidSeoIdents[$iLang];
+                
+                $aSources[$iLang]       = clone $o;
+                $aSources[$oLang->abbr] = clone $o;
             }
             
-            $o = new stdClass();
-            
-            $o->sBaseUrl    = $aCmsxidBaseUrls[$iLang];
-            $o->sBaseUrlSsl = $aCmsxidBaseSslUrls[$iLang];
-            $o->sPagePath   = $aCmsxidPagePaths[$iLang];
-            $o->sParams     = $aCmsxidParams[$iLang];
-            $o->sIdParam    = $aCmsxidIdParams[$iLang];
-            $o->sLangParam  = $aCmsxidLangParams[$iLang];
-            $o->sSeoIdent   = $aCmsxidSeoIdents[$iLang];
-            
-            $aSources[$iLang]       = clone $o;
-            $aSources[$oLang->abbr] = clone $o;
+            self::$_aConfiguredSources = $aSources;
         }
         
-        return $aSources;
+        stopProfile(__METHOD__);
+        
+        return self::$_aConfiguredSources;
     }
     
     /**
@@ -799,13 +906,13 @@ class CmsxidUtils
      *
      * @return mixed
      */
-    public static function getConfiguredSourceProperty ( $sLang, $sProperty )
+    public function getConfiguredSourceProperty ( $sLang, $sProperty )
     {
         if ( $sLang === null ) {
             $sLang = oxRegistry::getLang()->getBaseLanguage();
         }
         
-        $aSources = self::getConfiguredSources();
+        $aSources = $this->getConfiguredSources();
         
         if ( !array_key_exists($sLang, $aSources) ) {
             return false;
@@ -821,10 +928,10 @@ class CmsxidUtils
      * 
      * @return string
      */
-    public static function getConfiguredSourceBaseUrl ( $sLang )
+    public function getConfiguredSourceBaseUrl ( $sLang )
     {
-        $sBaseUrl = self::getConfiguredSourceProperty( $sLang, 'sBaseUrl' );
-        $sBaseUrl = self::sanitizeUrl( $sBaseUrl );
+        $sBaseUrl = $this->getConfiguredSourceProperty( $sLang, 'sBaseUrl' );
+        $sBaseUrl = $this->sanitizeUrl( $sBaseUrl );
         
         return $sBaseUrl;
     }
@@ -836,10 +943,10 @@ class CmsxidUtils
      * 
      * @return string
      */
-    public static function getConfiguredSourceSslBaseUrl ( $sLang )
+    public function getConfiguredSourceSslBaseUrl ( $sLang )
     {
-        $sBaseUrlSsl = self::getConfiguredSourceProperty( $sLang, 'sBaseUrlSsl' );
-        $sBaseUrlSsl = self::sanitizeUrl( $sBaseUrlSsl );
+        $sBaseUrlSsl = $this->getConfiguredSourceProperty( $sLang, 'sBaseUrlSsl' );
+        $sBaseUrlSsl = $this->sanitizeUrl( $sBaseUrlSsl );
         
         return $sBaseUrlSsl;
     }
@@ -851,9 +958,9 @@ class CmsxidUtils
      * 
      * @return string
      */
-    public static function getConfiguredSourcePagePath ( $sLang )
+    public function getConfiguredSourcePagePath ( $sLang )
     {
-        return self::getConfiguredSourceProperty( $sLang, 'sPagePath' );
+        return $this->getConfiguredSourceProperty( $sLang, 'sPagePath' );
     }
     
     /**
@@ -863,9 +970,9 @@ class CmsxidUtils
      * 
      * @return string
      */
-    public static function getConfiguredSourceParams ( $sLang )
+    public function getConfiguredSourceParams ( $sLang )
     {
-        return self::getConfiguredSourceProperty( $sLang, 'sParams' );
+        return $this->getConfiguredSourceProperty( $sLang, 'sParams' );
     }
     
     /**
@@ -875,9 +982,9 @@ class CmsxidUtils
      * 
      * @return string
      */
-    public static function getConfiguredSourceIdParam ( $sLang )
+    public function getConfiguredSourceIdParam ( $sLang )
     {
-        return self::getConfiguredSourceProperty( $sLang, 'sIdParam' );
+        return $this->getConfiguredSourceProperty( $sLang, 'sIdParam' );
     }
     
     /**
@@ -887,9 +994,9 @@ class CmsxidUtils
      * 
      * @return string
      */
-    public static function getConfiguredSourceLangParam ( $sLang )
+    public function getConfiguredSourceLangParam ( $sLang )
     {
-        return self::getConfiguredSourceProperty( $sLang, 'sLangParam' );
+        return $this->getConfiguredSourceProperty( $sLang, 'sLangParam' );
     }
     
     /**
@@ -899,9 +1006,9 @@ class CmsxidUtils
      * 
      * @return string
      */
-    public static function getConfiguredSourceSeoIdentifier ( $sLang )
+    public function getConfiguredSourceSeoIdentifier ( $sLang )
     {
-        return self::getConfiguredSourceProperty( $sLang, 'sSeoIdent' );
+        return $this->getConfiguredSourceProperty( $sLang, 'sSeoIdent' );
     }
     
     /**
@@ -911,7 +1018,7 @@ class CmsxidUtils
      * 
      * @return array
      */
-    public static function getPassedHttpGetParameters ()
+    public function getPassedHttpGetParameters ()
     {
         // $_GET is extended by OXID with the parameters that "should" be in it
         // when parsing the SEO url; it's thus unreliable.
@@ -930,7 +1037,7 @@ class CmsxidUtils
      * 
      * @return array
      */
-    public static function getPassedHttpPostParameters ()
+    public function getPassedHttpPostParameters ()
     {
         return $_POST;
     }
@@ -943,10 +1050,10 @@ class CmsxidUtils
      * 
      * @return array
      */
-    public static function getSanitizedPassedHttpGetParameters ( $sLang )
+    public function getSanitizedPassedHttpGetParameters ( $sLang )
     {
-        $aParams = self::getPassedHttpGetParameters();
-        $aParams = self::sanitizeHttpParameterArray( $aParams, $sLang );
+        $aParams = $this->getPassedHttpGetParameters();
+        $aParams = $this->sanitizeHttpParameterArray( $aParams, $sLang );
         
         return $aParams;
     }
@@ -957,10 +1064,10 @@ class CmsxidUtils
      * 
      * @return array
      */
-    // public static function getSanitizedPassedHttpPostParameters ( $sLang )
+    // public function getSanitizedPassedHttpPostParameters ( $sLang )
     // {
-        // $aParams = self::getPassedHttpPostParameters();
-        // $aParams = self::sanitizeHttpParameterArray( $aParams, $sLang );
+        // $aParams = $this->getPassedHttpPostParameters();
+        // $aParams = $this->sanitizeHttpParameterArray( $aParams, $sLang );
         
         // return $aParams;
     // }
@@ -973,19 +1080,19 @@ class CmsxidUtils
      * 
      * @return array
      */
-    public static function sanitizeHttpParameterArray ( $aParams, $sLang )
+    public function sanitizeHttpParameterArray ( $aParams, $sLang )
     {
         // Remove parameters specified in the static blacklist
         foreach ( self::$_aRequestParamBlacklist as $sBlacklistedParam ) {
             unset( $aParams[$sBlacklistedParam] );
         }      
         
-        $sIdParam = self::getConfiguredSourceIdParam($sLang);
+        $sIdParam = $this->getConfiguredSourceIdParam($sLang);
         unset( $aParams[$sIdParam] );
         
         // Obtain the name of the language parameter so we can unset it
         $aLangParam = array();
-        parse_str( self::getConfiguredSourceLangParam($sLang), $aLangParam );
+        parse_str( $this->getConfiguredSourceLangParam($sLang), $aLangParam );
         $sLangParam = implode( '', array_keys($aLangParam) );
         unset( $aParams[$sLangParam] );
         
@@ -999,9 +1106,9 @@ class CmsxidUtils
      * 
      * @return CmsxidResult
      */
-    public static function getResultFromSessionCache ( $sUrl )
+    public function getResultFromSessionCache ( $sUrl )
     {
-        self::_initializeSessionCache();
+        $this->_initializeSessionCache();
         
         $sKey = md5($sUrl);
         
@@ -1020,9 +1127,9 @@ class CmsxidUtils
      * 
      * @return void
      */
-    public static function saveResultToSessionCache ( $sUrl, $oResult )
+    public function saveResultToSessionCache ( $sUrl, $oResult )
     {
-        self::_initializeSessionCache();
+        $this->_initializeSessionCache();
         
         $sKey = md5($sUrl);
         
@@ -1034,7 +1141,7 @@ class CmsxidUtils
      * 
      * @return bool
      */
-    protected static function _initializeSessionCache ()
+    protected function _initializeSessionCache ()
     {
         if ( empty(self::$_aSessionCache) ) {
             self::$_aSessionCache = array(
@@ -1051,7 +1158,7 @@ class CmsxidUtils
      * 
      * @return string
      */
-    public static function getDummyString ($oPage, $sSnippet)
+    public function getDummyString ($oPage, $sSnippet)
     {
         return '<span class="cmsxid-dummy">Cmsxid dummy content for URL: ' . $oPage->getFullUrl() . ', argument: ' . $sSnippet . '</span>';
     }
