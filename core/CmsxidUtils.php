@@ -47,11 +47,7 @@ class CmsxidUtils
      *
      * @var array[]
      */
-    protected static $_aConfiguredSources = array(
-        'cl',
-        'fn',
-        'shp',
-    );
+    protected static $_aConfiguredSources = null;
     
     /**
      * Return the Cmsxid singleton instance. Construct if not present.
@@ -856,17 +852,19 @@ class CmsxidUtils
         if ( null === self::$_aConfiguredSources ) {
             $oxLang     = oxRegistry::getLang();
             $oxConfig   = oxRegistry::getConfig();
+            $iShop      = $oxConfig->getShopId();
             
-            $aCmsxidBaseUrls    = $oxConfig->getShopConfVar('aCmsxidBaseUrls',      $oxConfig->getShopId(), 'module:cmsxid');
-            $aCmsxidBaseSslUrls = $oxConfig->getShopConfVar('aCmsxidBaseSslUrls',   $oxConfig->getShopId(), 'module:cmsxid');
-            $aCmsxidPagePaths   = $oxConfig->getShopConfVar('aCmsxidPagePaths',     $oxConfig->getShopId(), 'module:cmsxid');
-            $aCmsxidParams      = $oxConfig->getShopConfVar('aCmsxidParams',        $oxConfig->getShopId(), 'module:cmsxid');
-            $aCmsxidIdParams    = $oxConfig->getShopConfVar('aCmsxidIdParams',      $oxConfig->getShopId(), 'module:cmsxid');
-            $aCmsxidLangParams  = $oxConfig->getShopConfVar('aCmsxidLangParams',    $oxConfig->getShopId(), 'module:cmsxid');
-            $aCmsxidSeoIdents   = $oxConfig->getShopConfVar('aCmsxidSeoIdents',     $oxConfig->getShopId(), 'module:cmsxid');
+            $aCmsxidBaseUrls    = $oxConfig->getShopConfVar('aCmsxidBaseUrls',      $iShop, 'module:cmsxid');
+            $aCmsxidBaseSslUrls = $oxConfig->getShopConfVar('aCmsxidBaseSslUrls',   $iShop, 'module:cmsxid');
+            $aCmsxidPagePaths   = $oxConfig->getShopConfVar('aCmsxidPagePaths',     $iShop, 'module:cmsxid');
+            $aCmsxidParams      = $oxConfig->getShopConfVar('aCmsxidParams',        $iShop, 'module:cmsxid');
+            $aCmsxidIdParams    = $oxConfig->getShopConfVar('aCmsxidIdParams',      $iShop, 'module:cmsxid');
+            $aCmsxidLangParams  = $oxConfig->getShopConfVar('aCmsxidLangParams',    $iShop, 'module:cmsxid');
+            $aCmsxidSeoIdents   = $oxConfig->getShopConfVar('aCmsxidSeoIdents',     $iShop, 'module:cmsxid');
             
             $aLanguages = $oxLang->getLanguageArray();
-            $aSources = array();
+            
+            $aSources   = array();
             
             foreach ( $aLanguages as $oLang ) {
                 $iLang = $oLang->id;
@@ -891,6 +889,8 @@ class CmsxidUtils
             }
             
             self::$_aConfiguredSources = $aSources;
+        
+            // echo "<pre>";var_dump(self::$_aConfiguredSources);echo "</pre>";
         }
         
         stopProfile(__METHOD__);

@@ -57,7 +57,7 @@ class CmsxidPathPage extends CmsxidPage
     {
         $oUtils = CmsxidUtils::getInstance();
         
-        $sUrl = $oUtils->getFullPageUrlById( $this->_sPagePath, $this->_sLang );
+        $sUrl = $oUtils->getFullPageUrlById( $this->getPagePath(), $this->getLang() );
         
         return $sUrl;
     }
