@@ -48,7 +48,7 @@ class cmsxid_oxseoencoder extends cmsxid_oxseoencoder_parent
         if ( !empty($aQuery['cl']) && $aQuery['cl'] == 'cmsxid_fe' ) {
             // Construct an SEO URL that represents a call to CMSxid from the passed page
             $sPage      = urldecode($aQuery['page']);
-            $sSeoIdent  = $oUtils->getConfiguredSourceSeoIdentifier($iLang);
+            $sSeoIdent  = $oUtils->getLangConfigValue(CmsxidUtils::CONFIG_KEY_SEO_IDENTIFIERS, $iLang);
             $sShopUrl   = (strpos($sStdUrl, 'https:') === 0) ? $oxConfig->getSslShopUrl($iLang) : $oxConfig->getShopUrl($iLang);
             
             $sSeoUrl = $oUtils->sanitizeUrl( $sShopUrl . '/' . $sSeoIdent . '/' . $sPage );

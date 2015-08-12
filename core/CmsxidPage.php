@@ -79,13 +79,22 @@ abstract class CmsxidPage
         $sFullUrl = false;
         
         if ( $sBaseUrl ) {
-            $sBaseQuery     = parse_url( $sBaseUrl, PHP_URL_QUERY );
-            $sAddQuery      = http_build_query( $oUtils->getExplicitQueryParams() );
+            // $sBaseQuery     = parse_url( $sBaseUrl, PHP_URL_QUERY );
+            
+            $aMatches = array();
+            preg_match('/(\?(?:.*?))(#.*)?$/', $sBaseUrl, $aMatches);
+            
+            $sBaseQuery = $aMatches[1];
+            $sAddQuery  = http_build_query( $oUtils->getExplicitQueryParams() );
 
             $sFullUrl = $sBaseUrl;
-            $sFullUrl = preg_replace( '/' . preg_quote($sBaseQuery, '/') . '$/', '', $sFullUrl );
+            
+            // Strip away the query string
+            // $sFullUrl = preg_replace( '/' . preg_quote($sBaseQuery, '/') . '$/', '', $sFullUrl );
+            $sFullUrl = substr( $sFullUrl, 0, strlen($sFullUrl) - strlen($sBaseQuery) );
+            
             $sFullUrl = rtrim( $sFullUrl, '?&' );
-            $sFullUrl .= '?' . $sBaseQuery . '&' . $sAddQuery;
+            $sFullUrl .= '?' . ltrim($sBaseQuery, '?&') . '&' . $sAddQuery;
             $sFullUrl = rtrim( $sFullUrl, '?&' );
         }
         

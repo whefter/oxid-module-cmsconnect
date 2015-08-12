@@ -13,6 +13,117 @@ class CmsxidUtils
     const TYPE_IDENTIFIER_PATH  = 1;
     const TYPE_IDENTIFIER_ID    = 2;
     
+    const
+        CONFIG_KEY_SSL_DONT_VERIFY_PEER = 'blCmsxidSslDontVerifyPeer',
+        CONFIG_KEY_ENABLE_DUMMY_CONTENT = 'blCmsxidEnableDummyContent',
+        CONFIG_KEY_CURL_EXECUTE_TIMEOUT = 'iCmsxidCurlExecuteTimeout',
+        CONFIG_KEY_CURL_CONNECT_TIMEOUT = 'iCmsxidCurlConnectTimeout',
+        CONFIG_KEY_DONT_REWRITE_URLS    = 'blCmsxidLeaveUrls',
+        CONFIG_KEY_TTL_DEFAULT_RND      = 'iCmsxidTtlDefaultRnd',
+        CONFIG_KEY_TTL_DEFAULT          = 'iCmsxidTtlDefault',
+        
+        CONFIG_KEY_BASE_URLS            = 'aCmsxidBaseUrls',
+        CONFIG_KEY_BASE_SSL_URLS        = 'aCmsxidBaseSslUrls',
+        CONFIG_KEY_PAGE_PATHS           = 'aCmsxidPagePaths',
+        CONFIG_KEY_QUERY_PARAMETERS     = 'aCmsxidParams',
+        CONFIG_KEY_ID_PARAMETERS        = 'aCmsxidIdParams',
+        CONFIG_KEY_LANG_PARAMETERS      = 'aCmsxidLangParams',
+        CONFIG_KEY_SEO_IDENTIFIERS      = 'aCmsxidSeoIdents'
+        
+        ;
+    
+    /**
+     * Configuration: return a configuration value. Caches values to circumvent any
+     * problems of getShopConfVar(); getShopConfVar() is the only way to ensure
+     * the configuration value is for the module, but it requests the value from
+     * the database, so cache it.
+     *
+     * @param   string      $sKey       Configuration key
+     * 
+     * @return mixed
+     */
+    public function getConfigValue ($sKey)
+    {
+        startProfile(__METHOD__);
+        
+        $mVal = $this->getFromSessionCache('config', $sKey);
+        
+        if ( $mVal === null ) {
+            $oxConfig = oxRegistry::getConfig();
+            
+            $mVal = $oxConfig->getShopConfVar($sKey, $oxConfig->getShopId(), 'module:cmsxid');
+            
+            $this->saveToSessionCache('config', $sKey, $mVal);
+        }
+        
+        stopProfile(__METHOD__);
+        
+        return $mVal;
+    }
+    
+    /**
+     * Same as getConfigValue(), but for configuration values that are language specific,
+     * i.e. present once for each language.
+     * 
+     * @param   string      $sKey       Configuration key
+     * @param   string      $sLang      Language to return the configuration value for
+     *
+     * @return mixed
+     */
+    public function getLangConfigValue ($sKey, $sLang = null)
+    {
+        startProfile(__METHOD__);
+        
+        $aVal = $this->getConfigValue($sKey);
+        
+        if ( $sLang === null ) {
+            $sLang = oxRegistry::getLang()->getBaseLanguage();
+        }
+        
+        $sLang = $this->_getStandardLanguageIdentifier($sLang);
+        
+        if ( !array_key_exists($sLang, $aVal) ) {
+            $mVal = false;
+        } else {
+            $mVal = $aVal[$sLang];
+        }
+        
+        stopProfile(__METHOD__);
+        
+        return $mVal;
+    }
+    
+    /**
+     * Returns an integer language identifier no matter what. Used for accessing configuration variables.
+     * 
+     * @param   string      $sLang      Language identifier in arbitrary form (abbreviation/integer)
+     *
+     * @return int
+     */
+    protected function _getStandardLanguageIdentifier ($sLang)
+    {
+        startProfile(__METHOD__);
+        
+        $sLangMapped = $this->getFromSessionCache('langIdentMap', $sLang);
+
+        if ( $sLangMapped === null ) {
+            $oxLang     = oxRegistry::getLang();
+            $aLanguages = $oxLang->getLanguageArray();
+            
+            foreach ( $aLanguages as $oLang ) {
+                $this->saveToSessionCache('langIdentMap', $oLang->abbr, (int)$iLang);
+                $this->saveToSessionCache('langIdentMap', (int)$iLang,  (int)$iLang);
+                $this->saveToSessionCache('langIdentMap', $iLang,       (int)$iLang);
+            }
+            
+            $sLangMapped = $this->getFromSessionCache('langIdentMap', $sLang);
+        }
+        
+        stopProfile(__METHOD__);
+        
+        return $sLangMapped;
+    }
+    
     /**
      * The CmsxidUtils singleton instance.
      *
@@ -84,10 +195,10 @@ class CmsxidUtils
         $oxConfig       = oxRegistry::getConfig();
         $blSsl          = $oxConfig->isSsl();
         
-        $sBaseUrl       = $this->getConfiguredSourceBaseUrl($sLang);
-        $sBaseUrlSsl    = $this->getConfiguredSourceSslBaseUrl($sLang);
-        $sPagePath      = $this->getConfiguredSourcePagePath($sLang);
-        $sParams        = $this->getConfiguredSourceParams($sLang);
+        $sBaseUrl       = $this->getLangConfigValue(CmsxidUtils::CONFIG_KEY_BASE_URLS,          $sLang);
+        $sBaseUrlSsl    = $this->getLangConfigValue(CmsxidUtils::CONFIG_KEY_BASE_SSL_URLS,      $sLang);
+        $sPagePath      = $this->getLangConfigValue(CmsxidUtils::CONFIG_KEY_PAGE_PATHS,         $sLang);
+        $sParams        = $this->getLangConfigValue(CmsxidUtils::CONFIG_KEY_QUERY_PARAMETERS,   $sLang);
         
         // We don't know how the user input his parameters, so parse them to be sure
         $aParams = array();
@@ -128,11 +239,11 @@ class CmsxidUtils
         $oxConfig       = oxRegistry::getConfig();
         $blSsl          = $oxConfig->isSsl();
         
-        $sBaseUrl       = $this->getConfiguredSourceBaseUrl($sLang);
-        $sBaseUrlSsl    = $this->getConfiguredSourceSslBaseUrl($sLang);
-        $sIdParam       = $this->getConfiguredSourceIdParam($sLang);
-        $sLangParam     = $this->getConfiguredSourceLangParam($sLang);
-        $sParams        = $this->getConfiguredSourceParams($sLang);
+        $sBaseUrl       = $this->getLangConfigValue(CmsxidUtils::CONFIG_KEY_BASE_URLS,          $sLang);
+        $sBaseUrlSsl    = $this->getLangConfigValue(CmsxidUtils::CONFIG_KEY_BASE_SSL_URLS,      $sLang);
+        $sIdParam       = $this->getLangConfigValue(CmsxidUtils::CONFIG_KEY_ID_PARAMETERS,      $sLang);
+        $sLangParam     = $this->getLangConfigValue(CmsxidUtils::CONFIG_KEY_LANG_PARAMETERS,    $sLang);
+        $sParams        = $this->getLangConfigValue(CmsxidUtils::CONFIG_KEY_QUERY_PARAMETERS,   $sLang);
         
         // Parse the user-specified params and add the id and L parameters
         $aParams = array();
@@ -157,81 +268,102 @@ class CmsxidUtils
     }
     
     /**
-     * Sanitize URLs prior to caching to prevent double caching of a page under different URLs
+     * Sanitize URLs prior to caching to prevent double caching of a page under different URLs.
+     * This method gets called so often it has its own caching mechanism.
      *
-     * @param string    $sUrl       Page URL
+     * @param string    $sUnsanitizedUrl    Page URL
      * 
      * @return string
      */
-    public function sanitizeUrl ( $sUrl )
+    public function sanitizeUrl ( $sUnsanitizedUrl)
     {
         startProfile(__METHOD__);
         
-        // Automatic encoding handling
-        $oStr = getStr();
+        $sSanitizedUrl = $this->getFromSessionCache('urls', $sUnsanitizedUrl);
         
-        // Replace multiple slashes, except for the protocol part
-        $sUrl = $oStr->preg_replace( '/(?<!:)\/+/', '/', $sUrl);
-        
-        // Put through PHP's functions to ensure standardized URL
-        // $sUrl = http_build_url( parse_url( $sUrl ) );
-        
-        // Remove ending '&' or '?'
-        // Do this without regular expressions (which are expensive)
-        $sUrl = rtrim( $sUrl, '&?' );
+        if ( null === $sSanitizedUrl ) {
+            // Automatic encoding handling
+            $oStr = getStr();
+            
+            // Replace multiple slashes, except for the protocol part
+            $sUrl = $oStr->preg_replace( '/(?<!:)\/+/', '/', $sUnsanitizedUrl);
+            
+            // Put through PHP's functions to ensure standardized URL
+            // $sUrl = http_build_url( parse_url( $sUrl ) );
+            
+            // Remove ending '&' or '?'
+            // Do this without regular expressions (which are expensive)
+            $sUrl = rtrim( $sUrl, '&?' );
+            
+            $sSanitizedUrl = $sUrl;
+            
+            $this->saveToSessionCache('urls', $sUnsanitizedUrl, $sSanitizedUrl);
+        }
         
         stopProfile(__METHOD__);
         
-        return $sUrl;
+        return $sSanitizedUrl;
     }
     
     /**
      * Ensure that a page title can be used in a URL without causing problems
      *
-     * @param string    $sTitle     Title
+     * @param string    $sUnsanitizedTitle      Title
      * 
      * @return string
      */
-    public function sanitizePageTitle ( $sTitle )
+    public function sanitizePageTitle ( $sUnsanitizedTitle )
     {
         startProfile(__METHOD__);
         
-        // Automatic encoding handling
-        $oStr = getStr();
+        $sSanitizedTitle = $this->getFromSessionCache('title', $sUnsanitizedTitle);
         
-        // Strip leading slashes
-        $sTitle = $oStr->preg_replace( '/^\/+/', '', $sTitle);
-        
-        // Replace multiple instances of slashes with a single one, but make sure there is an ending slash
-        $sTitle = $oStr->preg_replace( '/\/+/', '/', $sTitle . '/');
-        
-        // Slashes should be left intact
-        $sTitle = $oStr->preg_replace('/\/+/', '/', $sTitle);
-        $aTitleParts = explode('/', $sTitle);
-        
-        // Use OXID SEO encoder native functions
-        $oxSeoEncoder = oxRegistry::get('oxSeoEncoder');
-        
-        foreach ( $aTitleParts as $i => $sTitlePart ) {
-            $sTitlePart = $oxSeoEncoder->encodeString($sTitlePart, true, $iLang);
+        if ( null === $sSanitizedTitle ) {
             
-            // Convert to lowercase
-            $sTitlePart = $oStr->strtolower($sTitlePart);
+            // Automatic encoding handling
+            $oStr = getStr();
             
-            // Remove Tags
-            $sTitlePart = strip_tags($sTitlePart);
+            $sTitle = $sUnsanitizedTitle;
             
-            // Replace special characters with hyphen
-            $sTitlePart = preg_replace('/[ \-+_]+/', '-', $sTitlePart);
+            // Strip leading slashes
+            // $sTitle = $oStr->preg_replace( '/^\/+/', '', $sTitle);
+            $sTitle = ltrim($sTitle, '/');
             
-            $aTitleParts[$i] = rawurlencode($sTitlePart);
+            // Replace multiple instances of slashes with a single one, but make sure there is an ending slash
+            $sTitle = $oStr->preg_replace( '/\/+/', '/', $sTitle . '/');
+            
+            // Slashes should be left intact
+            // $sTitle = $oStr->preg_replace('/\/+/', '/', $sTitle);
+            $aTitleParts = explode('/', $sTitle);
+            
+            // Use OXID SEO encoder native functions
+            $oxSeoEncoder = oxRegistry::get('oxSeoEncoder');
+            
+            foreach ( $aTitleParts as $i => $sTitlePart ) {
+                $sTitlePart = $oxSeoEncoder->encodeString($sTitlePart, true, $iLang);
+                
+                // Convert to lowercase
+                $sTitlePart = $oStr->strtolower($sTitlePart);
+                
+                // Remove Tags
+                $sTitlePart = strip_tags($sTitlePart);
+                
+                // Replace special characters with hyphen
+                $sTitlePart = preg_replace('/[ \-+_]+/', '-', $sTitlePart);
+                
+                $aTitleParts[$i] = rawurlencode($sTitlePart);
+            }
+            
+            $sTitle = implode('/', $aTitleParts);
+            
+            $sSanitizedTitle = $sTitle;
+                
+            $this->saveToSessionCache('title', $sUnsanitizedTitle, $sSanitizedTitle);
         }
         
-        $sTitle = implode('/', $aTitleParts);
-
         stopProfile(__METHOD__);
         
-        return $sTitle;
+        return $sSanitizedTitle;
     }
     
     /**
@@ -296,15 +428,15 @@ class CmsxidUtils
         $oResult->info      = array();
         
         if ( $sUrl ) {
-            // var_dump('Connect: ', $this->getConfiguredCurlConnectTimeout());
-            // var_dump('Execute: ', $this->getConfiguredCurlExecuteTimeout());
+            // var_dump('Connect: ', $this->getConfigValue(CmsxidUtils::CONFIG_KEY_CURL_CONNECT_TIMEOUT));
+            // var_dump('Execute: ', $this->getConfigValue(CmsxidUtils::CONFIG_KEY_CURL_EXECUTE_TIMEOUT));
             
             $curl_handle = curl_init();
             curl_setopt( $curl_handle, CURLOPT_URL,             $sUrl );
             curl_setopt( $curl_handle, CURLOPT_FOLLOWLOCATION,  1 );
             curl_setopt( $curl_handle, CURLOPT_RETURNTRANSFER,  1 );
             
-            curl_setopt( $curl_handle, CURLOPT_SSL_VERIFYPEER,  $this->getConfiguredSslVerifyPeerValue() );
+            curl_setopt( $curl_handle, CURLOPT_SSL_VERIFYPEER,  !$this->getConfigValue(CmsxidUtils::CONFIG_KEY_SSL_DONT_VERIFY_PEER) );
             
             // curl_setopt( $curl_handle, CURLOPT_CONNECTTIMEOUT,  2 );
             // curl_setopt( $curl_handle, CURLOPT_TIMEOUT,         1 );
@@ -385,10 +517,10 @@ class CmsxidUtils
         
         // Figure out cache TTL
         if ( null === $iTtl ) {
-            if ( !($iTtl = $this->getConfiguredDefaultCacheTTL()) ) {
+            if ( !($iTtl = $this->getConfigValue(CmsxidUtils::CONFIG_KEY_TTL_DEFAULT)) ) {
                 $iTtl = 600;
             }
-            if ( !($iTtlRnd = $this->getConfiguredDefaultCacheTTLRandomization()) ) {
+            if ( !($iTtlRnd = $this->getConfigValue(CmsxidUtils::CONFIG_KEY_TTL_DEFAULT_RND)) ) {
                 $iTtlRnd = 10;
             }
         }
@@ -570,19 +702,13 @@ class CmsxidUtils
         startProfile(__METHOD__);
         
         $oxConfig   = oxRegistry::getConfig();
+        $oxLang     = oxRegistry::getLang();
         $oUtils     = CmsxidUtils::getInstance();
-        
-        $aSources = $oUtils->getConfiguredSources();
         
         $aSeoInfo = false;
         
-        foreach ( $aSources as $sLang => $oSource ) {
-            // We only want actual numeric language IDs at this point
-            if ( !is_numeric($sLang) ) {
-                continue;
-            }
-            
-            $sSeoIdent  = $oUtils->getConfiguredSourceSeoIdentifier($sLang);
+        foreach ( $oxLang->getLanguageArray() as $oLang ) {
+            $sSeoIdent = $oUtils->getLangConfigValue(CmsxidUtils::CONFIG_KEY_SEO_IDENTIFIERS, $oLang->id);
             
             // Either starts with SEO identifier and a slash (subpage of CMS is called)
             // or is just the plain SEO identifier
@@ -593,7 +719,7 @@ class CmsxidUtils
                             ;
                 
                 $aSeoInfo = array(
-                    'lang'          => $sLang,
+                    'lang'          => $oLang->abbr,
                     'cl'            => 'cmsxid_fe',
                     'page'          => $sPage,
                 );
@@ -618,31 +744,32 @@ class CmsxidUtils
     {
         startProfile(__METHOD__);
         
-        $oxConfig = oxRegistry::getConfig();
+        $oxConfig   = oxRegistry::getConfig();
+        $oxLang     = oxRegistry::getLang();
         
-        if ( $this->getConfiguredNoUrlRewriteSetting() == true ) {
+        if ( $this->getConfigValue(CmsxidUtils::CONFIG_KEY_DONT_REWRITE_URLS) == true ) {
             stopProfile(__METHOD__);
             
             return $sContent;
         }
         
-        // We want to replace URLs for all configured sources
-        $aLanguages = array_keys( $this->getConfiguredSources() );
-
-        foreach ( $aLanguages as $sLang ) {
-            // Deal only with numeric language IDs, since all OXID functions only take those
-            if ( !is_numeric($sLang) ) {
+        foreach ( $oxLang->getLanguageArray() as $oLang ) {
+            $sSourceUrl     = $this->getLangConfigValue(CmsxidUtils::CONFIG_KEY_BASE_URLS);
+            $sSourceSslUrl  = $this->getLangConfigValue(CmsxidUtils::CONFIG_KEY_BASE_SSL_URLS);
+            
+            // No configured URLs - skip this language
+            if ( !$sSourceUrl && !$sSourceSslUrl ) {
                 continue;
             }
             
             // No matter what URLs the CMS returns, the URLs schema needs to be rewritten to the current shop's schema
-            foreach ( array($this->getConfiguredSourceBaseUrl($sLang), $this->getConfiguredSourceSslBaseUrl($sLang)) as $sSourceBaseUrl ) {
-                $sSourcePagePath    = $this->getConfiguredSourcePagePath($sLang);
+            foreach ( array($sSourceUrl, $sSourceSslUrl) as $sSourceBaseUrl ) {
+                $sSourcePagePath    = $this->getLangConfigValue(CmsxidUtils::CONFIG_KEY_PAGE_PATHS, $oLang->id);
                 $sFullBaseUrl       = $this->sanitizeUrl( $sSourceBaseUrl . '/' . $sSourcePagePath . '/' );
                 
                 // The target is defined by the current shop's SSL setting
                 $sTargetBaseUrl     = $oxConfig->isSsl() ? $oxConfig->getSslShopUrl($sLang) : $oxConfig->getShopUrl($sLang);
-                $sTargetSeoIdent    = $this->getConfiguredSourceSeoIdentifier( $sLang );
+                $sTargetSeoIdent    = $this->getLangConfigValue(CmsxidUtils::CONFIG_KEY_SEO_IDENTIFIERS, $oLang->id);
                 $sFullTargetUrl     = $this->sanitizeUrl( $sTargetBaseUrl . '/' . $sTargetSeoIdent . '/' );
                 
                 // Replace all links
@@ -659,11 +786,11 @@ class CmsxidUtils
             // if configured, to prevent browser complaints about mixed modes
             if ( $oxConfig->isSsl() ) {
                 // Do this ONLY if an SSL source URL has actually been configured
-                if ( $this->getConfiguredSourceSslBaseUrl($sLang) ) {
+                if ( $sSourceSslUrl ) {
                     // We can safely do this crude replace since, in theory, all URLs left on the page should be to
                     // non-page CMS content
-                    $sSourceBaseUrl     = $this->sanitizeUrl( $this->getConfiguredSourceBaseUrl($sLang) . '/' );
-                    $sSourceSslBaseUrl  = $this->sanitizeUrl( $this->getConfiguredSourceSslBaseUrl($sLang) . '/' );
+                    $sSourceBaseUrl     = $this->sanitizeUrl( $sSourceUrl . '/' );
+                    $sSourceSslBaseUrl  = $this->sanitizeUrl( $sSourceSslUrl . '/' );
                 
                     $sContent = str_replace( $sSourceBaseUrl, $sSourceSslBaseUrl, $sContent );
                 }
@@ -1087,12 +1214,12 @@ class CmsxidUtils
             unset( $aParams[$sBlacklistedParam] );
         }      
         
-        $sIdParam = $this->getConfiguredSourceIdParam($sLang);
+        $sIdParam = $this->getLangConfigValue(CmsxidUtils::CONFIG_KEY_ID_PARAMETERS, $sLang);
         unset( $aParams[$sIdParam] );
         
         // Obtain the name of the language parameter so we can unset it
         $aLangParam = array();
-        parse_str( $this->getConfiguredSourceLangParam($sLang), $aLangParam );
+        parse_str( $this->getLangConfigValue(CmsxidUtils::CONFIG_KEY_LANG_PARAMETERS, $sLang), $aLangParam );
         $sLangParam = implode( '', array_keys($aLangParam) );
         unset( $aParams[$sLangParam] );
         
@@ -1108,19 +1235,11 @@ class CmsxidUtils
      */
     public function getResultFromSessionCache ( $sUrl )
     {
-        $this->_initializeSessionCache();
-        
-        $sKey = md5($sUrl);
-        
-        if ( array_key_exists($sKey, self::$_aSessionCache['results']) ) {
-            return self::$_aSessionCache['results'][$sKey];
-        }
-        
-        return false;
+        return $this->getFromSessionCache('results', $sUrl);
     }
     
     /**
-     * Returns the result object associated with a URL
+     * Saves a result object to session cache using its (hashed) URL as key
      *
      * @param string        $sUrl           Full URL of the page
      * @param CmsxidResult  $oResult        Result object
@@ -1129,24 +1248,63 @@ class CmsxidUtils
      */
     public function saveResultToSessionCache ( $sUrl, $oResult )
     {
-        $this->_initializeSessionCache();
+        $this->saveToSessionCache('results', $sUrl, $oResult);
+    }
+    
+    /**
+     * Generic session cache read method.
+     *
+     * @param string        $sGroup         Group identifier
+     * @param string        $sUnhashedKey   Unhashed key, will be hashed by MD5
+     * 
+     * @return CmsxidResult
+     */
+    public function getFromSessionCache ( $sGroup, $sUnhashedKey )
+    {
+        $this->_initializeSessionCache($sGroup);
         
-        $sKey = md5($sUrl);
+        $sKey = md5($sUnhashedKey);
         
-        self::$_aSessionCache['results'][$sKey] = $oResult;
+        if ( array_key_exists($sKey, self::$_aSessionCache[$sGroup]) ) {
+            return self::$_aSessionCache[$sGroup][$sKey];
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Generic session cache write method.
+     *
+     * @param string        $sGroup         Group identifier
+     * @param string        $sUnhashedKey   Unhashed key, will be hashed by MD5
+     * @param string        $sValue         Value to save
+     * 
+     * @return void
+     */
+    public function saveToSessionCache ( $sGroup, $sUnhashedKey, $sValue )
+    {
+        $this->_initializeSessionCache($sGroup);
+        
+        $sKey = md5($sUnhashedKey);
+        
+        self::$_aSessionCache[$sGroup][$sKey] = $sValue;
     }
     
     /**
      * Initialize the session cache
      * 
-     * @return bool
+     * @param string        $sGroup         Group identifier
+     *
+     * @return void
      */
-    protected function _initializeSessionCache ()
+    protected function _initializeSessionCache ($sGroup)
     {
-        if ( empty(self::$_aSessionCache) ) {
-            self::$_aSessionCache = array(
-                'results' => array(),
-            );
+        if ( !is_array(self::$_aSessionCache) ) {
+            self::$_aSessionCache = array();
+        }
+        
+        if ( !array_key_exists($sGroup, self::$_aSessionCache) ) {
+            self::$_aSessionCache[$sGroup] = array();
         }
     }
     
