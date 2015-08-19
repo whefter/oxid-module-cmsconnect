@@ -25,8 +25,8 @@ $aLang = array(
 'CMSXID_ADMIN_SETTINGS_aCmsxidSeoIdents'                => 'SEO-Schnipsel für OXID-URLs',
 'CMSXID_ADMIN_SETTINGS_iCmsxidCurlConnectTimeout'       => 'Connect-Timeout für cURL-Aufrufe in Sekunden (Standard: 1 s)',
 'CMSXID_ADMIN_SETTINGS_iCmsxidCurlExecuteTimeout'       => 'Execute-Timeout für cURL-Aufrufe in Sekunden (Standard: 3 s)',
-'CMSXID_ADMIN_SETTINGS_blCmsxidEnableDummyContent'      => 'Dummy-Content ausliefern',
-'CMSXID_ADMIN_SETTINGS_blCmsxidEnableDummyContent_HELP' => 'Es werden keine Inhalte mittels cURL abgerufen, sondern Platzhalter zurückgegeben. Für Debug-Zwecke gedacht.',
+'CMSXID_ADMIN_SETTINGS_blCmsxidEnableTestContent'       => 'Test-Content ausliefern',
+'CMSXID_ADMIN_SETTINGS_blCmsxidEnableTestContent_HELP'  => 'Es werden keine Inhalte mittels cURL abgerufen, sondern der Test-Content zurückgegeben. Für Debug-Zwecke gedacht.',
 'CMSXID_ADMIN_SETTINGS_blCmsxidSslDontVerifyPeer'       => 'SSL-Peer nicht überprüfen',
 'CMSXID_ADMIN_SETTINGS_blCmsxidSslDontVerifyPeer_HELP'  => 'Beim abrufen von SSL-Seiten das Zertifikat der Gegenstelle nicht überprüfen. <p class="warning">ACHTUNG SICHERHEITSRISIKO: Diese Option sollte nur zu Debug-Zwecken eingeschaltet werden.</p>',
 

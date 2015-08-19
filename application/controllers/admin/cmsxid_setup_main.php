@@ -64,7 +64,7 @@ class cmsxid_setup_main extends oxAdminView
                 'type'      => 'str',
                 'global'    => false,
             ),
-        array(  'name'      => 'blCmsxidEnableDummyContent',
+        array(  'name'      => 'blCmsxidEnableTestContent',
                 'type'      => 'bool',
                 'global'    => false,
             ),
@@ -85,8 +85,6 @@ class cmsxid_setup_main extends oxAdminView
      * Constructor. Sets the template variable to the current class name with .tpl suffix
      *
      * @return string
-     *
-     * @author William Hefter <william@whefter.de>
      */
     function __construct()
     {
@@ -146,7 +144,7 @@ class cmsxid_setup_main extends oxAdminView
             
             // For global settings, the associated shop id is the base shop id.
             $iTargetShopId = $aSetting['global'] ? $oxConfig->getBaseShopId() : $sShopId;
-            $oxConfig->saveShopConfVar( $aSetting['type'], $aSetting['name'], $aParams[ $aSetting['name'] ], $iTargetShopId, 'module:' . static::CONFIG_MODULE_NAME );
+            $oxConfig->saveShopConfVar( $aSetting['type'], $aSetting['name'], $aParams[ $aSetting['name'] ], $iTargetShopId, 'module:' . self::CONFIG_MODULE_NAME );
         }
     }
 }

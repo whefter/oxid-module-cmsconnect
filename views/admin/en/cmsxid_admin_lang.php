@@ -25,8 +25,8 @@ $aLang = array(
 'CMSXID_ADMIN_SETTINGS_aCmsxidSeoIdents'                => 'SEO-Snippet for OXID URLs',
 'CMSXID_ADMIN_SETTINGS_iCmsxidCurlConnectTimeout'       => 'Connect-Timeout for cURL calls in seconds (default: 1 s)',
 'CMSXID_ADMIN_SETTINGS_iCmsxidCurlExecuteTimeout'       => 'Execute-Timeout for cURL calls in seconds (default: 3 s)',
-'CMSXID_ADMIN_SETTINGS_blCmsxidEnableDummyContent'      => 'Server dummy content',
-'CMSXID_ADMIN_SETTINGS_blCmsxidEnableDummyContent_HELP' => 'Nothing is fetched from remote servers, and dummy content is returned by all functions. For debug purposes.',
+'CMSXID_ADMIN_SETTINGS_blCmsxidEnableTestContent'       => 'Serve test content',
+'CMSXID_ADMIN_SETTINGS_blCmsxidEnableTestContent_HELP'  => 'Nothing is fetched from remote servers, the test content is used. For debug purposes.',
 'CMSXID_ADMIN_SETTINGS_blCmsxidSslDontVerifyPeer'       => 'Don\'t verify SSL peers',
 'CMSXID_ADMIN_SETTINGS_blCmsxidSslDontVerifyPeer_HELP'  => 'Don\'t verify peer certificate when fetching SSL pages. <p class="warning">WARNING! COMPROMISES SAFETY: this option should only ever be enabled for debug purposes.</p>',
 

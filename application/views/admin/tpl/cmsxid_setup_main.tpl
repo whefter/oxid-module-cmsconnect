@@ -180,10 +180,10 @@
         </p>
         
         <p>
-            <input type="hidden" name="editval[blCmsxidEnableDummyContent]" value="0" />
-            <input type="checkbox" name="editval[blCmsxidEnableDummyContent]" value="1" [{ if $blCmsxidEnableDummyContent }]checked="checked"[{ /if }] />
-            [{ oxmultilang ident="CMSXID_ADMIN_SETTINGS_blCmsxidEnableDummyContent" }]
-            [{ oxinputhelp ident="CMSXID_ADMIN_SETTINGS_blCmsxidEnableDummyContent_HELP" }]
+            <input type="hidden" name="editval[blCmsxidEnableTestContent]" value="0" />
+            <input type="checkbox" name="editval[blCmsxidEnableTestContent]" value="1" [{ if $blCmsxidEnableTestContent }]checked="checked"[{ /if }] />
+            [{ oxmultilang ident="CMSXID_ADMIN_SETTINGS_blCmsxidEnableTestContent" }]
+            [{ oxinputhelp ident="CMSXID_ADMIN_SETTINGS_blCmsxidEnableTestContent_HELP" }]
         </p>
         
         <p>

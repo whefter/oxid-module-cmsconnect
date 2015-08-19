@@ -357,25 +357,15 @@ class cmsxid
         
         $oUtils = CmsxidUtils::getInstance();
         
-        // URL should be sanitized at this point
-        
-        // echo "<pre>";
-        // var_dump(__METHOD__);
-        // var_dump("Base URL: " . $oPage->getBaseUrl());
-        // var_dump("Full URL: " . $oPage->getFullUrl());
-        
         $sBaseUrl   = $oPage->getBaseUrl();
         $sFullUrl   = $oPage->getFullUrl();
         
         $blUseFileCache     = true;
         $sSessionCacheUrl   = $sBaseUrl;
         
-        // startProfile
         $blIsImplicitSeoPage = $oUtils->checkIsImplicitSeoPage($oPage);
         
         if ( $blIsImplicitSeoPage ) {
-            // var_dump("Detected implicit page");
-            
             // The implicit SEO page is exempt from caching IF
             // any query parameters at all have been passed along, since
             // we have to assume some plugin or similar on the page needs these.
@@ -384,12 +374,8 @@ class cmsxid
             // has been requested.
             //
             // Additionally, we now use the full page URL for session cache
-            
-            $iExplicitQueryParamsCount = count($oUtils->getExplicitQueryParams());
-            
-            if ( $iExplicitQueryParamsCount )  {
-                // var_dump("Detected custom query params");
-                // var_dump("Disabling file cache and setting session cache identifier to full URL");
+            if ( count($oUtils->getExplicitQueryParams()) )  {
+                // @TODO Add some debug output here
                 $blUseFileCache     = false;
                 $sSessionCacheUrl   = $sFullUrl;
             }
@@ -400,6 +386,10 @@ class cmsxid
         
         // var_dump("Retrieving " . $sSessionCacheUrl . " from session cache");
         $oResult    = $oUtils->getResultFromSessionCache( $sSessionCacheUrl );
+        
+        if ( $oUtils->getConfigValue(CmsxidUtils::CONFIG_KEY_ENABLE_TEST_CONTENT) ) {
+            $oResult = $oUtils->fetchXmlSourceFromTestContent( $oPage );
+        }
         
         // No result so far and caching enabled for this page, attempt to read from file cache
         if ( !is_object($oResult) && $blUseFileCache ) {
@@ -420,9 +410,8 @@ class cmsxid
             $oResult = $oUtils->fetchXmlSourceFromRemote( $oPage );
             
             if ( $blUseFileCache ) {
-                $oUtils->saveXmlSourceToCache( $oResult, $sBaseUrl );
-                
                 // var_dump("Saving " . $oPage->getBaseUrl() . " to file cache");
+                $oUtils->saveXmlSourceToCache( $oResult, $sBaseUrl );
             }
         }
         
@@ -543,11 +532,11 @@ class cmsxid
     {
         $oUtils = CmsxidUtils::getInstance();
         
-        if ( $oUtils->getConfiguredDummyContentValue() ) {
-            return $oUtils->getDummyString($oPage, $sSnippet);
-        } else {
+        // if ( $oUtils->getConfiguredDummyContentValue() ) {
+            // return $oUtils->getDummyString($oPage, $sSnippet);
+        // } else {
             return false;
-        }
+        // }
     }
     
     /**
@@ -562,26 +551,26 @@ class cmsxid
     {
         $oUtils = CmsxidUtils::getInstance();
         
-        if ( $oUtils->getConfiguredDummyContentValue() ) {
-            if ( empty($aNodes) ) {
-                $aNodes = array(
-                    'left',
-                    'normal',
-                    'right',
-                    'border',
-                );
-            }
+        // if ( $oUtils->getConfiguredDummyContentValue() ) {
+            // if ( empty($aNodes) ) {
+                // $aNodes = array(
+                    // 'left',
+                    // 'normal',
+                    // 'right',
+                    // 'border',
+                // );
+            // }
             
-            $aContentArray = array();
+            // $aContentArray = array();
             
-            foreach ( $aNodes as $sSnippet ) {
-                $aContentArray[$sSnippet] = $oUtils->getDummyString($oPage, $sSnippet);
-            }
+            // foreach ( $aNodes as $sSnippet ) {
+                // $aContentArray[$sSnippet] = $oUtils->getDummyString($oPage, $sSnippet);
+            // }
             
-            return $aContentArray;
-        } else {
+            // return $aContentArray;
+        // } else {
             return false;
-        }
+        // }
     }
     
     /**
@@ -608,13 +597,13 @@ class cmsxid
     {
         $oUtils = CmsxidUtils::getInstance();
         
-        if ( $oUtils->getConfiguredDummyContentValue() ) {
-            $sDummyString = $oUtils->getDummyString($oPage, $sSnippet);
+        // if ( $oUtils->getConfiguredDummyContentValue() ) {
+            // $sDummyString = $oUtils->getDummyString($oPage, $sSnippet);
             
-            return $oUtils->getXmlObjectFromSource('<xml>' . $sDummyString . '</xml>');
-        } else {
+            // return $oUtils->getXmlObjectFromSource('<xml>' . $sDummyString . '</xml>');
+        // } else {
             return false;
-        }
+        // }
     }
     
     /**
@@ -629,11 +618,11 @@ class cmsxid
     {
         $oUtils = CmsxidUtils::getInstance();
         
-        if ( $oUtils->getConfiguredDummyContentValue() ) {
-            return $oUtils->getDummyString($oPage, $sMetadata);
-        } else {
+        // if ( $oUtils->getConfiguredDummyContentValue() ) {
+            // return $oUtils->getDummyString($oPage, $sMetadata);
+        // } else {
             return false;
-        }
+        // }
     }
     
     /**

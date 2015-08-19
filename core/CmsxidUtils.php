@@ -15,7 +15,8 @@ class CmsxidUtils
     
     const
         CONFIG_KEY_SSL_DONT_VERIFY_PEER = 'blCmsxidSslDontVerifyPeer',
-        CONFIG_KEY_ENABLE_DUMMY_CONTENT = 'blCmsxidEnableDummyContent',
+        CONFIG_KEY_ENABLE_TEST_CONTENT  = 'blCmsxidEnableTestContent',
+        CONFIG_KEY_TEST_CONTENT         = 'sCmsxidTestContent',
         CONFIG_KEY_CURL_EXECUTE_TIMEOUT = 'iCmsxidCurlExecuteTimeout',
         CONFIG_KEY_CURL_CONNECT_TIMEOUT = 'iCmsxidCurlConnectTimeout',
         CONFIG_KEY_DONT_REWRITE_URLS    = 'blCmsxidLeaveUrls',
@@ -73,7 +74,7 @@ class CmsxidUtils
     public function getLangConfigValue ($sKey, $sLang = null)
     {
         startProfile(__METHOD__);
-        
+
         $aVal = $this->getConfigValue($sKey);
         
         if ( $sLang === null ) {
@@ -110,10 +111,10 @@ class CmsxidUtils
             $oxLang     = oxRegistry::getLang();
             $aLanguages = $oxLang->getLanguageArray();
             
-            foreach ( $aLanguages as $oLang ) {
-                $this->saveToSessionCache('langIdentMap', $oLang->abbr, (int)$iLang);
-                $this->saveToSessionCache('langIdentMap', (int)$iLang,  (int)$iLang);
-                $this->saveToSessionCache('langIdentMap', $iLang,       (int)$iLang);
+            foreach ( $aLanguages as $iLang => $oLang ) {
+                $this->saveToSessionCache('langIdentMap', $oLang->abbr,     (int)$iLang);
+                $this->saveToSessionCache('langIdentMap', (int)$iLang,      (int)$iLang);
+                $this->saveToSessionCache('langIdentMap', (string)$iLang,   (int)$iLang);
             }
             
             $sLangMapped = $this->getFromSessionCache('langIdentMap', $sLang);
@@ -469,6 +470,35 @@ class CmsxidUtils
             if ( $oResult->info['http_code'] != 200 ) {
                 $oResult->content = '';
             }
+        }
+        
+        stopProfile(__METHOD__);
+        
+        return $oResult;
+    }
+    
+    /**
+     * Returns an object containing a fake cURL information array and the configured test content.
+     *
+     * @param CmsxidPage    $oPage      Page object
+     * 
+     * @return object
+     */
+    public function fetchXmlSourceFromTestContent ( $oPage )
+    {
+        startProfile(__METHOD__);
+        
+        $oUtils = CmsxidUtils::getInstance();
+        
+        // We know nothing about caching here, so we always use the full URL.
+        $sUrl = $oPage->getFullUrl();
+        
+        $oResult = new stdClass();
+        $oResult->content   = '';
+        $oResult->info      = array();
+        
+        if ( $sUrl ) {
+            $oResult->content = $oUtils->getConfigValue(CmsxidUtils::CONFIG_KEY_TEST_CONTENT);
         }
         
         stopProfile(__METHOD__);
@@ -940,21 +970,21 @@ class CmsxidUtils
     }
     
     /**
-     * Configuration: return the configuration value for blCmsxidEnableDummyContent
+     * Configuration: return the configuration value for blCmsxidEnableTestContent
      * 
      * @return bool
      */
-    public function getConfiguredDummyContentValue ()
+    public function getConfiguredTestContentValue ()
     {
         $oxConfig = oxRegistry::getConfig();
         
-        $mVal = $oxConfig->getShopConfVar('blCmsxidEnableDummyContent', $oxConfig->getShopId(), 'module:cmsxid');
+        $mVal = $oxConfig->getShopConfVar('blCmsxidEnableTestContent', $oxConfig->getShopId(), 'module:cmsxid');
         
         return $mVal ?: false;
     }
     
     /**
-     * Configuration: return the configuration value for blCmsxidEnableDummyContent
+     * Configuration: return the configuration value for blCmsxidEnableTestContent
      * 
      * @return bool
      */
@@ -1263,10 +1293,16 @@ class CmsxidUtils
     {
         $this->_initializeSessionCache($sGroup);
         
-        $sKey = md5($sUnhashedKey);
+        // $sKey = md5($sUnhashedKey);
         
-        if ( array_key_exists($sKey, self::$_aSessionCache[$sGroup]) ) {
-            return self::$_aSessionCache[$sGroup][$sKey];
+        // if ( array_key_exists($sKey, self::$_aSessionCache[$sGroup]) ) {
+            // return self::$_aSessionCache[$sGroup][$sKey];
+        // }
+        
+        $sKey = md5($sGroup . $sUnhashedKey);
+        
+        if ( array_key_exists($sKey, self::$_aSessionCache) ) {
+            return self::$_aSessionCache[$sKey];
         }
         
         return null;
@@ -1285,9 +1321,13 @@ class CmsxidUtils
     {
         $this->_initializeSessionCache($sGroup);
         
-        $sKey = md5($sUnhashedKey);
+        // $sKey = md5($sUnhashedKey);
         
-        self::$_aSessionCache[$sGroup][$sKey] = $sValue;
+        // self::$_aSessionCache[$sGroup][$sKey] = $sValue;
+        
+        $sKey = md5($sGroup . $sUnhashedKey);
+        
+        self::$_aSessionCache[$sKey] = $sValue;
     }
     
     /**

@@ -6,7 +6,7 @@ $aModule = array(
     'title'             => 'CMSxid',
     'email'             => 'william@whefter.de',
     'url'               => 'http://www.whefter.de',
-    'version'           => '1.0',
+    'version'           => '1.1',
     'author'            => 'William Hefter',
     'description'       => array(
         'de'    => 'Erlaubt das Einbinden von CMS-Inhalten im OXID eShop.',
@@ -14,10 +14,12 @@ $aModule = array(
     ),
     
     'templates' => array(
-        'cmsxid_fe.tpl'             => 'wh/cmsxid/application/views/tpl/cmsxid_fe.tpl',
+        'cmsxid_fe.tpl'                 => 'wh/cmsxid/application/views/tpl/cmsxid_fe.tpl',
         
         // Admin
-        'cmsxid_setup_main.tpl'     => 'wh/cmsxid/application/views/admin/tpl/cmsxid_setup_main.tpl',
+        'cmsxid_setup_list.tpl'         => 'wh/cmsxid/application/views/admin/tpl/cmsxid_setup_list.tpl',
+        'cmsxid_setup_main.tpl'         => 'wh/cmsxid/application/views/admin/tpl/cmsxid_setup_main.tpl',
+        'cmsxid_setup_testcontent.tpl'  => 'wh/cmsxid/application/views/admin/tpl/cmsxid_setup_testcontent.tpl',
     ),
     
     'blocks'    => array(
@@ -25,12 +27,12 @@ $aModule = array(
     ),
     
     'extend' => array(
-        'oxconfig'                  => 'wh/cmsxid/application/models/cmsxid_oxconfig',
-        'oxcontent'                 => 'wh/cmsxid/application/models/cmsxid_oxcontent',
-        'oxutilsview'               => 'wh/cmsxid/application/models/cmsxid_oxutilsview',
-        'oxseodecoder'              => 'wh/cmsxid/application/models/cmsxid_oxseodecoder',
-        'oxseoencoder'              => 'wh/cmsxid/application/models/cmsxid_oxseoencoder',
-        'oxviewconfig'              => 'wh/cmsxid/application/models/cmsxid_oxviewconfig',
+        'oxconfig'      => 'wh/cmsxid/application/models/cmsxid_oxconfig',
+        'oxcontent'     => 'wh/cmsxid/application/models/cmsxid_oxcontent',
+        'oxutilsview'   => 'wh/cmsxid/application/models/cmsxid_oxutilsview',
+        'oxseodecoder'  => 'wh/cmsxid/application/models/cmsxid_oxseodecoder',
+        'oxseoencoder'  => 'wh/cmsxid/application/models/cmsxid_oxseoencoder',
+        'oxviewconfig'  => 'wh/cmsxid/application/models/cmsxid_oxviewconfig',
     ),
     
     'files' => array(
@@ -47,15 +49,16 @@ $aModule = array(
         
         // Admin
         'cmsxid_setup'              => 'wh/cmsxid/application/controllers/admin/cmsxid_setup.php',
-        'cmsxid_setup_main'         => 'wh/cmsxid/application/controllers/admin/cmsxid_setup_main.php',
         'cmsxid_setup_list'         => 'wh/cmsxid/application/controllers/admin/cmsxid_setup_list.php',
+        'cmsxid_setup_main'         => 'wh/cmsxid/application/controllers/admin/cmsxid_setup_main.php',
+        'cmsxid_setup_testcontent'  => 'wh/cmsxid/application/controllers/admin/cmsxid_setup_testcontent.php',
     ),
     
     'settings' => array(
     ),
     
     'events'    => array(
-        'onActivate'                => 'cmsxid_events::onActivate',
-        'onDeactivate'              => 'cmsxid_events::onDeactivate',
+        'onActivate'    => 'cmsxid_events::onActivate',
+        'onDeactivate'  => 'cmsxid_events::onDeactivate',
     ),
 );
