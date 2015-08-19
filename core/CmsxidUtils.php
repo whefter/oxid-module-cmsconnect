@@ -749,11 +749,11 @@ class CmsxidUtils
                             ;
                 
                 $aSeoInfo = array(
-                    'lang'          => $oLang->abbr,
+                    'lang'          => $oLang->id,
                     'cl'            => 'cmsxid_fe',
                     'page'          => $sPage,
                 );
-                
+
                 break;
             }
         }
