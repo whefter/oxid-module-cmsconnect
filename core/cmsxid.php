@@ -75,16 +75,23 @@ class cmsxid
         $oXml = $this->_getXmlByPage( $oPage );
         
         $sReturnSource = false;
-        
+
         if ( is_object($oXml) ) {
-            $aSnippets = $oXml->xpath( '/' . $oXml->getName() . '/' . $sSnippet ); 
-            if ( count($aSnippets) ) {
-                $oSnippetXml = $aSnippets[0];
+            try {
+                $aSnippets = $oXml->xpath( '/' . $oXml->getName() . '/' . $sSnippet ); 
                 
-                $sContentSource = $oUtils->getTextContentFromXmlObject( $oSnippetXml );
-                $sContentSource = $this->_processContent( $sContentSource );
+                if ( count($aSnippets) ) {
+                    $oSnippetXml = $aSnippets[0];
+                    
+                    if ( $oSnippetXml ) {
+                        $sContentSource = $oUtils->getTextContentFromXmlObject( $oSnippetXml );
+                        $sContentSource = $this->_processContent( $sContentSource );
+                        
+                        $sReturnSource = $sContentSource;
+                    }
+                }
+            } catch ( Exception $e) {
                 
-                $sReturnSource = $sContentSource;
             }
         }
         
