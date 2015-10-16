@@ -73,25 +73,21 @@ class cmsxid
         }
         
         $oXml = $this->_getXmlByPage( $oPage );
-        
         $sReturnSource = false;
 
         if ( is_object($oXml) ) {
             try {
-                $aSnippets = $oXml->xpath( '/' . $oXml->getName() . '/' . $sSnippet ); 
+                $aSnippets = $oXml->xpath( '/' . $oXml->getName() . '/' . $sSnippet );
                 
-                if ( count($aSnippets) ) {
+                if ( $aSnippets !== false && count($aSnippets) ) {
                     $oSnippetXml = $aSnippets[0];
                     
-                    if ( $oSnippetXml ) {
-                        $sContentSource = $oUtils->getTextContentFromXmlObject( $oSnippetXml );
-                        $sContentSource = $this->_processContent( $sContentSource );
-                        
-                        $sReturnSource = $sContentSource;
-                    }
+                    $sContentSource = $oUtils->getTextContentFromXmlObject( $oSnippetXml );
+                    $sContentSource = $this->_processContent( $sContentSource );
+                    
+                    $sReturnSource = $sContentSource;
                 }
             } catch ( Exception $e) {
-                
             }
         }
         
@@ -173,22 +169,25 @@ class cmsxid
         // else return empty array.
         if ( is_object($oXml) ) {
             $aXpathSnippets = $oXml->xpath('/' . $oXml->getName()); 
-            foreach ( $aXpathSnippets[0] as $sSnippet => $oSnippetXml ) {
-                // Let _getContent do the work here
-                
-                switch ( $sSnippet ) {
-                    case 'metadata';
-                    break;
+            
+            if ( $aXpathSnippets !== false && count($aXpathSnippets) ) {
+                foreach ( $aXpathSnippets[0] as $sSnippet => $oSnippetXml ) {
+                    // Let _getContent do the work here
                     
-                    default:
-                        if ( !count($aNodes) || in_array($sSnippet, $aNodes) ) {
-                            $sSnippetContent = $this->_getContent( $oPage, $sSnippet );
-                            
-                            if ( $sSnippetContent ) {
-                                $aSnippets[$sSnippet] = $sSnippetContent;
+                    switch ( $sSnippet ) {
+                        case 'metadata';
+                        break;
+                        
+                        default:
+                            if ( !count($aNodes) || in_array($sSnippet, $aNodes) ) {
+                                $sSnippetContent = $this->_getContent( $oPage, $sSnippet );
+                                
+                                if ( $sSnippetContent ) {
+                                    $aSnippets[$sSnippet] = $sSnippetContent;
+                                }
                             }
-                        }
-                    break;
+                        break;
+                    }
                 }
             }
         }
@@ -319,8 +318,9 @@ class cmsxid
         $oReturnXml = false;
         
         if ( is_object($oXml) ) {
-            $aSnippets = $oXml->xpath( '/' . $oXml->getName() . '/' . $sSnippet ); 
-            if ( count($aSnippets) ) {
+            $aSnippets = $oXml->xpath( '/' . $oXml->getName() . '/' . $sSnippet );
+            
+            if ( $aSnippets !== false && count($aSnippets) ) {
                 $oSnippetXml = $aSnippets[0];
                 
                 $sContentSource = $oUtils->unwrapCDATA( $oSnippetXml->asXml() );
@@ -500,7 +500,8 @@ class cmsxid
         
         if ( is_object($oXml) ) {
             $aXpathResults = $oXml->xpath( '/' . $oXml->getName() . '/metadata/' . $sMetadata );
-            if ( count($aXpathResults) == 1 ) {
+            
+            if ( $aXpathResults !== false && count($aXpathResults) == 1 ) {
                 $sMetadataValue = $oUtils->getTextContentFromXmlObject( $aXpathResults[0] );
             }
         }
