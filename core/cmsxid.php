@@ -67,7 +67,7 @@ class cmsxid
     protected function _getContent ( $oPage, $sSnippet )
     {
         $oUtils = CmsxidUtils::getInstance();
-        
+
         if ( false !== ($sDummyContent = $this->_getDummyContent($oPage, $sSnippet)) ) {
             return $sDummyContent;
         }
@@ -76,14 +76,14 @@ class cmsxid
         
         $sReturnSource = false;
 
-        if ( is_object($oXml) ) {
+        if ($oXml instanceof SimpleXMLElement) {
             try {
                 $aSnippets = $oXml->xpath( '/' . $oXml->getName() . '/' . $sSnippet ); 
                 
                 if ( count($aSnippets) ) {
                     $oSnippetXml = $aSnippets[0];
                     
-                    if ( $oSnippetXml ) {
+                    if ($oSnippetXml instanceof SimpleXMLElement) {
                         $sContentSource = $oUtils->getTextContentFromXmlObject( $oSnippetXml );
                         $sContentSource = $this->_processContent( $sContentSource );
                         
@@ -91,7 +91,7 @@ class cmsxid
                     }
                 }
             } catch ( Exception $e) {
-                
+				//var_dump($e->getMessage());
             }
         }
         
