@@ -431,6 +431,8 @@ class CmsxidUtils
         if ( $sUrl ) {
             // var_dump('Connect: ', $this->getConfigValue(CmsxidUtils::CONFIG_KEY_CURL_CONNECT_TIMEOUT));
             // var_dump('Execute: ', $this->getConfigValue(CmsxidUtils::CONFIG_KEY_CURL_EXECUTE_TIMEOUT));
+			//var_dump($sUrl);
+			//var_dump($this->getConfigValue(CmsxidUtils::CONFIG_KEY_SSL_DONT_VERIFY_PEER));
             
             $curl_handle = curl_init();
             curl_setopt( $curl_handle, CURLOPT_URL,             $sUrl );
@@ -438,10 +440,12 @@ class CmsxidUtils
             curl_setopt( $curl_handle, CURLOPT_RETURNTRANSFER,  1 );
             
             curl_setopt( $curl_handle, CURLOPT_SSL_VERIFYPEER,  !$this->getConfigValue(CmsxidUtils::CONFIG_KEY_SSL_DONT_VERIFY_PEER) );
+            curl_setopt( $curl_handle, CURLOPT_SSL_VERIFYHOST,  !$this->getConfigValue(CmsxidUtils::CONFIG_KEY_SSL_DONT_VERIFY_PEER) );
             
             // curl_setopt( $curl_handle, CURLOPT_CONNECTTIMEOUT,  2 );
+            // curl_setopt( $curl_handle, CURLOPT_CONNECTTIMEOUT,  2 );
             // curl_setopt( $curl_handle, CURLOPT_TIMEOUT,         1 );
-            // curl_setopt( $curl_handle, CURLOPT_HEADER, 0 );
+            //curl_setopt( $curl_handle, CURLOPT_SSLVERSION, 1 );
             
             // For POST
             if ( $blPost ) {
@@ -461,11 +465,11 @@ class CmsxidUtils
             $oResult->content   = curl_exec( $curl_handle );
             $oResult->info      = curl_getinfo( $curl_handle );
 
-            // var_dump("<pre>errno: ", curl_error($curl_handle), "</pre>");
+             var_dump("<pre>errno: ", curl_error($curl_handle), "</pre>");
             
             curl_close( $curl_handle );
             
-            // var_dump("<pre>info: ", $oResult->info, "</pre>");
+            //var_dump("<pre>info: ", $oResult->info, "</pre>");
             
             if ( $oResult->info['http_code'] != 200 ) {
                 $oResult->content = '';
