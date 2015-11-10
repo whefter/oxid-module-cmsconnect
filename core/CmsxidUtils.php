@@ -465,7 +465,7 @@ class CmsxidUtils
             $oResult->content   = curl_exec( $curl_handle );
             $oResult->info      = curl_getinfo( $curl_handle );
 
-             var_dump("<pre>errno: ", curl_error($curl_handle), "</pre>");
+             //var_dump("<pre>errno: ", curl_error($curl_handle), "</pre>");
             
             curl_close( $curl_handle );
             
