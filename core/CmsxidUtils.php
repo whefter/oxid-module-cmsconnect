@@ -341,6 +341,11 @@ class CmsxidUtils
             $oxSeoEncoder = oxRegistry::get('oxSeoEncoder');
             
             foreach ( $aTitleParts as $i => $sTitlePart ) {
+                // Try to match T3's SEO sanitizing
+                $sTitlePart = $oStr->preg_replace('/[^\w\s]/', '', $sTitlePart);
+                
+                $sTitlePart = trim($sTitlePart);
+                
                 $sTitlePart = $oxSeoEncoder->encodeString($sTitlePart, true, $iLang);
                 
                 // Convert to lowercase
@@ -350,7 +355,7 @@ class CmsxidUtils
                 $sTitlePart = strip_tags($sTitlePart);
                 
                 // Replace special characters with hyphen
-                $sTitlePart = preg_replace('/[ \-+_]+/', '-', $sTitlePart);
+                $sTitlePart = $oStr->preg_replace('/[ \-+_]+/', '-', $sTitlePart);
                 
                 $aTitleParts[$i] = rawurlencode($sTitlePart);
             }
