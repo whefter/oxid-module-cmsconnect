@@ -341,6 +341,8 @@ class CmsxidUtils
             $oxSeoEncoder = oxRegistry::get('oxSeoEncoder');
             
             foreach ( $aTitleParts as $i => $sTitlePart ) {
+                $sTitlePart = html_entity_decode($sTitlePart);
+                
                 // Try to match T3's SEO sanitizing
                 $sTitlePart = $oStr->preg_replace('/[^\w\s]/', '', $sTitlePart);
                 
