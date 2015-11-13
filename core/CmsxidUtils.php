@@ -325,6 +325,7 @@ class CmsxidUtils
             $oStr = getStr();
             
             $sTitle = $sUnsanitizedTitle;
+            // var_dump("<br />unsanitized: $sUnsanitizedTitle");
             
             // Strip leading slashes
             // $sTitle = $oStr->preg_replace( '/^\/+/', '', $sTitle);
@@ -341,14 +342,18 @@ class CmsxidUtils
             $oxSeoEncoder = oxRegistry::get('oxSeoEncoder');
             
             foreach ( $aTitleParts as $i => $sTitlePart ) {
-                $sTitlePart = html_entity_decode($sTitlePart);
-                
                 // Try to match T3's SEO sanitizing
-                $sTitlePart = $oStr->preg_replace('/[^\w\s]/', '', $sTitlePart);
+                // $sTitlePart = "test 12!!(&gt;&amp;/=?=()`?--%&-";
+                
+                // Decode entities _before_ running them through oxSeoEncoder::encodeString(), as the later
+                // would turn (e.g.) "&amp;" into "amp"
+                $sTitlePart = html_entity_decode($sTitlePart);
+                $sTitlePart = $oxSeoEncoder->encodeString($sTitlePart, true, $iLang);
+                $sTitlePart = $oStr->preg_replace('/[^\w\s]/', '-', $sTitlePart);
                 
                 $sTitlePart = trim($sTitlePart);
                 
-                $sTitlePart = $oxSeoEncoder->encodeString($sTitlePart, true, $iLang);
+                // var_dump("after seoencoder: $sTitlePart");
                 
                 // Convert to lowercase
                 $sTitlePart = $oStr->strtolower($sTitlePart);
@@ -358,6 +363,8 @@ class CmsxidUtils
                 
                 // Replace special characters with hyphen
                 $sTitlePart = $oStr->preg_replace('/[ \-+_]+/', '-', $sTitlePart);
+                
+                $sTitlePart = trim($sTitlePart, '-');
                 
                 $aTitleParts[$i] = rawurlencode($sTitlePart);
             }

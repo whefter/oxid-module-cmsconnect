@@ -401,6 +401,9 @@ class cmsxid
             $oResult = $oUtils->fetchXmlSourceFromTestContent( $oPage );
         }
         
+        // var_dump("Full URL: $sUrl");
+        // var_dump("BaseURL: $sBaseUrl");
+        
         // No result so far and caching enabled for this page, attempt to read from file cache
         if ( !is_object($oResult) && $blUseFileCache ) {
             // var_dump("Retrieving " . $oPage->getBaseUrl() . " from file cache");
