@@ -10,10 +10,10 @@
  */
 class CmsxidUtils
 {
-    const TYPE_IDENTIFIER_PATH  = 1;
-    const TYPE_IDENTIFIER_ID    = 2;
-    
     const
+        TYPE_IDENTIFIER_PATH            = 1,
+        TYPE_IDENTIFIER_ID              = 2,
+        
         CONFIG_KEY_SSL_DONT_VERIFY_PEER = 'blCmsxidSslDontVerifyPeer',
         CONFIG_KEY_ENABLE_TEST_CONTENT  = 'blCmsxidEnableTestContent',
         CONFIG_KEY_TEST_CONTENT         = 'sCmsxidTestContent',
@@ -535,6 +535,8 @@ class CmsxidUtils
     {
         startProfile(__METHOD__);
         
+        // var_dump($sUrl);
+        
         $sCacheName = $this->getCacheFilenameFromUrl($sUrl);
         
         $oResult = oxRegistry::get('oxUtils')->fromFileCache( $sCacheName );
@@ -616,7 +618,7 @@ class CmsxidUtils
     {
         // Only path-based pages can be SEO pages at all
         // Mainly this check ensures the call to getPagePath() below does not cause a fatal error
-        if ( $oPage->getType() != $this->TYPE_IDENTIFIER_PATH ) {
+        if ( $oPage->getType() != self::TYPE_IDENTIFIER_PATH ) {
             return false;
         }
         
@@ -640,8 +642,8 @@ class CmsxidUtils
      */
     public function getExplicitQueryParams ()
     {
-        // These are the explicit query params, not the one OXID set after looking up the SEO
-        // URL
+        // These are the explicit query params, not the one OXID set after
+        // looking up the SEO URL
         $aExplicitQueryParams = array();
         parse_str( $_SERVER['QUERY_STRING'], $aExplicitQueryParams );
         
@@ -649,7 +651,7 @@ class CmsxidUtils
         foreach ( self::$_aRequestParamBlacklist as $sBlacklistedParam ) {
             unset( $aExplicitQueryParams[$sBlacklistedParam] );
         }
-        
+        // var_dump(__METHOD__, $aExplicitQueryParams);
         return $aExplicitQueryParams;
     }
     
@@ -668,6 +670,9 @@ class CmsxidUtils
         
         // Fix stray ampersands, lit. '& not followed by word characters and a semicolon will be replaced with &amp;'
         $sXml = preg_replace( '/&(?![\w#]+;)/', '&amp;', $sXml );
+        
+        // var_dump(__METHOD__, $sXml);
+        // die;
 
         stopProfile(__METHOD__);
         
@@ -689,6 +694,7 @@ class CmsxidUtils
         
         try {
             // $oXml = simplexml_load_string($sXml, null, LIBXML_NOCDATA);
+            // $sXml = $this->fixXmlSourceEntities($sXml);
             $oXml = simplexml_load_string($sXml);
         } catch ( Exception $e ) {
             $oXml = false;
