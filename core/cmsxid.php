@@ -668,6 +668,20 @@ class cmsxid
     }
     
     /**
+     * Public access to rewriteUrl helper function
+     *
+     * @param string    $sUrl   URL to rewrite
+     *
+     * @return string
+     */
+    public function rewriteUrl($sUrl)
+    {
+        $oUtils = CmsxidUtils::getInstance();
+        
+        return $oUtils->rewriteUrl( $sUrl );
+    }
+    
+    /**
      * TOXID compatibility function
      */
     public function getXmlObject( $sPage = null, $sSnippet = null )

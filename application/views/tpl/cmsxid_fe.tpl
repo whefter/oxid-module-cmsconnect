@@ -1,13 +1,17 @@
 [{ cmsxid_load content="navigation" assign="sNavigation" }]
 [{ capture append="oxidBlock_sidebar" }]
     [{ if $sNavigation }]
-        <div class="cms-navigation tree">
+        <div id="cms-navigation">
             [{ $sNavigation }]
         </div>
     [{ /if }]
 [{ /capture }]
 
 [{ capture append="oxidBlock_content" }]
+    [{*
+        Replaced by XML-based breadcrumbs
+    *}]
+    [{*
     [{ cmsxid_load content="breadcrumb" assign="sBreadcrumb" }]
     [{ if $sBreadcrumb }]
         <div id="cms-breadcrumb-wrap">
@@ -16,8 +20,9 @@
             </div>
         </div>
     [{ /if }]
+    *}]
     
-    <div class="cms-content">
+    <div id="cms-content">
         [{ cmsxid_load nodes="left,content,right,border" assign="aCmsContent" }]
         [{ assign var="iSnippetCount" value=$aCmsContent|@count }]
         

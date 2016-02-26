@@ -857,6 +857,72 @@ class CmsxidUtils
     }
     
     /**
+     * Rewrites a single CMS URL
+     *
+     * @param string    $sUrl       The URL to process
+     * 
+     * @return string
+     */
+    public function rewriteUrl ( $sUrl )
+    {
+        startProfile(__METHOD__);
+        
+        $oxConfig   = oxRegistry::getConfig();
+        $oxLang     = oxRegistry::getLang();
+        
+        if ( $this->getConfigValue(CmsxidUtils::CONFIG_KEY_DONT_REWRITE_URLS) == true ) {
+            stopProfile(__METHOD__);
+            
+            return $sContent;
+        }
+        
+        foreach ( $oxLang->getLanguageArray() as $oLang ) {
+            $sSourceUrl     = $this->getLangConfigValue(CmsxidUtils::CONFIG_KEY_BASE_URLS);
+            $sSourceSslUrl  = $this->getLangConfigValue(CmsxidUtils::CONFIG_KEY_BASE_SSL_URLS);
+            
+            // No configured URLs - skip this language
+            if ( !$sSourceUrl && !$sSourceSslUrl ) {
+                continue;
+            }
+            
+            // No matter what URLs the CMS returns, the URLs schema needs to be rewritten to the current shop's schema
+            foreach ( array($sSourceUrl, $sSourceSslUrl) as $sSourceBaseUrl ) {
+                $sSourcePagePath    = $this->getLangConfigValue(CmsxidUtils::CONFIG_KEY_PAGE_PATHS, $oLang->id);
+                $sFullBaseUrl       = $this->sanitizeUrl( $sSourceBaseUrl . '/' . $sSourcePagePath . '/' );
+                
+                // The target is defined by the current shop's SSL setting
+                $sTargetBaseUrl     = $oxConfig->isSsl() ? $oxConfig->getSslShopUrl($sLang) : $oxConfig->getShopUrl($sLang);
+                $sTargetSeoIdent    = $this->getLangConfigValue(CmsxidUtils::CONFIG_KEY_SEO_IDENTIFIERS, $oLang->id);
+                $sFullTargetUrl     = $this->sanitizeUrl( $sTargetBaseUrl . '/' . $sTargetSeoIdent . '/' );
+                
+                if ( strpos($sUrl, $sFullBaseUrl) === 0 ) {
+                    $sUrl = str_replace($sFullBaseUrl, $sFullTargetUrl, $sUrl);
+                    
+                    break;
+                }
+            }
+                
+            // If the shop is in SSL mode, replace all links and sources to the non-SSL CMS with references to the SSL source,
+            // if configured, to prevent browser complaints about mixed modes
+            if ( $oxConfig->isSsl() ) {
+                // Do this ONLY if an SSL source URL has actually been configured
+                if ( $sSourceSslUrl ) {
+                    // We can safely do this crude replace since, in theory, all URLs left on the page should be to
+                    // non-page CMS content
+                    $sSourceBaseUrl     = $this->sanitizeUrl( $sSourceUrl . '/' );
+                    $sSourceSslBaseUrl  = $this->sanitizeUrl( $sSourceSslUrl . '/' );
+                
+                    $sUrl = str_replace( $sSourceBaseUrl, $sSourceSslBaseUrl, $sUrl );
+                }
+            }
+        }
+        
+        stopProfile(__METHOD__);
+
+        return $sUrl;
+    }
+    
+    /**
      * Fixes the passed content's encoding to match that of the shop
      *
      * @param string    $sContent       Content to process

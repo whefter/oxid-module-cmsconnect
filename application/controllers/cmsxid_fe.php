@@ -49,6 +49,11 @@ class cmsxid_fe extends oxUBase
         return $this->_prepareMetaDescription( $sDescription );
     }
     
+    protected function _getPageCMSxid ()
+    {
+        return oxRegistry::get('oxViewConfig')->getCMSxid();
+    }
+    
     /**
      * Template variable getter. Overwrites the parent function.
      *
@@ -61,5 +66,24 @@ class cmsxid_fe extends oxUBase
         $sKeywords = oxRegistry::get('oxViewConfig')->getCMSxid()->getPageMetadata('keywords');
         
         return $this->_prepareMetaKeyword( $sKeywords );
+    }
+    
+    public function getBreadCrumb ()
+    {
+        $oPage = $this->_getPageCMSxid();
+        $oXml  = $oPage->getXml();
+        
+        $aCrumbs = [];
+        
+        if ( $oXml->breadcrumb_xml ) {
+            foreach ( $oXml->breadcrumb_xml->crumb as $crumb ) {
+                $aCrumbs[] = [
+                    'link' => $oPage->rewriteUrl($crumb->url),
+                    'title' => $crumb->title,
+                ];
+            }
+        }
+        
+        return $aCrumbs;
     }
 }
