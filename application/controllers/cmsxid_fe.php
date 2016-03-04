@@ -70,15 +70,15 @@ class cmsxid_fe extends oxUBase
     
     public function getBreadCrumb ()
     {
-        $oPage = $this->_getPageCMSxid();
-        $oXml  = $oPage->getXml();
-        
+        $oCmsxid = $this->_getPageCMSxid();
+        $oXml    = $oCmsxid->getContentXml('breadcrumb_xml');
+
         $aCrumbs = [];
         
-        if ( $oXml->breadcrumb_xml ) {
-            foreach ( $oXml->breadcrumb_xml->crumb as $crumb ) {
+        if ( $oXml ) {
+            foreach ( $oXml->crumb as $crumb ) {
                 $aCrumbs[] = [
-                    'link' => $oPage->rewriteUrl($crumb->url),
+                    'link' => $oCmsxid->rewriteUrl($crumb->url),
                     'title' => $crumb->title,
                 ];
             }
