@@ -55,6 +55,22 @@ abstract class CmsxidPage
     }
     
     /**
+     * Setter method for the language of this page
+     *
+     * @param string        $sLang          Language identifier
+     *
+     * @return string
+     */
+    public function setLang ($sLang)
+    {
+        if ( empty($sLang) ) {
+            $sLang = null;
+        }
+        
+        $this->_sLang = $sLang;
+    }
+    
+    /**
      * Getter method for the language of this page
      *
      * @return string

@@ -34,8 +34,8 @@ class CmsxidIdPage extends CmsxidPage
     {
         parent::__construct();
         
-        $this->_sPageId  = $sPageId;
-        $this->_sLang   = $sLang;
+        $this->_sPageId = $sPageId;
+        $this->setLang($sLang);
     }
     
     /**

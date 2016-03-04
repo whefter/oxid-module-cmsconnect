@@ -6,7 +6,7 @@ $aModule = array(
     'title'             => 'CMSxid',
     'email'             => 'william@whefter.de',
     'url'               => 'http://www.whefter.de',
-    'version'           => '1.1',
+    'version'           => '1.2',
     'author'            => 'William Hefter',
     'description'       => array(
         'de'    => 'Erlaubt das Einbinden von CMS-Inhalten im OXID eShop.',
@@ -14,7 +14,9 @@ $aModule = array(
     ),
     
     'templates' => array(
-        'cmsxid_fe.tpl'                 => 'wh/cmsxid/application/views/tpl/cmsxid_fe.tpl',
+        'modules/cmsxid/fe.tpl'             => 'wh/cmsxid/application/views/tpl/fe.tpl',
+        'modules/cmsxid/async.tpl'          => 'wh/cmsxid/application/views/tpl/async.tpl',
+        'modules/cmsxid/async_snippet.tpl'  => 'wh/cmsxid/application/views/tpl/async_snippet.tpl',
         
         // Admin
         'cmsxid_setup_list.tpl'         => 'wh/cmsxid/application/views/admin/tpl/cmsxid_setup_list.tpl',
@@ -38,6 +40,7 @@ $aModule = array(
     'files' => array(
         'cmsxid'                    => 'wh/cmsxid/core/cmsxid.php',
         'cmsxid_fe'                 => 'wh/cmsxid/application/controllers/cmsxid_fe.php',
+        'cmsxid_async'              => 'wh/cmsxid/application/controllers/cmsxid_async.php',
         
         'CmsxidPage'                => 'wh/cmsxid/core/CmsxidPage.php',
         'CmsxidPathPage'            => 'wh/cmsxid/core/CmsxidPathPage.php',

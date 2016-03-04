@@ -67,7 +67,7 @@ class cmsxid
     protected function _getContent ( $oPage, $sSnippet )
     {
         $oUtils = CmsxidUtils::getInstance();
-
+        
         if ( false !== ($sDummyContent = $this->_getDummyContent($oPage, $sSnippet)) ) {
             return $sDummyContent;
         }

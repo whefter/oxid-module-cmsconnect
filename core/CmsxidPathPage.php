@@ -35,7 +35,7 @@ class CmsxidPathPage extends CmsxidPage
         parent::__construct();
         
         $this->_sPagePath   = $sPagePath;
-        $this->_sLang       = $sLang;
+        $this->setLang($sLang);
     }
     
     /**
