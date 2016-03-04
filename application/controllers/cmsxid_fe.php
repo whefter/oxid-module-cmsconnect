@@ -19,7 +19,7 @@ class cmsxid_fe extends oxUBase
     {
         parent::__construct();
         
-        $this->_sThisTemplate = 'modules/cmsxid/' . get_class() . '.tpl';
+        $this->_sThisTemplate = 'modules/cmsxid/fe.tpl';
     }
     
     /**
