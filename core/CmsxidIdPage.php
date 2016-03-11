@@ -61,4 +61,15 @@ class CmsxidIdPage extends CmsxidPage
         
         return $sUrl;
     }
+    
+    /**
+     * Override parent function.
+     */
+    protected function getExtraBlacklistedQueryParams ()
+    {
+        return array_merge(
+            parent::getExtraBlacklistedQueryParams(),
+            ['id']
+        );
+    }
 }

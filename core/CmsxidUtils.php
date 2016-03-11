@@ -34,6 +34,42 @@ class CmsxidUtils
         ;
     
     /**
+     * The CmsxidUtils singleton instance.
+     *
+     * @var object
+     */
+    protected static $_oInstance = null;
+    
+    /**
+     * "Level one" cache. Pages retrieved from remote or from cache are
+     * cached here to reduce the hits to file cache or to prevent multiple
+     * fetches of a remote page if the cache isn't used.
+     *
+     * @var CmsxidResult[]
+     */
+    protected static $_aSessionCache = array();
+    
+    /**
+     * GET/POST parameters that should never get passed along to 
+     * the CMS (known to belong to OXID or simply troublesome)
+     *
+     * @var string[]
+     */
+    protected static $_aRequestParamBlacklist = array(
+        'cl',
+        'fn',
+        'shp',
+    );
+    
+    /**
+     * Cache variable for the sources configuration, prevents the system from having
+     * to fetch all configuration all the time
+     *
+     * @var array[]
+     */
+    protected static $_aConfiguredSources = null;
+    
+    /**
      * Configuration: return a configuration value. Caches values to circumvent any
      * problems of getShopConfVar(); getShopConfVar() is the only way to ensure
      * the configuration value is for the module, but it requests the value from
@@ -126,42 +162,6 @@ class CmsxidUtils
     }
     
     /**
-     * The CmsxidUtils singleton instance.
-     *
-     * @var object
-     */
-    protected static $_oInstance = null;
-    
-    /**
-     * "Level one" cache. Pages retrieved from remote or from cache are
-     * cached here to reduce the hits to file cache or to prevent multiple
-     * fetches of a remote page if the cache isn't used.
-     *
-     * @var CmsxidResult[]
-     */
-    protected static $_aSessionCache = array();
-    
-    /**
-     * GET/POST parameters that should never get passed along to 
-     * the CMS (known to belong to OXID or simply troublesome)
-     *
-     * @var string[]
-     */
-    protected static $_aRequestParamBlacklist = array(
-        'cl',
-        'fn',
-        'shp',
-    );
-    
-    /**
-     * Cache variable for the sources configuration, prevents the system from having
-     * to fetch all configuration all the time
-     *
-     * @var array[]
-     */
-    protected static $_aConfiguredSources = null;
-    
-    /**
      * Return the Cmsxid singleton instance. Construct if not present.
      *
      * @return object
@@ -251,10 +251,10 @@ class CmsxidUtils
         parse_str( $sParams, $aParams );
         parse_str( $sLangParam, $aParams );
         $aParams = array_merge(
+            $aParams,
             array(
                 $sIdParam   => (int)$sPageId,
-            ),
-            $aParams
+            )
         );
         $sParams = http_build_query( $aParams );
         
@@ -646,6 +646,9 @@ class CmsxidUtils
         // looking up the SEO URL
         $aExplicitQueryParams = array();
         parse_str( $_SERVER['QUERY_STRING'], $aExplicitQueryParams );
+        
+        // var_dump(__METHOD__);
+        // var_dump($aExplicitQueryParams);
         
         // Remove parameters specified in the static blacklist
         foreach ( self::$_aRequestParamBlacklist as $sBlacklistedParam ) {
@@ -1449,5 +1452,17 @@ class CmsxidUtils
     public function getDummyString ($oPage, $sSnippet)
     {
         return '<span class="cmsxid-dummy">Cmsxid dummy content for URL: ' . $oPage->getFullUrl() . ', argument: ' . $sSnippet . '</span>';
+    }
+    
+    /**
+     * Trims '?' and '&' from the left/right sides of the passed query string.
+     *
+     * @param string        $sQuery     Query string
+     * 
+     * @return string
+     */
+    public function trimQuery($sQuery)
+    {
+        return rtrim(ltrim($sQuery, '?&'), '?&');
     }
 }

@@ -18,18 +18,25 @@ abstract class CmsxidPage
     protected $_sLang = null;
         
     /**
-     * aGetParams
+     * _aGetParams
      *
      * @var array
      */
     protected $_aGetParams;
         
     /**
-     * aPostParams
+     * _aPostParams
      *
      * @var array
      */
     protected $_aPostParams;
+    
+    /**
+     * _aExtraBlacklistedQueryParams
+     *
+     * @var array
+     */
+    protected static $_aExtraBlacklistedQueryParams = array();
     
     /**
      * __construct
@@ -89,6 +96,7 @@ abstract class CmsxidPage
     {
         startProfile(__METHOD__);
         
+        
         $oUtils = CmsxidUtils::getInstance();
         
         $sBaseUrl = $this->getBaseUrl();
@@ -101,7 +109,7 @@ abstract class CmsxidPage
             preg_match('/(\?(?:.*?))(#.*)?$/', $sBaseUrl, $aMatches);
             
             $sBaseQuery = $aMatches[1];
-            $sAddQuery  = http_build_query( $oUtils->getExplicitQueryParams() );
+            $sAddQuery  = http_build_query( $this->getExplicitQueryParams() );
 
             $sFullUrl = $sBaseUrl;
             
@@ -110,11 +118,14 @@ abstract class CmsxidPage
             $sFullUrl = substr( $sFullUrl, 0, strlen($sFullUrl) - strlen($sBaseQuery) );
             
             $sFullUrl = rtrim( $sFullUrl, '?&' );
-            $sFullUrl .= '?' . ltrim($sBaseQuery, '?&') . '&' . $sAddQuery;
+            $sFullUrl .= '?' . $oUtils->trimQuery($oUtils->trimQuery($sAddQuery) . '&') . $oUtils->trimQuery($sBaseQuery);
             $sFullUrl = rtrim( $sFullUrl, '?&' );
         }
         
         stopProfile(__METHOD__);
+        
+        // var_dump(__METHOD__);
+        // var_dump($sFullUrl);
         
         return $sFullUrl;
     }
@@ -128,5 +139,36 @@ abstract class CmsxidPage
     public function getType ()
     {
         return $this->_sType;
+    }
+    
+    /**
+     * Returns the explicit query params; that is, the ones specified in the URL, minus the
+     * ones blacklisted in the current Page Class.
+     *
+     * @return string[]
+     */
+    protected function getExplicitQueryParams ()
+    {
+        $oUtils  = CmsxidUtils::getInstance();
+        $aParams = $oUtils->getExplicitQueryParams();
+        
+        // Remove parameters specified in the static blacklist
+        foreach ( $this->getExtraBlacklistedQueryParams() as $sBlacklistedParam ) {
+            unset( $aParams[$sBlacklistedParam] );
+        }
+        
+        return $aParams;
+    }
+    
+    /**
+     * Returns the explicit query params; that is, the ones specified in the URL.
+     *
+     * Meant to be overridden.
+     *
+     * @return string[]
+     */
+    protected function getExtraBlacklistedQueryParams ()
+    {
+        return static::$_aExtraBlacklistedQueryParams;
     }
 }
