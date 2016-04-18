@@ -66,7 +66,7 @@ function smarty_function_cmsxid_load_async( $aParams, &$oSmarty )
     $oSmarty->assign('sMethod',     $sMethod);
     $oSmarty->assign('sIdentifier', $sIdentifier);
     $oSmarty->assign('sLang',       $sLang);
-    $oSmarty->assign('sBaseUrl',    $oxConfig->getShopCurrentUrl());
+    $oSmarty->assign('sBaseUrl',    $oxConfig->getCurrentShopUrl());
             
     $mReturn = oxRegistry::get("oxUtilsView")->parseThroughSmarty('[{ include file="modules/cmsxid/async_snippet.tpl" }]', $sCacheId);
     

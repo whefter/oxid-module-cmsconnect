@@ -31,7 +31,7 @@ $( function () {
     }
     
     function fetch () {
-        $.post('[{ $sBaseUrl }]cl=cmsxid_async', {
+        $.post('[{ $sBaseUrl }]?cl=cmsxid_async', {
             method: '[{ $sMethod }]',
             lang: '[{ $sLang }]',
             content: '[{ $sContent }]',
