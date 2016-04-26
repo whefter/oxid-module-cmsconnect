@@ -25,16 +25,16 @@ $( function () {
                 $el.off('inview');
             }
         });
-        console.warn("binding to inview");
+        // console.warn("binding to inview");
     } else {
         fetch();
     }
     
     function fetch () {
         $.post('[{ $sBaseUrl }]?cl=cmsxid_async', {
-            method: '[{ $sMethod }]',
-            lang: '[{ $sLang }]',
-            content: '[{ $sContent }]',
+            method:     '[{ $sMethod }]',
+            lang:       '[{ $sLang }]',
+            content:    '[{ $sContent }]',
             identifier: '[{ $sIdentifier }]',
         })
         .done(function (data) {
