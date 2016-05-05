@@ -76,11 +76,24 @@ function smarty_function_cmsxid_load( $aParams, &$oSmarty )
                         )
                 ;
     
-    if ( array_key_exists('assign', $aParams) ) {
-        // Regex tests for valid variable names (taken from php.net)
-        if ( preg_match('/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/', $aParams['assign']) ) {
-            $oSmarty->assign( $aParams['assign'], $mReturn );
+    if ( $aParams['wrap'] ) {
+        $deArray = false;
+        if ( !is_array($mReturn) ) {
+            $mReturn = array($mReturn);
+            $deArray = true;
         }
+        
+        $mReturn = array_map( function ($el) {
+            return '<div class="cms-content">' . $el . '</div>';
+        }, $mReturn);
+        
+        if ( $deArray ) {
+            $mReturn = $mReturn[0];
+        }
+    }
+    
+    if ( array_key_exists('assign', $aParams) ) {
+        $oSmarty->assign( $aParams['assign'], $mReturn );
     } else {
         if ( $mReturn ) {
             return $mReturn;
