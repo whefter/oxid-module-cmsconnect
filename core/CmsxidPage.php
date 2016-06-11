@@ -96,7 +96,6 @@ abstract class CmsxidPage
     {
         startProfile(__METHOD__);
         
-        
         $oUtils = CmsxidUtils::getInstance();
         
         $sBaseUrl = $this->getBaseUrl();
@@ -118,7 +117,7 @@ abstract class CmsxidPage
             $sFullUrl = substr( $sFullUrl, 0, strlen($sFullUrl) - strlen($sBaseQuery) );
             
             $sFullUrl = rtrim( $sFullUrl, '?&' );
-            $sFullUrl .= '?' . $oUtils->trimQuery($oUtils->trimQuery($sAddQuery) . '&') . $oUtils->trimQuery($sBaseQuery);
+            $sFullUrl .= '?' . $oUtils->trimQuery($oUtils->trimQuery($sAddQuery) . '&') . '&' . $oUtils->trimQuery($sBaseQuery);
             $sFullUrl = rtrim( $sFullUrl, '?&' );
         }
         
