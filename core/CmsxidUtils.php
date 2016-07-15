@@ -516,7 +516,13 @@ class CmsxidUtils
         $oResult->info      = array();
         
         if ( $sUrl ) {
-            $oResult->content = $oUtils->getConfigValue(CmsxidUtils::CONFIG_KEY_TEST_CONTENT);
+            $sTestContent = $oUtils->getConfigValue(CmsxidUtils::CONFIG_KEY_TEST_CONTENT);
+            
+            if ( !$sTestContent ) {
+                $sTestContent = CmsxidUtils::getInstance()->getDefaultTestContent();
+            }
+            
+            $oResult->content = $sTestContent;
         }
         
         stopProfile(__METHOD__);
@@ -1464,5 +1470,50 @@ class CmsxidUtils
     public function trimQuery($sQuery)
     {
         return rtrim(ltrim($sQuery, '?&'), '?&');
+    }
+
+    /**
+     * Returns the default test content
+     *
+     * @return string
+     */
+    public function getDefaultTestContent ()
+    {
+        return <<<EOF
+<cmsxid>
+    <navigation>
+        <![CDATA[ CMSxid test content navigation ]]>
+    </navigation>
+    <left>
+        <![CDATA[ CMSxid test content left ]]>
+    </left>
+    <content>
+        <![CDATA[ CMSxid test content normal ]]>
+    </content>
+    <right>
+        <![CDATA[ CMSxid test content right ]]>
+    </right>
+    <border>
+        <![CDATA[ CMSxid test content border ]]>
+    </border>
+    <metadata>
+        <keywords>
+            <![CDATA[ CMSxid test content metadata keywords ]]>
+        </keywords>
+        <title>
+            <![CDATA[ CMSxid test content metadata title ]]>
+        </title>
+        <description>
+            <![CDATA[ CMSxid test content metadata description ]]>
+        </description>
+    </metadata>
+    <breadcrumb>
+        <![CDATA[
+        CMSxid test content breadcrumbs 
+        ]]>
+    </breadcrumb>
+    <breadcrumb_xml/>
+</cmsxid>
+EOF;
     }
 }

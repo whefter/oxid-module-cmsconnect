@@ -39,7 +39,7 @@
         </p>
         
         <p>
-            <textarea name="editval[sCmsxidTestContent]">[{ if $sCmsxidTestContent }][{ $sCmsxidTestContent|htmlentities }][{ else }][{ $oView->getCmsxidDefaultTestContent()|htmlentities }][{ /if }]</textarea>
+            <textarea name="editval[sCmsxidTestContent]" style="width: 100%; height: 400px;">[{ if $sCmsxidTestContent }][{ $sCmsxidTestContent|htmlentities }][{ else }][{ $oView->getCmsxidDefaultTestContent()|htmlentities }][{ /if }]</textarea>
         </p>
     </fieldset>
     

@@ -5,7 +5,9 @@ $aLang = array(
 'charset'                                               => 'UTF-8',
 
 'cmsxid_setup'                                          => 'CMSxid',
-'cmsxid_setup_main'                                     => 'CMSxid settings',
+'cmsxid_setup_main'                                     => 'Settings',
+'cmsxid_setup_testcontent'                              => 'Test content',
+
 
 'CMSXID_ADMIN_SETTINGS_SOURCE'                          => 'Source',
 'CMSXID_ADMIN_SETTINGS_DEMO'                            => 'Preview',
@@ -37,6 +39,11 @@ $aLang = array(
 'CMSXID_ADMIN_SETTINGS_iCmsxidTtlDefaultRnd_HELP'       => 'To prevent large amounts of request being sent to the CMS when the cache expires in shops with numerous CMSxid calls, the cache lifetime should be randomized for each content object. A randomization of 10% means a cache lifetime of 600 seconds would result in effective lifetimes between 540 and 660 seconds.',
 
 'CMSXID_ADMIN_SETTINGS_GENERAL'                         => 'General Settings',
+
+
+'CMSXID_ADMIN_TESTCONTENT'                              => 'Test-Inhalt',
+'CMSXID_ADMIN_TESTCONTENT_INFO'                         => 'Test-Inhalt, der auf alle Anfragen ausgeliefert wird.',
+
 
 'CMSXID_ADMIN_CONTENT_PAGE_ID'                          => '(CMSxid) Page ID',
 'CMSXID_ADMIN_CONTENT_PAGE_ID_HELP'                     => 'ID of the page to load via CMSxid. <p class="warning">Content configured here will be OVERWRITTEN!</p>',

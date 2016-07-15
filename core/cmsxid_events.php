@@ -15,7 +15,18 @@ class cmsxid_events
      */
     public static function onActivate()
     {
-        cmsxid_dbhandler::addCustomColumns();
+        cmsxid_dbhandler::addColumns([
+            'oxcontents' => array(
+                'CMSXIDPAGE' => array(
+                    'multilang' => true,
+                    'schema'    => 'varchar(1024) NULL',
+                ),
+                'CMSXIDPAGEID' => array(
+                    'multilang' => false,
+                    'schema'    => 'varchar(32) NOT NULL',
+                ),
+            )
+        ]);
     }
 
     /**

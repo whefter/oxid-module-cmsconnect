@@ -2,7 +2,7 @@
 /**
  * @author      William Hefter <william@whefter.de>
  * @link        http://www.whefter.de
- * @copyright   William Hefter 2014
+ * @copyright   William Hefter 2014-2016
  */
 
 /**
@@ -29,6 +29,6 @@ class cmsxid_setup_testcontent extends cmsxid_setup_main
      */
     public function getCmsxidDefaultTestContent ()
     {
-        return "defaultest";
+        return CmsxidUtils::getInstance()->getDefaultTestContent();
     }
 }

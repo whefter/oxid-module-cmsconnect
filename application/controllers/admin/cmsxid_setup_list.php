@@ -2,7 +2,7 @@
 /**
  * @author      William Hefter <william@whefter.de>
  * @link        http://www.whefter.de
- * @copyright   William Hefter 2014
+ * @copyright   William Hefter 2014-2016
  */
 
 /**
@@ -10,15 +10,10 @@
  */
 class cmsxid_setup_list extends Shop_List
 {
-    /**
-     * Constructor. Sets the template variable to the current class name with .tpl suffix
-     *
-     * @return string
-     */
-    function __construct()
+    function render ()
     {
-        parent::__construct();
+        $sParentTemplate = parent::render();
         
-        $this->_sThisTemplate = get_class($this) . '.tpl';
+        return get_called_class() . '.tpl';
     }
 }

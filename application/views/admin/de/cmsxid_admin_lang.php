@@ -5,7 +5,9 @@ $aLang = array(
 'charset'                                               => 'UTF-8',
 
 'cmsxid_setup'                                          => 'CMSxid',
-'cmsxid_setup_main'                                     => 'CMSxid-Einstellungen',
+'cmsxid_setup_main'                                     => 'Einstellungen',
+'cmsxid_setup_testcontent'                              => 'Test-Inhalt',
+
 
 'CMSXID_ADMIN_SETTINGS_SOURCE'                          => 'Quelle',
 'CMSXID_ADMIN_SETTINGS_DEMO'                            => 'Vorschau',
@@ -37,6 +39,11 @@ $aLang = array(
 'CMSXID_ADMIN_SETTINGS_iCmsxidTtlDefaultRnd_HELP'       => 'Um bei vielen mit CMSxid zu ladenden Elementen pro Seite zu verhindern, dass nach Ablauf des Caches ein Seitenaufruf sehr viele Aufrufe zum CMS produziert, sollte die Cache-Lebensdauer pro Element leicht von der Cache-Lebensdauer-Einstellung abweichen. Dazu sollte sie eine zufällige Komponente enhalten, die hier eingestellt werden kann. Bei einer Cache-Lebensdauer von 600 Sekunden bedeuten 10% Streuung, dass die tatsächliche Cache-Lebensdauer für jedes Element zwischen 540 und 660 Sekunden liegen kann.',
 
 'CMSXID_ADMIN_SETTINGS_GENERAL'                         => 'Allgemeine Einstellungen',
+
+
+'CMSXID_ADMIN_TESTCONTENT'                              => 'Test-Inhalt',
+'CMSXID_ADMIN_TESTCONTENT_INFO'                         => 'Test-Inhalt, der auf alle Anfragen ausgeliefert wird.',
+
 
 'CMSXID_ADMIN_CONTENT_PAGE_ID'                          => '(CMSxid) Page-ID',
 'CMSXID_ADMIN_CONTENT_PAGE_ID_HELP'                     => 'CMS-Page-ID; die Seite mit der zugehörigen ID wird in der eingestellten Sprache für den aktuellen Shop geladen. <p class="warning">Der hier konfigurierte Inhalt der CMS-Seite wird ÜBERSCHRIEBEN!</p>',

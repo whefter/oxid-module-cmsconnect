@@ -151,7 +151,7 @@ window.onload = function ()
 
 [{ include file="pagetabsnippet.tpl" }]
 
-<script type="text/javascript">
+<script type="text/javascript">aaa
 if (parent.parent != null && parent.parent.setTitle )
 {   parent.parent.sShopTitle   = "[{ $actshopobj->oxshops__oxname->getRawValue()|oxaddslashes }]";
     parent.parent.sMenuItem    = "[{ oxmultilang ident="SHOP_LIST_MENUITEM" }]";
@@ -159,6 +159,15 @@ if (parent.parent != null && parent.parent.setTitle )
     parent.parent.sWorkArea    = "[{ $_act }]";
     parent.parent.setTitle();
 }
+window.onload = function ()
+{
+    [{ if $updatenav }]
+    var oTransfer = top.basefrm.edit.document.getElementById( "transfer" );
+    oTransfer.updatenav.value = 1;
+    oTransfer.cl.value = '[{ $default_edit }]';
+    [{ /if}]
+    top.reloadEditFrame();
+} 
 </script>
 </body>
 </html>
