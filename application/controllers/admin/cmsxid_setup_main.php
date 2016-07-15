@@ -123,7 +123,7 @@ class cmsxid_setup_main extends oxAdminView
         $oxConfig   = oxRegistry::getConfig();
         $sShopId    = $oxConfig->getShopId();
         
-        $aParams = $oxConfig->getParameter('editval');
+        $aParams = $oxConfig->getRequestParameter('editval');
         
         if ( !is_array($aParams) ) {
             $aParams = array();
