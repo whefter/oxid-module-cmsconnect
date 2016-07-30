@@ -7,12 +7,11 @@
 @param  string      sBaseUrl        Shop base URL (for POST request)
 *}]
 
-<span id="[{ $sUid }]" class="cmsxid-async-placeholder">
+<span id="[{ $sUid }]" class="cmsconnect-async-placeholder">
     <span class="loading-indicator"></span>
-    <!--placeholder,     aaaaaaaaa, [{$sContent}], [{$sIdentifier}], [{$sLang}]<br />-->
 </span>
 
-[{ capture assign="js_cmsxid_async_snippet" }]
+[{ capture assign="js_cmsconnect_async_snippet" }]
 $( function () {
     var $el = $('#[{ $sUid }]');
     
@@ -31,7 +30,7 @@ $( function () {
     }
     
     function fetch () {
-        $.post('[{ $sBaseUrl }]?cl=cmsxid_async', {
+        $.post('[{ $sBaseUrl }]?cl=cmsconnect_async', {
             method:     '[{ $sMethod }]',
             lang:       '[{ $sLang }]',
             content:    '[{ $sContent }]',
@@ -44,4 +43,4 @@ $( function () {
     }
 });
 [{ /capture }]
-[{ oxscript add=$js_cmsxid_async_snippet }]
+[{ oxscript add=$js_cmsconnect_async_snippet }]

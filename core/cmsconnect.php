@@ -1,0 +1,342 @@
+<?php
+/**
+ * @author      William Hefter <william@whefter.de>
+ * @link        http://www.whefter.de
+ * @copyright   2014-2016 William Hefter
+ */
+
+/**
+ * cmsconnect
+ *
+ * Terminology
+ * - Local page = local page. An article page is a page. A category list view is a page. An implicit CMS seo page is a page.
+ * - CMS page = full remote CMS page obtained when fetching a CMS URL.
+ * - Content = part of a CMS page, identified by a node identifier
+ *
+ * All getter functions do not throw errors when cms pages/contents cannot
+ * be found; rather, they return false. This enables smooth handling and prevents
+ * hard-to-handle crashes in the templates.
+ */
+class cmsconnect
+{
+    /**
+     * Returns the processed text of the requested content on the requested CMS
+     * page and the requested OXID language ID
+     *
+     * @param string        $sContentIdent  Content ident
+     * @param string        $sCmsPagePath   CMS page path. When omitted, CMSconnect will attempt to determine from current local SEO page path.
+     * @param int|string    $sLang          OXID language ID/abbreviation.
+     *
+     * @return string
+     */
+    public function getContent ($sContentIdent, $sCmsPagePath = null, $sLang = null)
+    {
+        if ( $sCmsPagePath === null ) {
+            $oCmsPage = new CMSc_CmsPage_Path_Implicit($sLang);
+        } else {
+            $oCmsPage = new CMSc_CmsPage_Path($sCmsPagePath, $sLang);
+        }
+        
+        return $oCmsPage->getContent($sContentIdent);
+    }
+    
+    /**
+     * Returns the processed text of the requested content on the requested CMS
+     * page and the requested OXID language ID
+     *
+     * @param string        $sContentIdent  Content ident
+     * @param int           $sCmsPageId     CMS page ID
+     * @param int|string    $sLang          OXID language ID/abbreviation.
+     *
+     * @return string
+     */
+    public function getContentById ($sContentIdent, $sCmsPageId, $sLang = null)
+    {
+        $oCmsPage = new CMSc_CmsPage_Id($sCmsPageId, $sLang);
+        
+        return $oCmsPage->getContent($sContentIdent);
+    }
+    
+    /**
+     * Returns an array containing the text content of all content nodes for the requested CMS page and OXID language ID.
+     * Specific nodes can be returned by passing the last argument.
+     *
+     * @param string        $sCmsPagePath       CMS page path. When omitted, CMSconnect will attempt to determine from current local SEO page.
+     * @param int|string    $sLang              OXID language ID/abbreviation.
+     * @param string[]      $aContentIdents     List of contents to return (empty array for all: default)
+     *
+     * @return string[]
+     */
+    public function getContentArray ($sCmsPagePath = null, $sLang = null, $aContentIdents = [])
+    {
+        if ( $sCmsPagePath === null ) {
+            $oCmsPage = new CMSc_CmsPage_Path_Implicit($sLang);
+        } else {
+            $oCmsPage = new CMSc_CmsPage_Path($sCmsPagePath, $sLang);
+        }
+
+        return $oCmsPage->getContentArray($aContentIdents);
+    }
+    
+    /**
+     * Returns an array containing the text content of all content nodes for the requested CMS page and OXID language ID.
+     * Specific nodes can be returned by passing the last argument.
+     *
+     * @param int           $sCmsPageId         CMS page ID
+     * @param int|string    $sLang              OXID language ID/abbreviation.
+     * @param string[]      $aContentIdents     List of contents names to return (empty array for all: default)
+     *
+     * @return string[]
+     */
+    public function getContentArrayById ($sCmsPageId, $sLang = null, $aContentIdents = [])
+    {
+        $oCmsPage = new CMSc_CmsPage_Id($sContentId, $sLang);
+        
+        return $oCmsPage->getContentArray($aContentIdents);
+    }
+    
+    /**
+     * Returns the full XML object for the requested CMS page and OXID language ID.
+     *
+     * @param int           $sCmsPagePath   CMS page path. When omitted, CMSconnect will attempt to determine from current local SEO page.
+     * @param int|string    $sLang          OXID language ID/abbreviation.
+     *
+     * @return SimpleXMLObject
+     */
+    public function getXml ($sCmsPagePath = null, $sLang = null)
+    {
+        if ( $sCmsPagePath === null ) {
+            $oCmsPage = new CMSc_CmsPage_Path_Implicit($sLang);
+        } else {
+            $oCmsPage = new CMSc_CmsPage_Path($sCmsPagePath, $sLang);
+        }
+        
+        return $oCmsPage->getXml();
+    }
+    
+    /**
+     * Returns the full XML object for the requested CMS page and OXID language ID.
+     *
+     * @param int           $sCmsPageId     CMS page ID
+     * @param int|string    $sLang          OXID language ID/abbreviation.
+     *
+     * @return SimpleXMLObject
+     */
+    public function getXmlById ($sCmsPageId, $sLang = null)
+    {
+        $oCmsPage = new CMSc_CmsPage_Id($sCmsPageId, $sLang);
+        
+        return $oCmsPage->getXml();
+    }
+    
+    /**
+     * Returns an XML object for the requested content, CMS page and OXID language ID
+     *
+     * @param string        $sContentIdent      Content ident
+     * @param int           $sCmsPagePath       CMS page path. When omitted, CMSconnect will attempt to determine from current local SEO page.
+     * @param int|string    $sLang              OXID language ID/abbreviation.
+     *
+     * @return SimpleXMLObject
+     */
+    public function getContentXml ($sContentIdent = null, $sCmsPagePath = null, $sLang = null)
+    {
+        if ( $sCmsPagePath === null ) {
+            $oCmsPage = new CMSc_CmsPage_Path_Implicit($sLang);
+        } else {
+            $oCmsPage = new CMSc_CmsPage_Path($sCmsPagePath, $sLang);
+        }
+        
+        return $oCmsPage->getContentXml($sContentIdent);
+    }
+    
+    /**
+     * Returns an XML object for the requested content, CMS page and OXID language ID
+     *
+     * @param string        $sContentIdent      Content ident
+     * @param int           $sCmsPageId         CMS page ID
+     * @param int|string    $sLang              OXID language ID/abbreviation.
+     *
+     * @return SimpleXMLObject
+     */
+    public function getContentXmlById ($sContentIdent = null, $sCmsPageId = null, $sLang = null)
+    {
+        $oCmsPage = new CMSc_CmsPage_Id($sCmsPageId, $sLang);
+        
+        return $oCmsPage->getContentXml($sContentIdent);
+    }
+    
+    /**
+     * @deprecated
+     */
+    public function getPageMetadata ($sField, $sCmsPagePath = null, $sLang = null)
+    {
+        return $this->getMetadata($sField, $sCmsPagePath, $sLang);
+    }
+    /**
+     * Returns the metadata field value for the passed metadata field name of the
+     * requested CMS page and the requested OXID language ID
+     *
+     * @param string        $sField         Metadata field name
+     * @param string        $sCmsPagePath   CMS page path. When omitted, CMSconnect will attempt to determine from current local SEO page.
+     * @param int|string    $sLang          OXID language ID/abbreviation.
+     *
+     * @return string
+     */
+    public function getMetadata ($sField, $sCmsPagePath = null, $sLang = null)
+    {
+        if ( $sCmsPagePath === null ) {
+            $oCmsPage = new CMSc_CmsPage_Path_Implicit($sLang);
+        } else {
+            $oCmsPage = new CMSc_CmsPage_Path($sCmsPagePath, $sLang);
+        }
+        
+        return $oCmsPage->getMetadata($sField);
+    }
+    
+    /**
+     * @deprecated
+     */
+    public function getPageMetadataById ($sField, $sCmsPageId, $sLang = null)
+    {
+        return $this->getMetadataById($sField, $sContentId, $sLang);
+    }
+    /**
+     * Returns the metadata field value for the passed metadata field name of the
+     * requested CMS page and the requested OXID language ID
+     *
+     * @param string        $sField         Metadata field name
+     * @param int           $sCmsPageId     CMS page ID
+     * @param int|string    $sLang          OXID language ID/abbreviation.
+     *
+     * @return string
+     */
+    public function getMetadataById ($sField, $sCmsPageId, $sLang = null)
+    {
+        $oCmsPage = new CMSc_CmsPage_Id($sCmsPageId, $sLang);
+        
+        return $oCmsPage->getMetadata($sField);
+    }
+    
+    /**
+     * Public access to sanitizePageTitle helper function
+     *
+     * @param string    $sUrl   Page page to sanitize
+     *
+     * @return string
+     */
+    public function preparePagePath( $sUrl )
+    {
+        return $this->sanitizePagePath($sUrl);
+    }
+    public function sanitizePageTitle( $sUrl )
+    {
+        return CMSc_Utils::sanitizePageTitle( $sUrl );
+    }
+    
+    /**
+     * Public access to rewriteContentUrls helper function
+     *
+     * @param string    $sContent   Content to rewrite URLs in
+     *
+     * @return string
+     */
+    public function rewriteContentUrls($sContent)
+    {
+        return $this->rewriteTextContentLinks($sContent);
+    }
+    public function rewriteTextContentLinks($sContent)
+    {
+        return CMSc_Utils::rewriteTextContentLinks( $sContent );
+    }
+    
+    /**
+     * Public access to rewriteUrl helper function
+     *
+     * @param string    $sUrl   URL to rewrite
+     *
+     * @return string
+     */
+    public function rewriteUrl($sUrl)
+    {
+        return CMSc_Utils::rewriteUrl( $sUrl );
+    }
+    
+    /**
+     * TOXID compatibility function
+     */
+    public function getXmlObject( $sPage = null, $sContentIdent = null )
+    {
+        if ( $sContentIdent !== null ) {
+            return $this->getContentXml( $sContentIdent, $sPage );
+        } else {
+            return $this->getXml( $sPage );
+        }
+    }
+    
+    /**
+     * TOXID compatibility function
+     */
+    public function getContentList( $sCustomPage = null, $blOnlyContentNodes = true )
+    {
+        $aNodes = array();
+        
+        if ( $blOnlyContentNodes ) {
+            // Default CMS column names
+            $aNodes = array(
+                'left',
+                'normal', 'content',
+                'right',
+                'border',
+            );
+        }
+        
+        return $this->getContentArray( $sCustomPage, null, $aNodes );
+    }
+    
+    /**
+     * TOXID compatibility function
+     */
+    public function getCmsContentIdent( $sContentIdent = null, $blMultiLang = false, $sCustomPage = null )
+    {
+        return $this->getContent( $sContentIdent, $sCustomPage );
+    }
+    
+    /**
+     * TOXID compatibility function
+     */
+    public function toxidRewriteUrls($sContent, $iLangId = null, $blMultiLang = false)
+    {
+        return CMSc_Utils::rewriteTextContentLinks( $sContent );
+    }
+    
+    /**
+     * TOXID compatibility function
+     */
+    public function toxidRewriteUrl( $sUrl, $iLangId = null, $blMultiLang = false )
+    {
+        return CMSc_Utils::rewriteUrl( $sUrl );
+    }
+    
+    /**
+     * TOXID compatibility function
+     */
+    public function toxidEncodeTitle( $sUrl, $iLang = null )
+    {
+        return CMSc_Utils::sanitizePagePath( $sUrl );
+    }
+    
+    /**
+     * TOXID compatibility function
+     */
+    public function getSearchResult($sKeywords)
+    {
+    }
+    
+    /**
+     * TOXID compatibility function
+     */
+    public function getHttpCode( $sUrl = null )
+    {
+        return 200;
+    }
+}

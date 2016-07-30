@@ -1,5 +1,5 @@
 #+++localconf.php+++#
-$TYPO3_CONF_VARS['BE']['forceCharset'] = 'utf-8';
+$CMS_CONF_VARS['BE']['forceCharset'] = 'utf-8';
 
 config {
    # Use "Language: All" content elements
@@ -49,8 +49,8 @@ config {
 
 [global]
 ########## MAIN NAVIGATION ##########
-lib.mainnav = HMENU
-lib.mainnav {
+lib.navigation = HMENU
+lib.navigation {
   entryLevel = 1
   wrap = <navigation><![CDATA[|]]></navigation>
   
@@ -96,25 +96,26 @@ lib.mainnav {
 }
 
 ########## CONTENT ##########
-lib.left = COA
-print.10 = COA
-lib.left.wrap = <left><![CDATA[|]]></left>
-lib.left.10 < styles.content.getLeft
-
 lib.content = COA
-print.20 = COA
-lib.content.wrap = <content><![CDATA[|]]></content>
-lib.content.10 < styles.content.get
+lib.content {
+    wrap = <content>|</content>
+    
+    10 = COA
+    10.wrap = <left><![CDATA[|]]></left>
+    10.10 < styles.content.getLeft
 
-lib.right = COA
-print.30 = COA
-lib.right.wrap = <right><![CDATA[|]]></right>
-lib.right.10 < styles.content.getRight
+    20 = COA
+    20.wrap = <normal><![CDATA[|]]></normal>
+    20.10 < styles.content.get
 
-lib.border = COA
-print.30 = COA
-lib.border.wrap = <border><![CDATA[|]]></border>
-lib.border.10 < styles.content.getBorder
+    30 = COA
+    30.wrap = <right><![CDATA[|]]></right>
+    30.10 < styles.content.getRight
+
+    40 = COA
+    40.wrap = <border><![CDATA[|]]></border>
+    40.10 < styles.content.getBorder
+}
 
 lib.metadata = COA
 lib.metadata {
@@ -146,22 +147,74 @@ lib.metadata {
 }
 
 ########## BREADCRUMBS ##########
-lib.breadcrumb = HMENU
-lib.breadcrumb {
-  wrap = <breadcrumb>|</breadcrumb>
+lib.breadcrumbs = COA
+lib.breadcrumbs {
+  wrap = <breadcrumbs>|</breadcrumbs>
 
-  includeNotInMenu = 1
-  special = rootline
-  special.range = 1|-1
-  1 = TMENU
-  1 {
-    NO.linkWrap = | >
-    NO.stdWrap2.noTrimWrap = | | |
-    CUR < .NO
-    CUR = 1
-    CUR {
-      linkWrap = |
-      doNotLinkIt = 1
+  100 = HMENU
+  100 {
+    special = rootline
+    special.range = 1|-1
+
+    1 = TMENU
+    1 {
+      NO {
+        allWrap = <crumb>|</crumb>
+        doNotLinkIt = 1
+        stdWrap {
+          cObject = COA
+          cObject { 
+            10 = TEXT
+            10 {
+              wrap = <url>|</url>
+              typolink {
+                parameter.field = uid
+                returnLast = url
+              }
+            }
+            20 = TEXT
+            20 {
+              field = title//subtitle
+              wrap = <title><![CDATA[|]]></title>
+            }
+          }
+        }
+      }
+  
+      CUR < .NO
+      CUR = 1
+      CUR {
+        allWrap = <crumb current="1">|</crumb>
+        
+        stdWrap {
+          override {
+            // Nur überschreiben, wenn tt_news Artikel aufgerufen
+            if.isTrue.data = GP:tx_ttnews|tt_news
+
+            cObject = COA
+            cObject { 
+              10 = RECORDS
+              10 {
+                dontCheckPid = 1
+                tables = tt_news
+                source.data = GP:tx_ttnews|tt_news
+                languageField = sys_language_uid
+                conf.tt_news = TEXT
+                conf.tt_news.field = title
+                wrap = <title>|</title>
+              }
+              20 = TEXT
+              20 {
+                wrap = <url>|</url>
+                typolink {
+                  parameter.field = uid
+                  returnLast = url
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -181,12 +234,9 @@ page.config {
   xhtml_cleaning = all
 }
 
-page.10 < lib.mainnav
-page.20 < lib.left
-page.30 < lib.content
-page.40 < lib.right
-page.50 < lib.border
-page.60 < lib.metadata
-page.70 < lib.breadcrumb
+page.10 < lib.navigation
+page.20 < lib.content
+page.30 < lib.metadata
+page.40 < lib.breadcrumbs
 
-page.wrap = <?xml version="1.0" encoding="utf-8"?><toxid>|</toxid>
+page.wrap = <?xml version="1.0" encoding="utf-8"?><cmsconnect>|</cmsconnect>

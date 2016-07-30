@@ -2,11 +2,11 @@
 $sMetadataVersion = '1.1';
 
 $aModule = array(
-    'id'                => 'cmsxid',
-    'title'             => 'CMSxid',
+    'id'                => 'cmsconnect',
+    'title'             => 'CMSconnect',
     'email'             => 'william@whefter.de',
     'url'               => 'http://www.whefter.de',
-    'version'           => '1.2',
+    'version'           => '1.0',
     'author'            => 'William Hefter',
     'description'       => array(
         'de'    => 'Erlaubt das Einbinden von CMS-Inhalten im OXID eShop.',
@@ -14,54 +14,57 @@ $aModule = array(
     ),
     
     'templates' => array(
-        'modules/cmsxid/fe.tpl'             => 'wh/cmsxid/application/views/tpl/fe.tpl',
-        'modules/cmsxid/async.tpl'          => 'wh/cmsxid/application/views/tpl/async.tpl',
-        'modules/cmsxid/async_snippet.tpl'  => 'wh/cmsxid/application/views/tpl/async_snippet.tpl',
+        'modules/wh/cmsconnect/frontend.tpl'        => 'wh/cmsconnect/application/views/tpl/frontend.tpl',
+        'modules/wh/cmsconnect/async.tpl'           => 'wh/cmsconnect/application/views/tpl/async.tpl',
+        'modules/wh/cmsconnect/async_snippet.tpl'   => 'wh/cmsconnect/application/views/tpl/async_snippet.tpl',
         
         // Admin
-        'cmsxid_setup_list.tpl'         => 'wh/cmsxid/application/views/admin/tpl/cmsxid_setup_list.tpl',
-        'cmsxid_setup_main.tpl'         => 'wh/cmsxid/application/views/admin/tpl/cmsxid_setup_main.tpl',
-        'cmsxid_setup_testcontent.tpl'  => 'wh/cmsxid/application/views/admin/tpl/cmsxid_setup_testcontent.tpl',
+        'modules/wh/cmsconnect/admin/setup_list.tpl'             => 'wh/cmsconnect/application/views/admin/tpl/setup_list.tpl',
+        'modules/wh/cmsconnect/admin/setup_main.tpl'             => 'wh/cmsconnect/application/views/admin/tpl/setup_main.tpl',
+        'modules/wh/cmsconnect/admin/setup_testcontent.tpl'      => 'wh/cmsconnect/application/views/admin/tpl/setup_testcontent.tpl',
+        'modules/wh/cmsconnect/admin/setup_cache_localpages.tpl' => 'wh/cmsconnect/application/views/admin/tpl/setup_cache_localpages.tpl',
+        'modules/wh/cmsconnect/admin/setup_cache_cmspages.tpl'   => 'wh/cmsconnect/application/views/admin/tpl/setup_cache_cmspages.tpl',
     ),
     
     'blocks'    => array(
-        array('template' => 'content_main.tpl',                 'block' => 'admin_content_main_form',                   'file' => '/application/views/admin/blocks/content_main.tpl/admin_content_main_form.tpl'),
+        array(
+            'template'  => 'content_main.tpl',
+            'block'     => 'admin_content_main_form',
+            'file'      => '/application/views/admin/blocks/content_main.tpl/admin_content_main_form.tpl'
+        ),
     ),
     
     'extend' => array(
-        'oxconfig'      => 'wh/cmsxid/application/models/cmsxid_oxconfig',
-        'oxcontent'     => 'wh/cmsxid/application/models/cmsxid_oxcontent',
-        'oxutilsview'   => 'wh/cmsxid/application/models/cmsxid_oxutilsview',
-        'oxseodecoder'  => 'wh/cmsxid/application/models/cmsxid_oxseodecoder',
-        'oxseoencoder'  => 'wh/cmsxid/application/models/cmsxid_oxseoencoder',
-        'oxviewconfig'  => 'wh/cmsxid/application/models/cmsxid_oxviewconfig',
+        'oxconfig'      => 'wh/cmsconnect/application/models/cmsconnect_oxconfig',
+        'oxcontent'     => 'wh/cmsconnect/application/models/cmsconnect_oxcontent',
+        'oxutilsview'   => 'wh/cmsconnect/application/models/cmsconnect_oxutilsview',
+        'oxseodecoder'  => 'wh/cmsconnect/application/models/cmsconnect_oxseodecoder',
+        'oxseoencoder'  => 'wh/cmsconnect/application/models/cmsconnect_oxseoencoder',
+        'oxviewconfig'  => 'wh/cmsconnect/application/models/cmsconnect_oxviewconfig',
     ),
     
     'files' => array(
-        'cmsxid'                    => 'wh/cmsxid/core/cmsxid.php',
-        'cmsxid_fe'                 => 'wh/cmsxid/application/controllers/cmsxid_fe.php',
-        'cmsxid_async'              => 'wh/cmsxid/application/controllers/cmsxid_async.php',
+        'cmsconnect'                    => 'wh/cmsconnect/core/cmsconnect.php',
+        'cmsconnect_frontend'           => 'wh/cmsconnect/application/controllers/cmsconnect_frontend.php',
+        'cmsconnect_async'              => 'wh/cmsconnect/application/controllers/cmsconnect_async.php',
         
-        'CmsxidPage'                => 'wh/cmsxid/core/CmsxidPage.php',
-        'CmsxidPathPage'            => 'wh/cmsxid/core/CmsxidPathPage.php',
-        'CmsxidIdPage'              => 'wh/cmsxid/core/CmsxidIdPage.php',
-        'CmsxidUtils'               => 'wh/cmsxid/core/CmsxidUtils.php',
-        
-        'cmsxid_dbhandler'          => 'wh/cmsxid/core/cmsxid_dbhandler.php',
-        'cmsxid_events'             => 'wh/cmsxid/core/cmsxid_events.php',
+        'cmsconnect_dbhandler'          => 'wh/cmsconnect/core/cmsconnect_dbhandler.php',
+        'cmsconnect_events'             => 'wh/cmsconnect/core/cmsconnect_events.php',
         
         // Admin
-        'cmsxid_setup'              => 'wh/cmsxid/application/controllers/admin/cmsxid_setup.php',
-        'cmsxid_setup_list'         => 'wh/cmsxid/application/controllers/admin/cmsxid_setup_list.php',
-        'cmsxid_setup_main'         => 'wh/cmsxid/application/controllers/admin/cmsxid_setup_main.php',
-        'cmsxid_setup_testcontent'  => 'wh/cmsxid/application/controllers/admin/cmsxid_setup_testcontent.php',
+        'cmsconnect_setup'                  => 'wh/cmsconnect/application/controllers/admin/cmsconnect_setup.php',
+        'cmsconnect_setup_list'             => 'wh/cmsconnect/application/controllers/admin/cmsconnect_setup_list.php',
+        'cmsconnect_setup_main'             => 'wh/cmsconnect/application/controllers/admin/cmsconnect_setup_main.php',
+        'cmsconnect_setup_testcontent'      => 'wh/cmsconnect/application/controllers/admin/cmsconnect_setup_testcontent.php',
+        'cmsconnect_setup_cache_localpages' => 'wh/cmsconnect/application/controllers/admin/cmsconnect_setup_cache_localpages.php',
+        'cmsconnect_setup_cache_cmspages'   => 'wh/cmsconnect/application/controllers/admin/cmsconnect_setup_cache_cmspages.php',
     ),
     
     'settings' => array(
     ),
     
     'events'    => array(
-        'onActivate'    => 'cmsxid_events::onActivate',
-        'onDeactivate'  => 'cmsxid_events::onDeactivate',
+        'onActivate'    => 'cmsconnect_events::onActivate',
+        'onDeactivate'  => 'cmsconnect_events::onDeactivate',
     ),
 );

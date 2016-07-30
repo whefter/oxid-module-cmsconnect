@@ -1,4 +1,4 @@
-bUrl = http://typo3.url
+bUrl = http://CMS.url
 
 lang_de_L      = 0
 lang_de_sysuid = 0

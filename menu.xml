@@ -2,9 +2,11 @@
 <OX>
   <OXMENU id="NAVIGATION_ESHOPADMIN">
       <MAINMENU id="mxextensions">
-            <SUBMENU id="cmsxid_setup" cl="cmsxid_setup" list="cmsxid_setup_list">
-                <TAB id="cmsxid_setup_main"         cl="cmsxid_setup_main" />
-                <TAB id="cmsxid_setup_testcontent"  cl="cmsxid_setup_testcontent" />
+            <SUBMENU id="cmsconnect_setup" cl="cmsconnect_setup" list="cmsconnect_setup_list">
+                <TAB id="cmsconnect_setup_main"             cl="cmsconnect_setup_main" />
+                <TAB id="cmsconnect_setup_testcontent"      cl="cmsconnect_setup_testcontent" />
+                <TAB id="cmsconnect_setup_cache_localpages" cl="cmsconnect_setup_cache_localpages" />
+                <TAB id="cmsconnect_setup_cache_cmspages"   cl="cmsconnect_setup_cache_cmspages" />
             </SUBMENU>
         </MAINMENU>
   </OXMENU>
