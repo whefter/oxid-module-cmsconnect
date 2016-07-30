@@ -196,7 +196,7 @@
         <table>
             <tr>
                 <td class="edittext">
-                    [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScTtlDefault" }]:
+                    [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScTtlDefault" args="CMSc_Utils::CONFIG_DEFAULTVALUE_TTL"|constant }]:
                     [{ oxinputhelp ident="CMSCONNECT_ADMIN_SETTINGS_sCMScTtlDefault_HELP" }]
                 </td>
                 <td class="edittext">
@@ -205,7 +205,7 @@
             </tr>
             <tr>
                 <td class="edittext">
-                    [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScTtlDefaultRnd" }]:
+                    [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScTtlDefaultRnd" args="CMSc_Utils::CONFIG_DEFAULTVALUE_TTL_RND"|constant }]:
                     [{ oxinputhelp ident="CMSCONNECT_ADMIN_SETTINGS_sCMScTtlDefaultRnd_HELP" }]
                 </td>
                 <td class="edittext">
@@ -214,20 +214,20 @@
             </tr>
             <tr>
                 <td class="edittext">
-                    [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScCurlConnectTimeout" }]:
+                    [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScCurlConnectTimeout" args="CMSc_Utils::CONFIG_DEFAULTVALUE_CURL_CONNECT_TIMEOUT"|constant }]:
                     [{ oxinputhelp ident="CMSCONNECT_ADMIN_SETTINGS_sCMScCurlConnectTimeout_HELP" }]
                 </td>
                 <td class="edittext">
-                    <input type="text" name="editval[sCMScCurlConnectTimeout]" value="[{ $sCMScCurlConnectTimeout }]" size="5" />%
+                    <input type="text" name="editval[sCMScCurlConnectTimeout]" value="[{ $sCMScCurlConnectTimeout }]" size="5" /> ms
                 </td>
             </tr>
             <tr>
                 <td class="edittext">
-                    [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScCurlExecuteTimeout" }]:
+                    [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScCurlExecuteTimeout" args="CMSc_Utils::CONFIG_DEFAULTVALUE_CURL_EXECUTE_TIMEOUT"|constant }]:
                     [{ oxinputhelp ident="CMSCONNECT_ADMIN_SETTINGS_sCMScCurlExecuteTimeout_HELP" }]
                 </td>
                 <td class="edittext">
-                    <input type="text" name="editval[sCMScCurlExecuteTimeout]" value="[{ $sCMScCurlExecuteTimeout }]" size="5" />%
+                    <input type="text" name="editval[sCMScCurlExecuteTimeout]" value="[{ $sCMScCurlExecuteTimeout }]" size="5" /> ms
                 </td>
             </tr>
             <tr>

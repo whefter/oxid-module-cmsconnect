@@ -40,8 +40,12 @@ class CMSc_Utils
         CONFIG_KEY_QUERY_PARAMETERS     = 'aCMScParams',
         CONFIG_KEY_ID_PARAMETERS        = 'aCMScIdParams',
         CONFIG_KEY_LANG_PARAMETERS      = 'aCMScLangParams',
-        CONFIG_KEY_SEO_IDENTIFIERS      = 'aCMScSeoIdents'
+        CONFIG_KEY_SEO_IDENTIFIERS      = 'aCMScSeoIdents',
         
+        CONFIG_DEFAULTVALUE_TTL                     = 36000,
+        CONFIG_DEFAULTVALUE_TTL_RND                 = 10,
+        CONFIG_DEFAULTVALUE_CURL_EXECUTE_TIMEOUT    = 1000,
+        CONFIG_DEFAULTVALUE_CURL_CONNECT_TIMEOUT    = 1000
         ;
     
     /**
@@ -461,9 +465,14 @@ class CMSc_Utils
             curl_setopt( $chs[$i], CURLOPT_SSL_VERIFYPEER,  !static::getConfigValue(CMSc_Utils::CONFIG_KEY_SSL_DONT_VERIFY_PEER) );
             curl_setopt( $chs[$i], CURLOPT_SSL_VERIFYHOST,  !static::getConfigValue(CMSc_Utils::CONFIG_KEY_SSL_DONT_VERIFY_PEER) );
             
-            // curl_setopt( $chs[$i], CURLOPT_CONNECTTIMEOUT,  2 );
-            // curl_setopt( $chs[$i], CURLOPT_CONNECTTIMEOUT,  2 );
-            // curl_setopt( $chs[$i], CURLOPT_TIMEOUT,         1 );
+            $iConnectTimeout = static::getConfigValue(CMSc_Utils::CONFIG_KEY_CURL_CONNECT_TIMEOUT);
+            $iConnectTimeout = $iConnectTimeout ?: static::CONFIG_DEFAULTVALUE_CURL_CONNECT_TIMEOUT;
+            curl_setopt( $chs[$i], CURLOPT_CONNECTTIMEOUT_MS,  $iConnectTimeout );
+            
+            $iExecuteTimeout = static::getConfigValue(CMSc_Utils::CONFIG_KEY_CURL_EXECUTE_TIMEOUT);
+            $iExecuteTimeout = $iConnectTimeout ?: static::CONFIG_DEFAULTVALUE_CURL_EXECUTE_TIMEOUT;
+            curl_setopt( $chs[$i], CURLOPT_CONNECTTIMEOUT, $iExecuteTimeout );
+            
             // curl_setopt( $chs[$i], CURLOPT_SSLVERSION,      1 );
             
             // For POST
@@ -836,269 +845,6 @@ class CMSc_Utils
         stopProfile(__METHOD__);
         
         return $sContent;
-    }
-    
-    /**
-     * Configuration: fetch default cache TTL value
-     * 
-     * @return int
-     */
-    public static function getConfiguredDefaultCacheTTL ()
-    {
-        $oxConfig = oxRegistry::getConfig();
-        
-        return $oxConfig->getShopConfVar('sCMScTtlDefault', $oxConfig->getShopId(), 'module:cmsconnect');
-    }
-    
-    /**
-     * Configuration: fetch default cache TTL randomization value
-     * 
-     * @return int
-     */
-    public static function getConfiguredDefaultCacheTTLRandomization ()
-    {
-        $oxConfig = oxRegistry::getConfig();
-        
-        return $oxConfig->getShopConfVar('sCMScTtlDefaultRnd', $oxConfig->getShopId(), 'module:cmsconnect');
-    }
-    
-    /**
-     * Configuration: fetch "no url rewriting" value
-     * 
-     * @return bool
-     */
-    public static function getConfiguredNoUrlRewriteSetting ()
-    {
-        $oxConfig = oxRegistry::getConfig();
-        
-        return $oxConfig->getShopConfVar('blCMScLeaveUrls', $oxConfig->getShopId(), 'module:cmsconnect');
-    }
-    
-    /**
-     * Configuration: return configured cURL connect timeout and default to 1
-     * 
-     * @return int
-     */
-    public static function getConfiguredCurlConnectTimeout ()
-    {
-        $oxConfig = oxRegistry::getConfig();
-        
-        $mVal = $oxConfig->getShopConfVar('sCMScCurlConnectTimeout', $oxConfig->getShopId(), 'module:cmsconnect');
-        
-        return $mVal ?: 1;
-    }
-    
-    /**
-     * Configuration: return configured cURL fetch timeout and default to 3
-     * 
-     * @return int
-     */
-    public static function getConfiguredCurlExecuteTimeout ()
-    {
-        $oxConfig = oxRegistry::getConfig();
-        
-        $mVal = $oxConfig->getShopConfVar('sCMScCurlExecuteTimeout', $oxConfig->getShopId(), 'module:cmsconnect');
-        
-        return $mVal ?: 3;
-    }
-    
-    /**
-     * Configuration: return the configuration value for blCMScEnableTestContent
-     * 
-     * @return bool
-     */
-    public static function getConfiguredTestContentValue ()
-    {
-        $oxConfig = oxRegistry::getConfig();
-        
-        $mVal = $oxConfig->getShopConfVar('blCMScEnableTestContent', $oxConfig->getShopId(), 'module:cmsconnect');
-        
-        return $mVal ?: false;
-    }
-    
-    /**
-     * Configuration: return the configuration value for blCMScEnableTestContent
-     * 
-     * @return bool
-     */
-    public static function getConfiguredSslVerifyPeerValue ()
-    {
-        $oxConfig = oxRegistry::getConfig();
-        
-        $mVal = $oxConfig->getShopConfVar('blCMScSslDontVerifyPeer', $oxConfig->getShopId(), 'module:cmsconnect');
-        
-        return !(bool)$mVal;
-    }
-    
-    /**
-     * Configuration: returns an array of all configured sources by language ID and language abbreviation as object
-     * 
-     * @return object[]
-     */
-    public static function getConfiguredSources ()
-    {
-        startProfile(__METHOD__);
-        
-        if ( self::$_aConfiguredSources === null ) {
-            $oxLang     = oxRegistry::getLang();
-            $oxConfig   = oxRegistry::getConfig();
-            $iShop      = $oxConfig->getShopId();
-            
-            $aCMScBaseUrls    = $oxConfig->getShopConfVar('aCMScBaseUrls',      $iShop, 'module:cmsconnect');
-            $aCMScBaseSslUrls = $oxConfig->getShopConfVar('aCMScBaseSslUrls',   $iShop, 'module:cmsconnect');
-            $aCMScPagePaths   = $oxConfig->getShopConfVar('aCMScPagePaths',     $iShop, 'module:cmsconnect');
-            $aCMScParams      = $oxConfig->getShopConfVar('aCMScParams',        $iShop, 'module:cmsconnect');
-            $aCMScIdParams    = $oxConfig->getShopConfVar('aCMScIdParams',      $iShop, 'module:cmsconnect');
-            $aCMScLangParams  = $oxConfig->getShopConfVar('aCMScLangParams',    $iShop, 'module:cmsconnect');
-            $aCMScSeoIdents   = $oxConfig->getShopConfVar('aCMScSeoIdents',     $iShop, 'module:cmsconnect');
-            
-            $aLanguages = $oxLang->getLanguageArray();
-            
-            $aSources   = array();
-            
-            foreach ( $aLanguages as $oLang ) {
-                $iLang = $oLang->id;
-                
-                // No URLs configured; invalid source, ignore
-                if ( !$aCMScBaseUrls[$iLang] && !$aCMScBaseSslUrls[$iLang] ) {
-                    continue;
-                }
-                
-                $o = new stdClass();
-                
-                $o->sBaseUrl    = $aCMScBaseUrls[$iLang];
-                $o->sBaseUrlSsl = $aCMScBaseSslUrls[$iLang];
-                $o->sPagePath   = $aCMScPagePaths[$iLang];
-                $o->sParams     = $aCMScParams[$iLang];
-                $o->sIdParam    = $aCMScIdParams[$iLang];
-                $o->sLangParam  = $aCMScLangParams[$iLang];
-                $o->sSeoIdent   = $aCMScSeoIdents[$iLang];
-                
-                $aSources[$iLang]       = clone $o;
-                $aSources[$oLang->abbr] = clone $o;
-            }
-            
-            self::$_aConfiguredSources = $aSources;
-        
-            // echo "<pre>";var_dump(self::$_aConfiguredSources);echo "</pre>";
-        }
-        
-        stopProfile(__METHOD__);
-        
-        return self::$_aConfiguredSources;
-    }
-    
-    /**
-     * Configuration: helper function
-     * 
-     * @param string        $sLang          Language to return the source property for
-     * @param string        $sProperty      Property to return for the source
-     *
-     * @return mixed
-     */
-    public static function getConfiguredSourceProperty ( $sLang, $sProperty )
-    {
-        if ( $sLang === null ) {
-            $sLang = oxRegistry::getLang()->getBaseLanguage();
-        }
-        
-        $aSources = static::getConfiguredSources();
-        
-        if ( !array_key_exists($sLang, $aSources) ) {
-            return false;
-        } else {
-            return $aSources[$sLang]->{$sProperty};
-        }
-    }
-    
-    /**
-     * Configuration: return source base url for the passed OXID language
-     * 
-     * @param string        $sLang          Language to return the property for
-     * 
-     * @return string
-     */
-    public static function getConfiguredSourceBaseUrl ( $sLang )
-    {
-        $sBaseUrl = static::getConfiguredSourceProperty( $sLang, 'sBaseUrl' );
-        $sBaseUrl = static::sanitizeUrl( $sBaseUrl );
-        
-        return $sBaseUrl;
-    }
-    
-    /**
-     * Configuration: return source ssl base url for the passed OXID language
-     * 
-     * @param string        $sLang          Language to return the property for
-     * 
-     * @return string
-     */
-    public static function getConfiguredSourceSslBaseUrl ( $sLang )
-    {
-        $sBaseUrlSsl = static::getConfiguredSourceProperty( $sLang, 'sBaseUrlSsl' );
-        $sBaseUrlSsl = static::sanitizeUrl( $sBaseUrlSsl );
-        
-        return $sBaseUrlSsl;
-    }
-    
-    /**
-     * Configuration: return page path for the passed OXID language
-     * 
-     * @param string        $sLang          Language to return the source property for
-     * 
-     * @return string
-     */
-    public static function getConfiguredSourcePagePath ( $sLang )
-    {
-        return static::getConfiguredSourceProperty( $sLang, 'sPagePath' );
-    }
-    
-    /**
-     * Configuration: return source parameter string for the passed OXID language
-     * 
-     * @param string        $sLang          Language to return the source property for
-     * 
-     * @return string
-     */
-    public static function getConfiguredSourceParams ( $sLang )
-    {
-        return static::getConfiguredSourceProperty( $sLang, 'sParams' );
-    }
-    
-    /**
-     * Configuration: return source CMS ID query parameter name for the passed OXID language
-     * 
-     * @param string        $sLang          Language to return the source property for
-     * 
-     * @return string
-     */
-    public static function getConfiguredSourceIdParam ( $sLang )
-    {
-        return static::getConfiguredSourceProperty( $sLang, 'sIdParam' );
-    }
-    
-    /**
-     * Configuration: return source CMS language ID for the passed OXID language
-     * 
-     * @param string        $sLang          Language to return the source property for
-     * 
-     * @return string
-     */
-    public static function getConfiguredSourceLangParam ( $sLang )
-    {
-        return static::getConfiguredSourceProperty( $sLang, 'sLangParam' );
-    }
-    
-    /**
-     * Configuration: return source url for the passed OXID language
-     * 
-     * @param string        $sLang          Language to return the source property for
-     * 
-     * @return string
-     */
-    public static function getConfiguredSourceSeoIdentifier ( $sLang )
-    {
-        return static::getConfiguredSourceProperty( $sLang, 'sSeoIdent' );
     }
     
     /**

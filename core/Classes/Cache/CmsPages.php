@@ -85,10 +85,10 @@ abstract class CMSc_Cache_CmsPages
         // Figure out cache TTL
         if ( $iTtl === null ) {
             if ( !($iTtl = CMSc_Utils::getConfigValue(CMSc_Utils::CONFIG_KEY_TTL_DEFAULT)) ) {
-                $iTtl = 600;
+                $iTtl = CMSc_Utils::CONFIG_DEFAULTVALUE_TTL;
             }
             if ( !($iTtlRnd = CMSc_Utils::getConfigValue(CMSc_Utils::CONFIG_KEY_TTL_DEFAULT_RND)) ) {
-                $iTtlRnd = 10;
+                $iTtlRnd = CMSc_Utils::CONFIG_DEFAULTVALUE_TTL_RND;
             }
         }
         
