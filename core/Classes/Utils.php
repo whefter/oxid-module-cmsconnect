@@ -123,7 +123,7 @@ class CMSc_Utils
         
         $sLang = CMSc_Utils::_getStandardLanguageIdentifier($sLang);
         
-        if ( !array_key_exists($sLang, $aVal) ) {
+        if ( !is_array($aVal) || !array_key_exists($sLang, $aVal) ) {
             $mVal = false;
         } else {
             $mVal = $aVal[$sLang];
@@ -578,7 +578,14 @@ class CMSc_Utils
         startProfile(__METHOD__);
         
         try {
+            libxml_use_internal_errors(true);
+            
             $oXml = simplexml_load_string($sXmlSource);
+            
+            $aErrors = libxml_get_errors();
+            if ( count($aErrors) ) {
+                throw new Exception('XML parsing error');
+            }
         } catch ( Exception $ex ) {
             $oXml = false;
         }
