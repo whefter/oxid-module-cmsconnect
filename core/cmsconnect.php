@@ -276,6 +276,14 @@ class cmsconnect
     /**
      * TOXID compatibility function
      */
+    public function getCmsSnippet( $sContentIdent, $sLang = null, $sPage = null )
+    {
+        return $this->getCmsContentIdent($sContentIdent, $sLang, $sPage);
+    }
+    
+    /**
+     * TOXID compatibility function
+     */
     public function getContentList( $sCustomPage = null, $blOnlyContentNodes = true )
     {
         $aNodes = array();
