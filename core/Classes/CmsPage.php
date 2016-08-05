@@ -221,7 +221,9 @@ abstract class CMSc_CmsPage
     {
         startProfile(__METHOD__);
         
-        if ( CMSc_Utils::getConfigValue(CMSc_Utils::CONFIG_KEY_ENABLE_TEST_CONTENT) ) {
+        if ( !$this->getUrl() ) {
+            $oHttpResult = false;
+        } elseif ( CMSc_Utils::getConfigValue(CMSc_Utils::CONFIG_KEY_ENABLE_TEST_CONTENT) ) {
             $oHttpResult = $this->getTestContentXmlSource();
         } else {
             $blIsCacheable = $this->isCacheable();
