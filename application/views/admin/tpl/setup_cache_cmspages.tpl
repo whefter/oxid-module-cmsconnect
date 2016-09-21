@@ -32,6 +32,11 @@
         [{ oxmultilang ident="cmsconnect_setup_cache_cmspages" }]
     </h1>
     
+    <p>
+        Engine: [{ $oCmsPagesCache->getEngineLabel() }]
+    </p>
+    
+    
     <script type="text/javascript">
     $(document).ready( function () {
         var $editForm = $('#myedit');

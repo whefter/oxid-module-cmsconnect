@@ -246,6 +246,9 @@
                         <option value="[{ "CMSc_Utils::VALUE_LOCAL_PAGES_CACHE_ENGINE_DB"|constant }]" [{ if $sCMScLocalPageCacheEngine === "CMSc_Utils::VALUE_LOCAL_PAGES_CACHE_ENGINE_DB"|constant }]selected="selected"[{ /if }]>
                             [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_DB" }]
                         </option>
+                        <option value="[{ "CMSc_Utils::VALUE_LOCAL_PAGES_CACHE_ENGINE_MEMCACHED"|constant }]" [{ if $sCMScLocalPageCacheEngine === "CMSc_Utils::VALUE_LOCAL_PAGES_CACHE_ENGINE_MEMCACHED"|constant }]selected="selected"[{ /if }]>
+                            [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_memcached" }]
+                        </option>
                         <option value="[{ "CMSc_Utils::VALUE_LOCAL_PAGES_CACHE_ENGINE_MEMCACHE"|constant }]" [{ if $sCMScLocalPageCacheEngine === "CMSc_Utils::VALUE_LOCAL_PAGES_CACHE_ENGINE_MEMCACHE"|constant }]selected="selected"[{ /if }]>
                             [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_memcache" }]
                         </option>
@@ -264,6 +267,9 @@
                         </option>
                         <option value="[{ "CMSc_Utils::VALUE_CMS_PAGES_CACHE_ENGINE_OXIDFILECACHE"|constant }]" [{ if $sCMScCmsPageCacheEngine === "CMSc_Utils::VALUE_CMS_PAGES_CACHE_ENGINE_OXIDFILECACHE"|constant }]selected="selected"[{ /if }]>
                             [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScCmsPageCacheEngine_OxidFileCache" }]
+                        </option>
+                        <option value="[{ "CMSc_Utils::VALUE_CMS_PAGES_CACHE_ENGINE_MEMCACHED"|constant }]" [{ if $sCMScCmsPageCacheEngine === "CMSc_Utils::VALUE_CMS_PAGES_CACHE_ENGINE_MEMCACHED"|constant }]selected="selected"[{ /if }]>
+                            [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScCmsPageCacheEngine_memcached" }]
                         </option>
                         <option value="[{ "CMSc_Utils::VALUE_CMS_PAGES_CACHE_ENGINE_MEMCACHE"|constant }]" [{ if $sCMScCmsPageCacheEngine === "CMSc_Utils::VALUE_CMS_PAGES_CACHE_ENGINE_MEMCACHE"|constant }]selected="selected"[{ /if }]>
                             [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScCmsPageCacheEngine_memcache" }]

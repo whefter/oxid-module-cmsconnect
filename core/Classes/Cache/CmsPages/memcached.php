@@ -6,22 +6,22 @@
  */
 
 /**
- * CMSc_Cache_CmsPages_memcache
+ * CMSc_Cache_CmsPages_memcached
  */
-class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
+class CMSc_Cache_CmsPages_memcached extends CMSc_Cache_CmsPages
 {
-    const ENGINE_LABEL = 'memcache';
+    const ENGINE_LABEL = 'memcached';
     
-    protected $_oMemcache = null;
+    protected $_oMemcached = null;
     
-    protected function _getMemcache ()
+    protected function _getMemcached ()
     {
-        if ( $this->_oMemcache === null ) {
-            $this->_oMemcache = new Memcache();
-            $this->_oMemcache->connect('127.0.0.1', 11211);
+        if ( $this->_oMemcached === null ) {
+            $this->_oMemcached = new Memcached();
+            $this->_oMemcached->addServer('127.0.0.1', 11211);
         }
         
-        return $this->_oMemcache;
+        return $this->_oMemcached;
     }
     
     protected function _addPageToIndex ($sCacheKey)
@@ -32,7 +32,7 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
         
         if ( !in_array($sCacheKey, $aIndex) ) {
             $aIndex[] = $sCacheKey;
-            $this->_getMemcache()->set('CMSc_CmsPages_' . $oxConfig->getShopId(), $aIndex);
+            $this->_getMemcached()->set('CMSc_CmsPages_' . $oxConfig->getShopId(), $aIndex);
         }
     }
     
@@ -44,7 +44,7 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
         
         if ( in_array($sCacheKey, $aIndex) ) {
             unset( $aIndex[array_search($sCacheKey, $aIndex)] );
-            $this->_getMemcache()->set('CMSc_CmsPages_' . $oxConfig->getShopId(), $aIndex);
+            $this->_getMemcached()->set('CMSc_CmsPages_' . $oxConfig->getShopId(), $aIndex);
         }
     }
     
@@ -52,7 +52,7 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
     {
         $oxConfig = oxRegistry::getConfig();
         
-        $aIndex = $this->_getMemcache()->get('CMSc_CmsPages_' . $oxConfig->getShopId());
+        $aIndex = $this->_getMemcached()->get('CMSc_CmsPages_' . $oxConfig->getShopId());
         
         if ( !$aIndex ) {
             $aIndex = [];
@@ -68,9 +68,9 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
     {
         startProfile(__METHOD__);
         
-        $sCacheName = $this->_getMemcacheKeyFromCacheKey($sCacheKey);
+        $sCacheName = $this->_getMemcachedKeyFromCacheKey($sCacheKey);
         
-        $blSuccess = $this->_getMemcache()->set($sCacheName, $oHttpResult);
+        $blSuccess = $this->_getMemcached()->set($sCacheName, $oHttpResult);
         $this->_addPageToIndex($sCacheKey);
         
         stopProfile(__METHOD__);
@@ -85,9 +85,9 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
     {
         startProfile(__METHOD__);
         
-        $sCacheName = $this->_getMemcacheKeyFromCacheKey($sCacheKey);
+        $sCacheName = $this->_getMemcachedKeyFromCacheKey($sCacheKey);
         
-        $oHttpResult = $this->_getMemcache()->get($sCacheName);
+        $oHttpResult = $this->_getMemcached()->get($sCacheName);
         
         stopProfile(__METHOD__);
         
@@ -101,11 +101,11 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
     {
         startProfile(__METHOD__);
         
-        $sCacheName = $this->_getMemcacheKeyFromCacheKey($sCacheKey);
+        $sCacheName = $this->_getMemcachedKeyFromCacheKey($sCacheKey);
         
         // Memcache::delete() is broken in several versions of php-memcache
-        // var_dump($this->_getMemcache()->delete($sCacheName, 0));
-        $this->_getMemcache()->set($sCacheName, false);
+        // var_dump($this->_getMemcached()->delete($sCacheName, 0));
+        $this->_getMemcached()->set($sCacheName, false);
         $this->_deletePageFromIndex($sCacheKey);
         
         stopProfile(__METHOD__);
@@ -118,7 +118,7 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
      * 
      * @return string
      */
-    protected function _getMemcacheKeyFromCacheKey ($sCacheKey)
+    protected function _getMemcachedKeyFromCacheKey ($sCacheKey)
     {
         return 'CMSc_CmsPage__' . $sCacheKey;
     }

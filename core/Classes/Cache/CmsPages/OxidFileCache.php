@@ -10,6 +10,8 @@
  */
 class CMSc_Cache_CmsPages_OxidFileCache extends CMSc_Cache_CmsPages
 {
+    const ENGINE_LABEL = 'OXID file cache';
+    
     /**
      * Override
      */
@@ -79,14 +81,16 @@ class CMSc_Cache_CmsPages_OxidFileCache extends CMSc_Cache_CmsPages
         $oxUtils = oxRegistry::get('oxUtils');
         
         $aFiles = glob($oxUtils->getCacheFilePath(null, true) . '*CMSc_CmsPage_*');
-        
+
         $aList = [];
         if ( is_array($aFiles) ) {
             foreach ( $aFiles as $sFilePath ) {
                 $sOxidCacheKey = substr($sFilePath, strrpos($sFilePath, 'CMSc_CmsPage_'));
                 $sOxidCacheKey = substr($sOxidCacheKey, 0, strrpos($sOxidCacheKey, '.'));
+                
+                $sCacheKey = substr($sOxidCacheKey, strlen('CMSc_CmsPage_'));
 
-                $aList[$sOxidCacheKey] = oxRegistry::get('oxUtils')->fromFileCache( $sOxidCacheKey );
+                $aList[$sCacheKey] = oxRegistry::get('oxUtils')->fromFileCache( $sOxidCacheKey );
             }
         }
         

@@ -101,7 +101,7 @@ abstract class CMSc_CmsPage
                     }
                 }
             } catch ( Exception $e) {
-				//var_dump($e->getMessage());
+                //var_dump($e->getMessage());
             }
         }
         

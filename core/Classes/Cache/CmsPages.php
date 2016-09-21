@@ -36,13 +36,20 @@ abstract class CMSc_Cache_CmsPages
             $sEngine = CMSc_Utils::getConfigValue(CMSc_Utils::CONFIG_KEY_CMS_PAGES_CACHE_ENGINE);
             
             if ( $sEngine === CMSc_Utils::VALUE_CMS_PAGES_CACHE_ENGINE_AUTO ) {
-                if ( extension_loaded('memcache') ) {
+                if ( extension_loaded('memcached') ) {
+                    static::$_oInstance = new CMSc_Cache_CmsPages_memcached();
+                } else if ( extension_loaded('memcache') ) {
                     static::$_oInstance = new CMSc_Cache_CmsPages_memcache();
                 } else {
                     static::$_oInstance = new CMSc_Cache_CmsPages_OxidFileCache();
                 }
             } else {
                 switch ( $sEngine ) {
+                    case CMSc_Utils::VALUE_CMS_PAGES_CACHE_ENGINE_MEMCACHED:
+                        if ( extension_loaded('memcached') ) {
+                            static::$_oInstance = new CMSc_Cache_CmsPages_memcached();
+                            break;
+                        }
                     case CMSc_Utils::VALUE_CMS_PAGES_CACHE_ENGINE_MEMCACHE:
                         if ( extension_loaded('memcache') ) {
                             static::$_oInstance = new CMSc_Cache_CmsPages_memcache();
@@ -187,5 +194,13 @@ abstract class CMSc_Cache_CmsPages
     public function getList ()
     {
         return $this->_getList();
+    }
+    
+    /**
+     * Returns a text label identifying the cache engine currently in use
+     */
+    public function getEngineLabel ()
+    {
+        return static::ENGINE_LABEL;
     }
 }

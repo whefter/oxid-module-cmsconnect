@@ -27,9 +27,11 @@ class cmsconnect_oxconfig extends cmsconnect_oxconfig_parent
             require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/Cache/LocalPages/OxidFileCache.php');
             require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/Cache/LocalPages/DB.php');
             require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/Cache/LocalPages/memcache.php');
+            require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/Cache/LocalPages/memcached.php');
             require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/Cache/CmsPages.php');
             require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/Cache/CmsPages/OxidFileCache.php');
             require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/Cache/CmsPages/memcache.php');
+            require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/Cache/CmsPages/memcached.php');
             
             require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/SessionCache.php');
             
@@ -40,36 +42,42 @@ class cmsconnect_oxconfig extends cmsconnect_oxconfig_parent
             
             $aCmsPages = CMSc_Cache_LocalPages::get()->getCurrentLocalPageCmsPages();
             
+            // var_dump(__METHOD__, $aCmsPages);
+            
             $aPagesToFetch =  [];
             
-            foreach ( $aCmsPages as $oCmsPage ) {
-                $oHttpResult = CMSc_Cache_CmsPages::get()->fetchHttpResult($oCmsPage);
+            if ( count($aCmsPages) ) {
+                foreach ( $aCmsPages as $oCmsPage ) {
+                    $oHttpResult = CMSc_Cache_CmsPages::get()->fetchHttpResult($oCmsPage);
 
-                if ( $oHttpResult ) {
-                    CMSc_SessionCache::set('results', $oCmsPage->getSessionCacheKey(), $oHttpResult);
-                } else {
-                    $aPagesToFetch[] = $oCmsPage;
+                    if ( $oHttpResult ) {
+                        CMSc_SessionCache::set('results', $oCmsPage->getSessionCacheKey(), $oHttpResult);
+                    } else {
+                        $aPagesToFetch[] = $oCmsPage;
+                    }
                 }
             }
             
-            $aRequests = [];
-            foreach ( $aPagesToFetch as $i => $oCmsPage ) {
-                $aRequests[] = $oCmsPage->getHttpRequest();
-            }
-            $aResults = CMSc_Utils::httpMultiRequest($aRequests);
-            
-            // $aResults = [];
-            // foreach ( $aUrlsToFetch as $i => $sUrl ) {
-                // $aResults[] = CMSc_Utils::fetchUrl($sUrl);
-            // }
-            
-            $time = microtime(true) - $start;
-            
-            // echo "<br>Time: " . $time . " s<br>";
-            
-            foreach ( $aPagesToFetch as $i => $oCmsPage ) {
-                CMSc_SessionCache::set('results', $oCmsPage->getSessionCacheKey(), $aResults[$i]);
-                CMSc_Cache_CmsPages::get()->saveHttpResult($oCmsPage, $aResults[$i]);
+            if ( count($aPagesToFetch) ) {
+                $aRequests = [];
+                foreach ( $aPagesToFetch as $i => $oCmsPage ) {
+                    $aRequests[] = $oCmsPage->getHttpRequest();
+                }
+                $aResults = CMSc_Utils::httpMultiRequest($aRequests);
+                
+                // $aResults = [];
+                // foreach ( $aUrlsToFetch as $i => $sUrl ) {
+                    // $aResults[] = CMSc_Utils::fetchUrl($sUrl);
+                // }
+                
+                $time = microtime(true) - $start;
+                
+                // echo "<br>Time: " . $time . " s<br>";
+                
+                foreach ( $aPagesToFetch as $i => $oCmsPage ) {
+                    CMSc_SessionCache::set('results', $oCmsPage->getSessionCacheKey(), $aResults[$i]);
+                    CMSc_Cache_CmsPages::get()->saveHttpResult($oCmsPage, $aResults[$i]);
+                }
             }
         }
         

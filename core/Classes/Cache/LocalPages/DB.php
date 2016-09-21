@@ -10,6 +10,8 @@
  */
 class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages_OxidFileCache
 {
+    const ENGINE_LABEL = 'DB + OXID file cache';
+    
     /**
      * Override parent.
      */

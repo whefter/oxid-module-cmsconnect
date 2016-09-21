@@ -31,6 +31,10 @@
         [{ oxmultilang ident="cmsconnect_setup_cache_localpages" }]
     </h1>
     
+    <p>
+        Engine: [{ $oLocalPagesCache->getEngineLabel() }]
+    </p>
+    
     <script type="text/javascript">
     ( function ($) {
         

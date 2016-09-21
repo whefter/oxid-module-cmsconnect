@@ -6,27 +6,27 @@
  */
 
 /**
- * CMSc_Cache_LocalPages_memcache
+ * CMSc_Cache_LocalPages_memcached
  */
-class CMSc_Cache_LocalPages_memcache extends CMSc_Cache_LocalPages
+class CMSc_Cache_LocalPages_memcached extends CMSc_Cache_LocalPages
 {
-    const ENGINE_LABEL = 'memcache';
+    const ENGINE_LABEL = 'memcached';
     
-    protected $_oMemcache = null;
+    protected $_oMemcached = null;
     
     protected $_aPageCache = [];
     
-    protected function _getMemcache ()
+    protected function _getMemcached ()
     {
-        if ( $this->_oMemcache === null ) {
-            $this->_oMemcache = new Memcache();
-            $this->_oMemcache->connect('127.0.0.1', 11211);
+        if ( $this->_oMemcached === null ) {
+            $this->_oMemcached = new Memcached();
+            $this->_oMemcached->addServer('127.0.0.1', 11211);
         }
         
-        return $this->_oMemcache;
+        return $this->_oMemcached;
     }
     
-    protected function _getMemcacheKey ($sCacheKey)
+    protected function _getMemcacheddKey ($sCacheKey)
     {
         $oxConfig = oxRegistry::getConfig();
         
@@ -41,7 +41,7 @@ class CMSc_Cache_LocalPages_memcache extends CMSc_Cache_LocalPages
         
         if ( !in_array($sCacheKey, $aIndex) ) {
             $aIndex[] = $sCacheKey;
-            $this->_getMemcache()->set('cmsconnect_localpages_' . $oxConfig->getShopId(), $aIndex);
+            $this->_getMemcached()->set('cmsconnect_localpages_' . $oxConfig->getShopId(), $aIndex);
         }
     }
     
@@ -49,7 +49,7 @@ class CMSc_Cache_LocalPages_memcache extends CMSc_Cache_LocalPages
     {
         $oxConfig = oxRegistry::getConfig();
         
-        $aIndex = $this->_getMemcache()->get('cmsconnect_localpages_' . $oxConfig->getShopId());
+        $aIndex = $this->_getMemcached()->get('cmsconnect_localpages_' . $oxConfig->getShopId());
         
         if ( !$aIndex ) {
             $aIndex = [];
@@ -62,7 +62,7 @@ class CMSc_Cache_LocalPages_memcache extends CMSc_Cache_LocalPages
     {
         $this->_aPageCache[$sCacheKey] = $aLocalPageCache;
         
-        $this->_getMemcache()->set( $this->_getMemcacheKey($sCacheKey), $aLocalPageCache );
+        $this->_getMemcached()->set( $this->_getMemcacheddKey($sCacheKey), $aLocalPageCache );
         
         $this->_addPageToIndex($sCacheKey);
     }
@@ -70,7 +70,7 @@ class CMSc_Cache_LocalPages_memcache extends CMSc_Cache_LocalPages
     protected function _getLocalPageCache ($sCacheKey)
     {
         if ( !isset($this->_aPageCache[$sCacheKey]) ) {
-            $aCache = $this->_getMemcache()->get( $this->_getMemcacheKey($sCacheKey) );
+            $aCache = $this->_getMemcached()->get( $this->_getMemcacheddKey($sCacheKey) );
             
             $this->_aPageCache[$sCacheKey] = $aCache;
         }

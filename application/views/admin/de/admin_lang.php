@@ -47,11 +47,13 @@ $aLang = array(
 'CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_OxidFileCache' => 'OXID File-Cache',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_DB'            => 'Datenbank',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_memcache'      => 'memcache',
+'CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_memcached'     => 'memcached',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScCmsPageCacheEngine'                 => 'Cache-Engine für CMS-Seiten',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScCmsPageCacheEngine_HELP'            => 'Intelligenter Cache für abgerufene CMS-Seiten, damit diese nicht bei jedem lokalen Seitenaufruf neu geladen werden müssen.  <div class="error">Kann zu Fehlern führen, wenn passende Module nicht geladen sind! Vorsicht bei Auswahl von Werten, die nicht "automatisch" sind!</div>',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScCmsPageCacheEngine_auto'            => 'Automatisch (empfohlen)',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScCmsPageCacheEngine_OxidFileCache'   => 'OXID File-Cache',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScCmsPageCacheEngine_memcache'        => 'memcache',
+'CMSCONNECT_ADMIN_SETTINGS_sCMScCmsPageCacheEngine_memcached'       => 'memcached',
 
 
 'CMSCONNECT_ADMIN_TESTCONTENT'                              => 'Test-Inhalt',

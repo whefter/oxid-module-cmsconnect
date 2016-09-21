@@ -10,6 +10,8 @@
  */
 class CMSc_Cache_LocalPages_OxidFileCache extends CMSc_Cache_LocalPages
 {
+    const ENGINE_LABEL = 'OXID file cache';
+    
     protected $_aPageCache = [];
     
     protected function _getCacheFilename ($sCacheKey)
@@ -30,9 +32,16 @@ class CMSc_Cache_LocalPages_OxidFileCache extends CMSc_Cache_LocalPages
     protected function _getLocalPageCacheFromFileCache ($sCacheKey)
     {
         if ( !isset($this->_aPageCache[$sCacheKey]) ) {
-            $aCache = oxRegistry::get('oxUtils')->fromFileCache( $this->_getCacheFilename($sCacheKey) );
+            $oxUtils = oxRegistry::get('oxUtils');
             
-            $this->_aPageCache[$sCacheKey] = $aCache;
+            $sCacheFilename = $this->_getCacheFilename($sCacheKey);
+            $sOxidCacheFilepath = $oxUtils->getCacheFilePath($sCacheFilename);
+            
+            if ( file_exists($sOxidCacheFilepath) ) {
+                $aCache = oxRegistry::get('oxUtils')->fromFileCache($sCacheFilename);
+                
+                $this->_aPageCache[$sCacheKey] = $aCache;
+            }
         }
     }
     
@@ -86,15 +95,19 @@ class CMSc_Cache_LocalPages_OxidFileCache extends CMSc_Cache_LocalPages
         $oxUtils = oxRegistry::get('oxUtils');
         $oxConfig = oxRegistry::getConfig();
         
-        $aFiles = glob($oxUtils->getCacheFilePath(null, true) . '*cmsconnect_localpage_' . $oxConfig->getShopId() . '_*');
+        $sOxidCachePrefix = 'cmsconnect_localpage_' . $oxConfig->getShopId() . '_';
+        
+        $aFiles = glob($oxUtils->getCacheFilePath(null, true) . '*' . $sOxidCachePrefix . '*');
         
         $aList = [];
         if ( is_array($aFiles) ) {
             foreach ( $aFiles as $sFilePath ) {
-                $sOxidCacheKey = substr($sFilePath, strrpos($sFilePath, 'cmsconnect_localpage_' . $oxConfig->getShopId()));
+                $sOxidCacheKey = substr($sFilePath, strrpos($sFilePath, $sOxidCachePrefix));
                 $sOxidCacheKey = substr($sOxidCacheKey, 0, strrpos($sOxidCacheKey, '.'));
                 
-                $aList[$sOxidCacheKey] = $this->_getLocalPageCache($sOxidCacheKey);
+                $sCacheKey = substr($sOxidCacheKey, strlen($sOxidCachePrefix));
+                
+                $aList[$sCacheKey] = $this->_getLocalPageCache($sCacheKey);
             }
         }
         
