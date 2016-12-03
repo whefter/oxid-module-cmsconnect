@@ -29,6 +29,39 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages_OxidFileCache
     }
     
     /**
+     * Override
+     */
+    protected function _deleteLocalPageCache ($sCacheKey)
+    {
+        startProfile(__METHOD__);
+        
+        $oxDb = oxDb::getDb( oxDb::FETCH_MODE_ASSOC );
+        
+        $sSql1 = "
+            DELETE
+            FROM
+                wh_cmsc_cache_localpages_data
+            WHERE
+                `key` = " . $oxDb->quote($sCacheKey) . "
+            ;
+        ";
+        $sSql2 = "
+            DELETE
+            FROM
+                wh_cmsc_cache_localpages_pages
+            WHERE
+                `localpagekey` = " . $oxDb->quote($sCacheKey) . "
+            ;
+        ";
+        $oxDb->query($sSql1);
+        $oxDb->query($sSql2);
+        
+        stopProfile(__METHOD__);
+        
+        parent::_deleteLocalPageCache($sCacheKey);
+    }
+    
+    /**
      * Override parent.
      */
     protected function _getList ()
@@ -93,7 +126,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages_OxidFileCache
                     MD5(CONCAT(RAND(), CURRENT_TIMESTAMP, " . $oxDb->quote($sCacheKey) . ")),
                     " . $oxDb->quote($sCacheKey) . ",
                     " . $oxDb->quote($oCmsPage->getIdent()) . ",
-                    " . $oxDb->quote($oCmsPage->serialize()) . "
+                    " . $oxDb->quote(serialize($oCmsPage)) . "
                 )
             ";
         }
@@ -154,7 +187,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages_OxidFileCache
             ];
             
             foreach ( $aPages as $aPageRow ) {
-                $aCache['pages'][] = CMSc_CmsPage::buildFromSerializedData($aPageRow['cmspagedata']);
+                $aCache['pages'][] = unserialize($aPageRow['cmspagedata']);
             }
             
             // Write to OXID cache

@@ -25,6 +25,7 @@
     [{ $oViewConf->getHiddenSid() }]
     <input type="hidden" name="cl" value="[{ $oViewConf->getActiveClassName() }]">
     <input type="hidden" name="fnc" value="">
+    <input type="hidden" name="key" value="">
     <input type="hidden" name="language" value="[{ $actlang }]">
     
     <h1>
@@ -36,10 +37,41 @@
     </p>
     
     <script type="text/javascript">
-    ( function ($) {
+    $(document).ready( function () {
+        var $editForm = $('#myedit');
         
-    })(jQuery);
+        var $fncInput = $('[name="fnc"]', $editForm);
+        var $keyInput = $('[name="key"]', $editForm);
+        
+        var $deleteAllBtn = $('#deleteAll');
+        var $deleteAllGlobalBtn = $('#deleteAllGlobal');
+        
+        window.deleteLocalPage = function (key)
+        {
+            $keyInput.val(key);
+            $fncInput.val('deleteLocalPage');
+            $editForm.submit();
+        };
+        
+        $deleteAllBtn.click(function () {
+            $fncInput.val('deleteAllLocalPages');
+            $editForm.submit();
+        });
+        
+        $deleteAllGlobalBtn.click(function () {
+            $fncInput.val('deleteAllLocalPagesGlobal');
+            $editForm.submit();
+        });
+    });
     </script>
+    
+    <button type="button" id="deleteAll">
+        Cache leeren
+    </button>
+    
+    <button type="button" id="deleteAllGlobal">
+        Cache für ALLE SHOPS leeren (!)
+    </button>
     
     <table style="width: 100%;">
         <tr>
@@ -54,6 +86,9 @@
             </th>
             <th style="border: 1px solid grey; border-top: none; border-left: none;">
                 Eingebundene CMS-Seiten
+            </th>
+            <th style="border: 1px solid grey; border-top: none; border-left: none;">
+                Aktionen
             </th>
         </tr>
         
@@ -72,6 +107,9 @@
                     [{ foreach from=$aLocalPage.pages item=oCmsPage }]
                         [{ $oCmsPage->getUrl() }]<br />
                     [{ /foreach }]
+                </td>
+                <td style="border: 1px solid grey; border-top: none; border-left: none;">
+                    <a href="javascript:deleteLocalPage('[{ $sLocalPageCacheKey }]');">Löschen</a>
                 </td>
             </tr>
         [{ /foreach }]

@@ -18,12 +18,19 @@ class CMSc_Cache_LocalPages_OxidFileCache extends CMSc_Cache_LocalPages
     {
         $oxConfig = oxRegistry::getConfig();
         
-        return 'cmsconnect_localpage_' . $oxConfig->getShopId() . '_' . $sCacheKey;
+        return $this->_getCachePrefix() . $sCacheKey;
     }
     
     protected function _setLocalPageCache ($sCacheKey, $aLocalPageCache)
     {
         $this->_aPageCache[$sCacheKey] = $aLocalPageCache;
+        
+        if ( $aLocalPageCache ) {
+            $aLocalPageCache['pages'] = array_map(function ($v)
+            {
+                return serialize($v);
+            }, $aLocalPageCache['pages']);
+        }
         
         $blSuccess = oxRegistry::get('oxUtils')->toFileCache( $this->_getCacheFilename($sCacheKey), $aLocalPageCache );
     }
@@ -39,6 +46,13 @@ class CMSc_Cache_LocalPages_OxidFileCache extends CMSc_Cache_LocalPages
             
             if ( file_exists($sOxidCacheFilepath) ) {
                 $aCache = oxRegistry::get('oxUtils')->fromFileCache($sCacheFilename);
+                
+                if ( $aCache ) {
+                    $aCache['pages'] = array_map(function ($v)
+                    {
+                        return unserialize($v);
+                    }, $aCache['pages']);
+                }
                 
                 $this->_aPageCache[$sCacheKey] = $aCache;
             }
@@ -90,12 +104,27 @@ class CMSc_Cache_LocalPages_OxidFileCache extends CMSc_Cache_LocalPages
     /**
      * Override
      */
+    protected function _deleteLocalPageCache ($sCacheKey)
+    {
+        startProfile(__METHOD__);
+
+        $sCacheName = $this->_getCacheFilename($sCacheKey);
+        
+        $sFilePath = oxRegistry::get('oxUtils')->getCacheFilePath($sCacheName);
+        unlink($sFilePath);
+        
+        stopProfile(__METHOD__);
+    }
+    
+    /**
+     * Override
+     */
     protected function _getList ()
     {
         $oxUtils = oxRegistry::get('oxUtils');
         $oxConfig = oxRegistry::getConfig();
         
-        $sOxidCachePrefix = 'cmsconnect_localpage_' . $oxConfig->getShopId() . '_';
+        $sOxidCachePrefix = $this->_getCachePrefix();;
         
         $aFiles = glob($oxUtils->getCacheFilePath(null, true) . '*' . $sOxidCachePrefix . '*');
         

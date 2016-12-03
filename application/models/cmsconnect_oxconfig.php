@@ -23,6 +23,7 @@ class cmsconnect_oxconfig extends cmsconnect_oxconfig_parent
             require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/CmsPage/Id.php');
             require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/Utils.php');
             
+            require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/Cache.php');
             require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/Cache/LocalPages.php');
             require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/Cache/LocalPages/OxidFileCache.php');
             require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/Cache/LocalPages/DB.php');

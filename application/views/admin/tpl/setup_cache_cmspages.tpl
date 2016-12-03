@@ -45,6 +45,7 @@
         var $keyInput = $('[name="key"]', $editForm);
         
         var $deleteAllBtn = $('#deleteAll');
+        var $deleteAllGlobalBtn = $('#deleteAllGlobal');
         
         window.deleteCmsPage = function (key)
         {
@@ -57,11 +58,20 @@
             $fncInput.val('deleteAllCmsPages');
             $editForm.submit();
         });
+        
+        $deleteAllGlobalBtn.click(function () {
+            $fncInput.val('deleteAllCmsPagesGlobal');
+            $editForm.submit();
+        });
     });
     </script>
     
     <button type="button" id="deleteAll">
         Cache leeren
+    </button>
+    
+    <button type="button" id="deleteAllGlobal">
+        Cache für ALLE SHOPS leeren (!)
     </button>
     
     <table style="width: 100%;">

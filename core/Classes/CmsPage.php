@@ -8,7 +8,7 @@
 /**
  * CMSc_CmsPage
  */
-abstract class CMSc_CmsPage
+abstract class CMSc_CmsPage implements \Serializable
 {
     /**
      * _sLang
@@ -22,14 +22,14 @@ abstract class CMSc_CmsPage
      *
      * @var array
      */
-    protected $_aGetParams;
+    protected $_aGetParams = [];
         
     /**
      * _aPostParams
      *
      * @var array
      */
-    protected $_aPostParams;
+    protected $_aPostParams = [];
     
     /**
      * __construct
@@ -49,7 +49,12 @@ abstract class CMSc_CmsPage
     public function setLang ($sLang)
     {
         if ( empty($sLang) ) {
-            $sLang = null;
+            // $sLang = null;
+            
+            // Hard-code the language HERE. Otherwise "null" will be committed to cache, meaning
+            // that upon unserialization, the language will be whatever is the current language
+            // at that time.
+            $sLang = oxRegistry::getLang()->getBaseLanguage();
         }
         
         $this->_sLang = $sLang;
@@ -530,7 +535,30 @@ abstract class CMSc_CmsPage
     
     public function serialize ()
     {
-        return serialize($this);
+        // return serialize($this);
+        $a = serialize([
+            'sLang' => $this->getLang(),
+            'aGetParams' => $this->getGetParams(),
+            'aPostParams' => $this->getPostParams(),
+        ]);
+        
+        // echo "<pre>";
+        // var_dump(__METHOD__, $a);
+        // echo (new Exception)->getTraceAsString();
+        // echo "</pre>";
+        
+        return $a;
+    }
+    
+    public function unserialize ($data)
+    {
+        $aData = unserialize($data);
+        
+        $this->setLang($aData['sLang']);
+        $this->setGetParams($aData['aGetParams']);
+        $this->setPostParams($aData['aPostParams']);
+        
+        // return CMSc_CmsPage::buildFromSerializedData($serialized);
     }
     
     public static function buildFromSerializedData ($mData)

@@ -34,8 +34,20 @@ class CMSc_CmsPage_Id extends CMSc_CmsPage
     {
         parent::__construct();
         
-        $this->_sId = $sCmsPageId;
+        $this->setPageId($sCmsPageId);
         $this->setLang($sLang);
+    }
+    
+    /**
+     * Setter method for the id of this page
+     *
+     * @param string        $sCmsPageId     CMS page id
+     *
+     * @return string
+     */
+    private function setPageId ($sCmsPageId)
+    {
+        $this->_sId = $sCmsPageId;
     }
     
     /**
@@ -58,5 +70,30 @@ class CMSc_CmsPage_Id extends CMSc_CmsPage
         $sUrl = CMSc_Utils::buildCmsIdPageFullUrl( $this->getPageId(), $this->getLang() );
         
         return $sUrl;
+    }
+    
+    /**
+     * Override parent.
+     */
+    public function serialize ()
+    {
+        return serialize(array_merge(
+            unserialize(parent::serialize()),
+            [
+                'sId' => $this->getPageId(),
+            ]
+        ));
+    }
+    
+    /**
+     * Override parent.
+     */
+    public function unserialize ($data)
+    {
+        parent::unserialize($data);
+        
+        $aData = unserialize($data);
+        
+        $this->setPageId($aData['sId']);
     }
 }

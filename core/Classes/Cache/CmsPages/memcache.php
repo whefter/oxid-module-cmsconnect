@@ -32,7 +32,7 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
         
         if ( !in_array($sCacheKey, $aIndex) ) {
             $aIndex[] = $sCacheKey;
-            $this->_getMemcache()->set('CMSc_CmsPages_' . $oxConfig->getShopId(), $aIndex);
+            $this->_getMemcache()->set($this->_getCachePrefix(), $aIndex);
         }
     }
     
@@ -44,7 +44,7 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
         
         if ( in_array($sCacheKey, $aIndex) ) {
             unset( $aIndex[array_search($sCacheKey, $aIndex)] );
-            $this->_getMemcache()->set('CMSc_CmsPages_' . $oxConfig->getShopId(), $aIndex);
+            $this->_getMemcache()->set($this->_getCachePrefix(), $aIndex);
         }
     }
     
@@ -52,7 +52,7 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
     {
         $oxConfig = oxRegistry::getConfig();
         
-        $aIndex = $this->_getMemcache()->get('CMSc_CmsPages_' . $oxConfig->getShopId());
+        $aIndex = $this->_getMemcache()->get($this->_getCachePrefix());
         
         if ( !$aIndex ) {
             $aIndex = [];
@@ -109,8 +109,6 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
         $this->_deletePageFromIndex($sCacheKey);
         
         stopProfile(__METHOD__);
-        
-        return $oHttpResult;
     }
     
     /**

@@ -24,4 +24,40 @@ class cmsconnect_setup_cache_localpages extends cmsconnect_setup_main
         // return get_called_class() . '.tpl';
         return parent::render();
     }
+    
+    public function deleteLocalPage ()
+    {
+        $oxConfig = oxRegistry::getConfig();
+        
+        $sKey = $oxConfig->getRequestParameter('key');
+        
+        CMSc_Cache_LocalPages::get()->deleteLocalPageCache($sKey);
+    }
+    
+    public function deleteAllLocalPages ()
+    {
+        $oxConfig = oxRegistry::getConfig();
+        $oCache = CMSc_Cache_LocalPages::get();
+        
+        $aList = $oCache->getList();
+        
+        foreach( $aList as $sCacheKey => $oLocalPageCache ) {
+            $oCache->deleteLocalPageCache($sCacheKey);
+        }
+    }
+    
+    public function deleteAllLocalPagesGlobal ()
+    {
+        $oxConfig = oxRegistry::getConfig();
+        $oCache = CMSc_Cache_LocalPages::get();
+        
+        foreach ( $oxConfig->getShopIds() as $sShopId ) {
+            $oCache->setShopId($sShopId);
+            $aList = $oCache->getList();
+            
+            foreach( $aList as $sCacheKey => $oLocalPageCache ) {
+                $oCache->deleteLocalPageCache($sCacheKey);
+            }
+        }
+    }
 }

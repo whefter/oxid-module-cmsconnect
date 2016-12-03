@@ -8,12 +8,11 @@
 /**
  * CMSc_Cache_CmsPages
  */
-abstract class CMSc_Cache_CmsPages
+abstract class CMSc_Cache_CmsPages extends CMSc_Cache
 {
     abstract protected function _saveHttpResult ($sCacheKey, $oHttpResult);
     abstract protected function _fetchHttpResult ($sCacheKey);
     abstract protected function _deleteHttpResult ($sCacheKey);
-    abstract protected function _getList ();
     
     /**
      * Singleton instance.
@@ -21,11 +20,6 @@ abstract class CMSc_Cache_CmsPages
      * @var
      */
     protected static $_oInstance = null;
-    
-    /**
-     * @var
-     */
-    protected $blInitialized = false;
     
     /**
      * Singleton instance getter
@@ -67,15 +61,11 @@ abstract class CMSc_Cache_CmsPages
     }
     
     /**
-     *
+     * @return string
      */
-    public function init ()
+    protected function _getCachePrefix ()
     {
-        if ( $this->blInitialized ) {
-            return;
-        }
-        
-        $this->blInitialized = true;
+        return 'CMSc_CmsPage_' . $this->getShopId() . '_';
     }
     
     /**
@@ -184,23 +174,5 @@ abstract class CMSc_Cache_CmsPages
         stopProfile(__METHOD__);
         
         return $mReturn;
-    }
-    
-    /**
-     * Returns the list of cached CmsPages
-     *
-     * @return CMSc_CmsPage[]
-     */
-    public function getList ()
-    {
-        return $this->_getList();
-    }
-    
-    /**
-     * Returns a text label identifying the cache engine currently in use
-     */
-    public function getEngineLabel ()
-    {
-        return static::ENGINE_LABEL;
     }
 }

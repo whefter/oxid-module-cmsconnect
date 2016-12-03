@@ -26,11 +26,11 @@ class CMSc_Cache_LocalPages_memcached extends CMSc_Cache_LocalPages
         return $this->_oMemcached;
     }
     
-    protected function _getMemcacheddKey ($sCacheKey)
+    protected function _getMemcachedKey ($sCacheKey)
     {
         $oxConfig = oxRegistry::getConfig();
         
-        return 'cmsconnect_localpage_' . $oxConfig->getShopId() . '_' . $sCacheKey;
+        return $this->_getCachePrefix() . $sCacheKey;
     }
     
     protected function _addPageToIndex ($sCacheKey)
@@ -41,7 +41,19 @@ class CMSc_Cache_LocalPages_memcached extends CMSc_Cache_LocalPages
         
         if ( !in_array($sCacheKey, $aIndex) ) {
             $aIndex[] = $sCacheKey;
-            $this->_getMemcached()->set('cmsconnect_localpages_' . $oxConfig->getShopId(), $aIndex);
+            $this->_getMemcached()->set($this->_getCachePrefix(), $aIndex);
+        }
+    }
+    
+    protected function _deletePageFromIndex ($sCacheKey)
+    {
+        $oxConfig = oxRegistry::getConfig();
+        
+        $aIndex = $this->_getIndex();
+        
+        if ( in_array($sCacheKey, $aIndex) ) {
+            unset( $aIndex[array_search($sCacheKey, $aIndex)] );
+            $this->_getMemcached()->set($this->_getCachePrefix(), $aIndex);
         }
     }
     
@@ -49,7 +61,7 @@ class CMSc_Cache_LocalPages_memcached extends CMSc_Cache_LocalPages
     {
         $oxConfig = oxRegistry::getConfig();
         
-        $aIndex = $this->_getMemcached()->get('cmsconnect_localpages_' . $oxConfig->getShopId());
+        $aIndex = $this->_getMemcached()->get($this->_getCachePrefix());
         
         if ( !$aIndex ) {
             $aIndex = [];
@@ -62,7 +74,14 @@ class CMSc_Cache_LocalPages_memcached extends CMSc_Cache_LocalPages
     {
         $this->_aPageCache[$sCacheKey] = $aLocalPageCache;
         
-        $this->_getMemcached()->set( $this->_getMemcacheddKey($sCacheKey), $aLocalPageCache );
+        if ( $aLocalPageCache ) {
+            $aLocalPageCache['pages'] = array_map(function ($v)
+            {
+                return serialize($v);
+            }, $aLocalPageCache['pages']);
+        }
+        
+        $this->_getMemcached()->set( $this->_getMemcachedKey($sCacheKey), $aLocalPageCache );
         
         $this->_addPageToIndex($sCacheKey);
     }
@@ -70,7 +89,14 @@ class CMSc_Cache_LocalPages_memcached extends CMSc_Cache_LocalPages
     protected function _getLocalPageCache ($sCacheKey)
     {
         if ( !isset($this->_aPageCache[$sCacheKey]) ) {
-            $aCache = $this->_getMemcached()->get( $this->_getMemcacheddKey($sCacheKey) );
+            $aCache = $this->_getMemcached()->get( $this->_getMemcachedKey($sCacheKey) );
+            
+            if ( $aCache ) {
+                $aCache['pages'] = array_map(function ($v)
+                {
+                    return unserialize($v);
+                }, $aCache['pages']);
+            }
             
             $this->_aPageCache[$sCacheKey] = $aCache;
         }
@@ -111,6 +137,21 @@ class CMSc_Cache_LocalPages_memcached extends CMSc_Cache_LocalPages
         } else {
             return $_aPageCache['pages'];
         }
+    }
+    
+    /**
+     * Override
+     */
+    protected function _deleteLocalPageCache ($sCacheKey)
+    {
+        startProfile(__METHOD__);
+        
+        // Memcache::delete() is broken in several versions of php-memcache
+        // $this->_getMemcache()->delete( $this->_getMemcacheKey($sCacheKey) );e
+        $this->_getMemcached()->set($this->_getMemcachedKey($sCacheKey), false);
+        $this->_deletePageFromIndex($sCacheKey);
+        
+        stopProfile(__METHOD__);
     }
     
     /**

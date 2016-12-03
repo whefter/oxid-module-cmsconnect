@@ -8,7 +8,7 @@
 /**
  * CMSc_Cache_LocalPages
  */
-abstract class CMSc_Cache_LocalPages
+abstract class CMSc_Cache_LocalPages extends CMSc_Cache
 {
     protected static $aBlacklistedParams = [
         'stoken',
@@ -18,7 +18,7 @@ abstract class CMSc_Cache_LocalPages
     
     abstract protected function _getLocalPageCmsPages ($sCacheKey);
     abstract protected function _registerCmsPage ($sLocalPageCacheKey, $sCmsPageKey);
-    abstract protected function _getList ();
+    abstract protected function _deleteLocalPageCache ($sCacheKey);
     
     /**
      * Singleton instance.
@@ -26,11 +26,6 @@ abstract class CMSc_Cache_LocalPages
      * @var
      */
     protected static $_oInstance = null;
-    
-    /**
-     * @var
-     */
-    protected $blInitialized = false;
     
     /**
      * Singleton instance getter
@@ -76,15 +71,11 @@ abstract class CMSc_Cache_LocalPages
     }
     
     /**
-     *
+     * @return string
      */
-    public function init ()
+    protected function _getCachePrefix ()
     {
-        if ( $this->blInitialized ) {
-            return;
-        }
-        
-        $this->blInitialized = true;
+        return 'CMSc_LocalPage_' . $this->getShopId() . '_';
     }
     
     /**
@@ -178,18 +169,20 @@ abstract class CMSc_Cache_LocalPages
     }
     
     /**
-     * Return a list of all known local pages
+     * Delete a local page's cache
+     *
+     * @param string    $sCacheKey
+     * 
+     * @return object
      */
-    public function getList ()
+    public function deleteLocalPageCache ($sCacheKey)
     {
-        return $this->_getList();
-    }
-    
-    /**
-     * Returns a text label identifying the cache engine currently in use
-     */
-    public function getEngineLabel ()
-    {
-        return static::ENGINE_LABEL;
+        startProfile(__METHOD__);
+        
+        $mReturn = $this->_deleteLocalPageCache($sCacheKey);
+        
+        stopProfile(__METHOD__);
+        
+        return $mReturn;
     }
 }

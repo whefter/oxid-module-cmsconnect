@@ -34,8 +34,20 @@ class CMSc_CmsPage_Path extends CMSc_CmsPage
     {
         parent::__construct();
         
-        $this->_sPath = $sCmsPagePath;
+        $this->setPagePath($sCmsPagePath);
         $this->setLang($sLang);
+    }
+    
+    /**
+     * Setter method for the path of this page
+     *
+     * @param string        $sCmsPagePath     CMS page path
+     *
+     * @return string
+     */
+    private function setPagePath ($sCmsPagePath)
+    {
+        $this->_sPath = $sCmsPagePath;
     }
     
     /**
@@ -58,5 +70,30 @@ class CMSc_CmsPage_Path extends CMSc_CmsPage
         $sUrl = CMSc_Utils::buildCmsPathPageFullUrl( $this->getPagePath(), $this->getLang() );
         
         return $sUrl;
+    }
+    
+    /**
+     * Override parent.
+     */
+    public function serialize ()
+    {
+        return serialize(array_merge(
+            unserialize(parent::serialize()),
+            [
+                'sPath' => $this->getPagePath(),
+            ]
+        ));
+    }
+    
+    /**
+     * Override parent.
+     */
+    public function unserialize ($data)
+    {
+        parent::unserialize($data);
+        
+        $aData = unserialize($data);
+        
+        $this->setPagePath($aData['sPath']);
     }
 }

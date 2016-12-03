@@ -55,10 +55,6 @@ class CMSc_Cache_CmsPages_OxidFileCache extends CMSc_Cache_CmsPages
         
         $sFilePath = oxRegistry::get('oxUtils')->getCacheFilePath($sCacheName);
         unlink($sFilePath);
-        
-        stopProfile(__METHOD__);
-        
-        return $oHttpResult;
     }
     
     /**
@@ -68,7 +64,7 @@ class CMSc_Cache_CmsPages_OxidFileCache extends CMSc_Cache_CmsPages
      */
     protected function _getCacheFilenameFromKey ($sCacheKey)
     {
-        return 'CMSc_CmsPage_' . $sCacheKey;
+        return $this->_getCachePrefix() . $sCacheKey;
     }
     
     /**
@@ -80,15 +76,17 @@ class CMSc_Cache_CmsPages_OxidFileCache extends CMSc_Cache_CmsPages
         
         $oxUtils = oxRegistry::get('oxUtils');
         
-        $aFiles = glob($oxUtils->getCacheFilePath(null, true) . '*CMSc_CmsPage_*');
+        $sOxidCachePrefix = $this->_getCachePrefix();
+        
+        $aFiles = glob($oxUtils->getCacheFilePath(null, true) . '*' . $sOxidCachePrefix . '*');
 
         $aList = [];
         if ( is_array($aFiles) ) {
             foreach ( $aFiles as $sFilePath ) {
-                $sOxidCacheKey = substr($sFilePath, strrpos($sFilePath, 'CMSc_CmsPage_'));
+                $sOxidCacheKey = substr($sFilePath, strrpos($sFilePath, $sOxidCachePrefix));
                 $sOxidCacheKey = substr($sOxidCacheKey, 0, strrpos($sOxidCacheKey, '.'));
                 
-                $sCacheKey = substr($sOxidCacheKey, strlen('CMSc_CmsPage_'));
+                $sCacheKey = substr($sOxidCacheKey, strlen($sOxidCachePrefix));
 
                 $aList[$sCacheKey] = oxRegistry::get('oxUtils')->fromFileCache( $sOxidCacheKey );
             }

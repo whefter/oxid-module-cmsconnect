@@ -45,4 +45,19 @@ class cmsconnect_setup_cache_cmspages extends cmsconnect_setup_main
             $oCache->deleteHttpResultByIdent($sCacheKey);
         }
     }
+    
+    public function deleteAllCmsPagesGlobal ()
+    {
+        $oxConfig = oxRegistry::getConfig();
+        $oCache = CMSc_Cache_CmsPages::get();
+        
+        foreach ( $oxConfig->getShopIds() as $sShopId ) {
+            $oCache->setShopId($sShopId);
+            $aList = $oCache->getList();
+            
+            foreach( $aList as $sCacheKey => $oHttpResult ) {
+                $oCache->deleteHttpResultByIdent($sCacheKey);
+            }
+        }
+    }
 }
