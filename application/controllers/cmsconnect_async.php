@@ -46,7 +46,7 @@ class cmsconnect_async extends oxUBase
         if ( $sMethod === 'id' ) {
             $oPage = new CMSc_CmsPage_Id($sIdentifier, $sLang);
         } else {
-            $oPage = new CMSc_CmsPage($sIdentifier, $sLang);
+            $oPage = new CMSc_CmsPage_Path($sIdentifier, $sLang);
         }
 
         return $oPage->getContent($sContent);
