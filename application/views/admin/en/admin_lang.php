@@ -29,8 +29,18 @@ $aLang = array(
 'CMSCONNECT_ADMIN_SETTINGS_aCMScSeoIdents'            => 'SEO-Snippet for OXID URLs',
 
 'CMSCONNECT_ADMIN_SETTINGS_GENERAL'                         => 'General Settings',
-
-'CMSCONNECT_ADMIN_SETTINGS_blCMScLeaveUrls'                 => 'Do not rewrite URLs',
+'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting'               => 'Rewrite URLs',
+'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_HELP'          => 'Sets whether URLs in CMS texts should be rewritten to point back to the OXID shop. This allows navigation of the CMS content inside the OXID shop. Setting this to "none" will lead to users being redirected away from the shop to the CMS when they click a link.
+                                                            <ul>
+                                                                <li><b>Paths only:</b> rewrite URLs matching the configured relative paths only
+                                                                <!--
+                                                                <li><b>All URLs:</b> es werden alle URLs umgeschrieben, auch solche, die nur mit den Basis-URLs beginnen und nicht den relativen Pfad enthalten (kann erforderlich sein, um auf SSL-Seiten auch Bilder und sonstige Resourcen über SSL laden zu können, falls diese nicht unterhalb der relativen Pfades zu erreichen sind)
+                                                                -->
+                                                                <li><b>None:</b> rewrite no URLs at all
+                                                            </ul>',
+'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_PathOnly'      => 'Paths only',
+'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_AllUrls'       => 'All URLs',
+'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_None'          => 'None',
 'CMSCONNECT_ADMIN_SETTINGS_blCMScEnableTestContent'         => 'Serve test content',
 'CMSCONNECT_ADMIN_SETTINGS_blCMScEnableTestContent_HELP'    => 'Nothing is fetched from remote servers, the test content is used. For debug purposes.',
 'CMSCONNECT_ADMIN_SETTINGS_blCMScSslDontVerifyPeer'         => 'Don\'t verify SSL peers',

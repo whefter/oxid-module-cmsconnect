@@ -3,35 +3,12 @@
 [{ assign var=oxConfig value=$oViewConf->getConfig() }]
 
 <script type="text/javascript" src="[{ $oxConfig->getResourceUrl('js/libs/jquery.min.js', true) }]"></script>
+[{*
 <script type="text/javascript" src="[{ $oxConfig->getResourceUrl('js/libs/jquery-ui.min.js', true) }]"></script>
+*}]
 
-[{ if $readonly }]
-    [{ assign var="readonly" value="readonly disabled" }]
-[{ else }]
-    [{ assign var="readonly" value="" }]
-[{ /if }]
-
-<form name="transfer" id="transfer" action="[{ $oViewConf->getSelfLink() }]" method="post">
-    [{ $oViewConf->getHiddenSid() }]    
-    <input type="hidden" name="oxid" value="[{ $oxid }]">
-    <input type="hidden" name="cl" value="[{ $oViewConf->getActiveClassName() }]">
-    <input type="hidden" name="fnc" value="">
-    <input type="hidden" name="actshop" value="[{ $oViewConf->getActiveShopId() }]">
-    <input type="hidden" name="updatenav" value="">
-    <input type="hidden" name="editlanguage" value="[{ $editlanguage }]">
-</form>
-
-<form name="myedit" id="myedit" action="[{ $oViewConf->getSelfLink() }]" method="post">
-    [{ $oViewConf->getHiddenSid() }]
-    <input type="hidden" name="cl" value="[{ $oViewConf->getActiveClassName() }]">
-    <input type="hidden" name="fnc" value="">
-    <input type="hidden" name="language" value="[{ $actlang }]">
-    
-    <h1>
-        [{ oxmultilang ident="cmsconnect_setup_main" }]
-    </h1>
-    
 <script type="text/javascript">
+$.noConflict();
 (function ($) {
     var displayDemos = function () {
         $('.demo').each( function () {
@@ -61,6 +38,32 @@
     } );
 })(jQuery);
 </script>
+
+[{ if $readonly }]
+    [{ assign var="readonly" value="readonly disabled" }]
+[{ else }]
+    [{ assign var="readonly" value="" }]
+[{ /if }]
+
+<form name="transfer" id="transfer" action="[{ $oViewConf->getSelfLink() }]" method="post">
+    [{ $oViewConf->getHiddenSid() }]    
+    <input type="hidden" name="oxid" value="[{ $oxid }]">
+    <input type="hidden" name="cl" value="[{ $oViewConf->getActiveClassName() }]">
+    <input type="hidden" name="fnc" value="">
+    <input type="hidden" name="actshop" value="[{ $oViewConf->getActiveShopId() }]">
+    <input type="hidden" name="updatenav" value="">
+    <input type="hidden" name="editlanguage" value="[{ $editlanguage }]">
+</form>
+
+<form name="myedit" id="myedit" action="[{ $oViewConf->getSelfLink() }]" method="post">
+    [{ $oViewConf->getHiddenSid() }]
+    <input type="hidden" name="cl" value="[{ $oViewConf->getActiveClassName() }]">
+    <input type="hidden" name="fnc" value="">
+    <input type="hidden" name="language" value="[{ $actlang }]">
+    
+    <h1>
+        [{ oxmultilang ident="cmsconnect_setup_main" }]
+    </h1>
     
     [{ foreach from=$languages key=iLang item=oLang }]
         <fieldset>
@@ -172,28 +175,48 @@
     <fieldset>
         <legend>[{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_GENERAL" }]</legend>
         
-        <p>
-            <input type="hidden" name="editval[blCMScLeaveUrls]" value="0" />
-            <input type="checkbox" name="editval[blCMScLeaveUrls]" value="1" [{ if $blCMScLeaveUrls }]checked="checked"[{ /if }] />
-            [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_blCMScLeaveUrls" }]
-            [{ oxinputhelp ident="CMSCONNECT_ADMIN_SETTINGS_blCMScLeaveUrls_HELP" }]
-        </p>
-        
-        <p>
-            <input type="hidden" name="editval[blCMScEnableTestContent]" value="0" />
-            <input type="checkbox" name="editval[blCMScEnableTestContent]" value="1" [{ if $blCMScEnableTestContent }]checked="checked"[{ /if }] />
-            [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_blCMScEnableTestContent" }]
-            [{ oxinputhelp ident="CMSCONNECT_ADMIN_SETTINGS_blCMScEnableTestContent_HELP" }]
-        </p>
-        
-        <p>
-            <input type="hidden" name="editval[blCMScSslDontVerifyPeer]" value="0" />
-            <input type="checkbox" name="editval[blCMScSslDontVerifyPeer]" value="1" [{ if $blCMScSslDontVerifyPeer }]checked="checked"[{ /if }] />
-            [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_blCMScSslDontVerifyPeer" }]
-            [{ oxinputhelp ident="CMSCONNECT_ADMIN_SETTINGS_blCMScSslDontVerifyPeer_HELP" }]
-        </p>
-        
         <table>
+            <tr>
+                <td class="edittext">
+                    [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting" }]:
+                    [{ oxinputhelp ident="CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_HELP" }]
+                </td>
+                <td class="edittext">
+                    <select name="editval[sCMScUrlRewriting]">
+                        <option value="[{ "CMSc_Utils::VALUE_URL_REWRITING_PATH_ONLY"|constant }]" [{ if !$sCMScUrlRewriting || $sCMScUrlRewriting === "CMSc_Utils::VALUE_URL_REWRITING_PATH_ONLY"|constant }]selected="selected"[{ /if }]>
+                            [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_PathOnly" }]
+                        </option>
+                        <!--
+                        <option value="[{ "CMSc_Utils::VALUE_URL_REWRITING_ALL_CMS_URLS"|constant }]" [{ if $sCMScUrlRewriting === "CMSc_Utils::VALUE_URL_REWRITING_ALL_CMS_URLS"|constant }]selected="selected"[{ /if }]>
+                            [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_AllUrls" }]
+                        </option>
+                        -->
+                        <option value="[{ "CMSc_Utils::VALUE_URL_REWRITING_NONE"|constant }]" [{ if $sCMScUrlRewriting === "CMSc_Utils::VALUE_URL_REWRITING_NONE"|constant }]selected="selected"[{ /if }]>
+                            [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_None" }]
+                        </option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="edittext">
+                </td>
+                <td class="edittext">
+                    <input type="hidden" name="editval[blCMScEnableTestContent]" value="0" />
+                    <input type="checkbox" name="editval[blCMScEnableTestContent]" value="1" [{ if $blCMScEnableTestContent }]checked="checked"[{ /if }] />
+                    [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_blCMScEnableTestContent" }]
+                    [{ oxinputhelp ident="CMSCONNECT_ADMIN_SETTINGS_blCMScEnableTestContent_HELP" }]
+                </td>
+            </tr>
+            <tr>
+                <td class="edittext">
+                </td>
+                <td class="edittext">
+                    <input type="hidden" name="editval[blCMScSslDontVerifyPeer]" value="0" />
+                    <input type="checkbox" name="editval[blCMScSslDontVerifyPeer]" value="1" [{ if $blCMScSslDontVerifyPeer }]checked="checked"[{ /if }] />
+                    [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_blCMScSslDontVerifyPeer" }]
+                    [{ oxinputhelp ident="CMSCONNECT_ADMIN_SETTINGS_blCMScSslDontVerifyPeer_HELP" }]
+                </td>
+            </tr>
             <tr>
                 <td class="edittext">
                     [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScTtlDefault" args="CMSc_Utils::CONFIG_DEFAULTVALUE_TTL"|constant }]:

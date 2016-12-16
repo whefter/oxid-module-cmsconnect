@@ -30,7 +30,19 @@ $aLang = array(
 
 'CMSCONNECT_ADMIN_SETTINGS_GENERAL'                         => 'Allgemeine Einstellungen',
 
-'CMSCONNECT_ADMIN_SETTINGS_blCMScLeaveUrls'                 => 'URLs nicht umschreiben',
+'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting'           => 'URLs umschreiben',
+'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_HELP'      => 'Definitiert, ob URLs, die in den CMS-Texten vorkommen, umgeschrieben werden sollen, damit sie wieder auf den OXID-Shop zeigen. Damit wird eine Navigation in den CMS-Seiten innerhalb des Shops möglich. Andernfalls werden Benutzer beim Klicken von Links auf das CMS und aus dem Shop heraus geleitet.
+                                                            <ul>
+                                                                <li><b>Nur Pfade:</b> es werden nur URLs umgeschrieben, die den eingestellten relativen Pfaden entsprechen</li>
+                                                                <!--
+                                                                <li><b>Alle URLs:</b> es werden alle URLs umgeschrieben, auch solche, die nur mit den Basis-URLs beginnen und nicht den relativen Pfad enthalten (kann erforderlich sein, um auf SSL-Seiten auch Bilder und sonstige Resourcen über SSL laden zu können, falls diese nicht unterhalb der relativen Pfades zu erreichen sind)
+                                                                -->
+                                                                <li><b>Nichts umschreiben:</b> es werden keine URLs umgeschrieben
+                                                            </ul>',
+'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_PathOnly'  => 'Nur Pfade',
+'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_AllUrls'   => 'Alle URLs',
+'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_None'      => 'Nichts umschreiben',
+
 'CMSCONNECT_ADMIN_SETTINGS_blCMScEnableTestContent'         => 'Test-Content ausliefern',
 'CMSCONNECT_ADMIN_SETTINGS_blCMScEnableTestContent_HELP'    => 'Es werden keine Inhalte mittels cURL abgerufen, sondern der Test-Content zurückgegeben. Für Debug-Zwecke gedacht.',
 'CMSCONNECT_ADMIN_SETTINGS_blCMScSslDontVerifyPeer'         => 'SSL-Peer nicht überprüfen',

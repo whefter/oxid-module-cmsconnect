@@ -19,9 +19,13 @@ class CMSc_Utils
         CONFIG_KEY_TEST_CONTENT             = 'sCMScTestContent',
         CONFIG_KEY_CURL_EXECUTE_TIMEOUT     = 'sCMScCurlExecuteTimeout',
         CONFIG_KEY_CURL_CONNECT_TIMEOUT     = 'sCMScCurlConnectTimeout',
-        CONFIG_KEY_DONT_REWRITE_URLS        = 'blCMScLeaveUrls',
         CONFIG_KEY_TTL_DEFAULT_RND          = 'sCMScTtlDefaultRnd',
         CONFIG_KEY_TTL_DEFAULT              = 'sCMScTtlDefault',
+        
+        CONFIG_KEY_URL_REWRITING            = 'sCMScUrlRewriting',
+        VALUE_URL_REWRITING_PATH_ONLY       = 'URL_REWRITING_PATH_ONLY',
+        VALUE_URL_REWRITING_ALL_CMS_URLS    = 'URL_REWRITING_ALL_CMS_URLS',
+        VALUE_URL_REWRITING_NONE            = 'URL_REWRITING_NONE',
         
         CONFIG_KEY_LOCAL_PAGES_CACHE_ENGINE          = 'sCMScLocalPageCacheEngine',
         VALUE_LOCAL_PAGES_CACHE_ENGINE_AUTO          = 'LOCAL_PAGE_CACHE_AUTO',
@@ -687,7 +691,7 @@ class CMSc_Utils
         $oxConfig = oxRegistry::getConfig();
         $oxLang   = oxRegistry::getLang();
         
-        if ( static::getConfigValue(CMSc_Utils::CONFIG_KEY_DONT_REWRITE_URLS) == true ) {
+        if ( static::getConfigValue(CMSc_Utils::CONFIG_KEY_URL_REWRITING) === static::VALUE_URL_REWRITING_NONE ) {
             stopProfile(__METHOD__);
             
             return $sTextContent;
@@ -716,6 +720,22 @@ class CMSc_Utils
                     $sTextContent = str_replace( $aMatch[0], static::rewriteUrl($aMatch[0]), $sTextContent );
                 }
             }
+            
+            // if ( static::getConfigValue(CMSc_Utils::CONFIG_KEY_URL_REWRITING) === static::VALUE_URL_REWRITING_ALL_CMS_URLS ) {
+                // If the shop is in SSL mode, replace all links and sources to the non-SSL CMS with references to the SSL source,
+                // if configured, to prevent browser complaints about mixed modes
+                if ( $oxConfig->isSsl() ) {
+                    // Do this ONLY if an SSL source URL has actually been configured
+                    if ( $sSourceSslUrl ) {
+                        // We can safely do this crude replace since, in theory, all URLs left on the page should be to
+                        // non-page CMS content
+                        $sSourceBaseUrl     = static::sanitizeUrl( $sSourceUrl . '/' );
+                        $sSourceSslBaseUrl  = static::sanitizeUrl( $sSourceSslUrl . '/' );
+                        
+                        $sTextContent = str_replace( $sSourceBaseUrl, $sSourceSslBaseUrl, $sTextContent );
+                    }
+                }
+            // }
         }
         
         stopProfile(__METHOD__);
@@ -758,20 +778,6 @@ class CMSc_Utils
 
                 if ( strpos($sUrl, $sFullBaseUrl) !== false ) {
                     $sUrl = str_replace($sFullBaseUrl, $sFullTargetUrl, $sUrl);
-                    
-                    // If the shop is in SSL mode, replace all links and sources to the non-SSL CMS with references to the SSL source,
-                    // if configured, to prevent browser complaints about mixed modes
-                    if ( $oxConfig->isSsl() ) {
-                        // Do this ONLY if an SSL source URL has actually been configured
-                        if ( $sSourceSslUrl ) {
-                            // We can safely do this crude replace since, in theory, all URLs left on the page should be to
-                            // non-page CMS content
-                            $sSourceBaseUrl     = static::sanitizeUrl( $sSourceUrl . '/' );
-                            $sSourceSslBaseUrl  = static::sanitizeUrl( $sSourceSslUrl . '/' );
-                        
-                            $sUrl = str_replace( $sSourceBaseUrl, $sSourceSslBaseUrl, $sUrl );
-                        }
-                    }
                     
                     break 2;
                 }
