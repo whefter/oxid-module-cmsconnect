@@ -20,6 +20,14 @@ class cmsconnect_setup_cache_localpages extends cmsconnect_setup_main
         
         $this->_aViewData['oLocalPagesCache'] = CMSc_Cache_LocalPages::get();
         $this->_aViewData['oCmsPagesCache'] = CMSc_Cache_CmsPages::get();
+        
+        $iPage = (int)$oxConfig->getRequestParameter('pgNr') ?: 1;
+        $iLimit = 100;
+        $iOffset = ($iPage - 1) * $iLimit;
+        
+        $this->_aViewData['iPage'] = $iPage;
+        $this->_aViewData['iLimit'] = $iLimit;
+        $this->_aViewData['iOffset'] = $iOffset;
 
         // return get_called_class() . '.tpl';
         return parent::render();
@@ -40,7 +48,6 @@ class cmsconnect_setup_cache_localpages extends cmsconnect_setup_main
         $oCache = CMSc_Cache_LocalPages::get();
         
         $aList = $oCache->getList();
-        
         foreach( $aList as $sCacheKey => $oLocalPageCache ) {
             $oCache->deleteLocalPageCache($sCacheKey);
         }

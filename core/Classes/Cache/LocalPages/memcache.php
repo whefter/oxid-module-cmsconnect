@@ -14,8 +14,6 @@ class CMSc_Cache_LocalPages_memcache extends CMSc_Cache_LocalPages
     
     protected $_oMemcache = null;
     
-    protected $_aPageCache = [];
-    
     protected function _getMemcache ()
     {
         if ( $this->_oMemcache === null ) {
@@ -41,6 +39,7 @@ class CMSc_Cache_LocalPages_memcache extends CMSc_Cache_LocalPages
         
         if ( !in_array($sCacheKey, $aIndex) ) {
             $aIndex[] = $sCacheKey;
+            
             $this->_getMemcache()->set($this->_getCachePrefix(), $aIndex);
         }
     }
@@ -70,22 +69,6 @@ class CMSc_Cache_LocalPages_memcache extends CMSc_Cache_LocalPages
         return $aIndex;
     }
     
-    protected function _setLocalPageCache ($sCacheKey, $aLocalPageCache)
-    {
-        $this->_aPageCache[$sCacheKey] = $aLocalPageCache;
-        
-        if ( $aLocalPageCache ) {
-            $aLocalPageCache['pages'] = array_map(function ($v)
-            {
-                return serialize($v);
-            }, $aLocalPageCache['pages']);
-        }
-        
-        $this->_getMemcache()->set( $this->_getMemcacheKey($sCacheKey), $aLocalPageCache );
-        
-        $this->_addPageToIndex($sCacheKey);
-    }
-    
     protected function _getLocalPageCache ($sCacheKey)
     {
         if ( !isset($this->_aPageCache[$sCacheKey]) ) {
@@ -98,45 +81,10 @@ class CMSc_Cache_LocalPages_memcache extends CMSc_Cache_LocalPages
                 }, $aCache['pages']);
             }
             
-            $this->_aPageCache[$sCacheKey] = $aCache;
-        }
-        
-        // This evaluates to true if there was no OXID file cache or it was
-        // invalid
-        if ( !$this->_aPageCache[$sCacheKey] ) {
-            $this->_aPageCache[$sCacheKey] = [
-                'pages' => [],
-                'data' => $this->_getCurrentLocalPageData(),
-            ];
+            $this->_aPageCache[$sCacheKey] = $aCache ?: false;
         }
         
         return $this->_aPageCache[$sCacheKey];
-    }
-    
-    /**
-     * Override parent
-     */
-    protected function _registerCmsPage ($sLocalPageCacheKey, $oCmsPage)
-    {
-        $aLocalPageCache = $this->_getLocalPageCache($sLocalPageCacheKey);
-        
-        $aLocalPageCache['pages'][] = $oCmsPage;
-
-        $this->_setLocalPageCache($sLocalPageCacheKey, $aLocalPageCache);
-    }
-    
-    /**
-     * Override
-     */
-    protected function _getLocalPageCmsPages ($sCacheKey)
-    {
-        $_aPageCache = $this->_getLocalPageCache($sCacheKey);
-        
-        if ( !$_aPageCache ) {
-            return [];
-        } else {
-            return $_aPageCache['pages'];
-        }
     }
     
     /**
@@ -157,15 +105,62 @@ class CMSc_Cache_LocalPages_memcache extends CMSc_Cache_LocalPages
     /**
      * Override
      */
-    protected function _getList ()
+    public function _getCount ()
     {
         $aIndex = $this->_getIndex();
         
+        return count($aIndex);
+    }
+    
+    /**
+     * Override
+     */
+    protected function _getList ($limit = null, $offset = null)
+    {
+        $aIndex = $this->_getIndex();
+        
+        $iCnt = 0;
         $aList = [];
         foreach ( $aIndex as $sCacheKey ) {
-            $aList[$sCacheKey] = $this->_getLocalPageCache($sCacheKey);
+            $iCnt++;
+            if ( $offset !== null && $iCnt <= $offset ) {
+                continue;
+            }
+            if ( $limit !== null && $iCnt > ((int)$offset + $limit) ) {
+                continue;
+            }
+            
+            $aCache = $this->_getLocalPageCache($sCacheKey);
+            
+            if ( $aCache ) {
+                $aList[$sCacheKey] = $aCache;
+            }
         }
+        // var_dump(__METHOD__, $aIndex, $aList);
         
         return $aList;
+    }
+    
+    /**
+     * Override parent.
+     */
+    public function commit ()
+    {
+        // echo "<pre>";
+        // var_dump(__METHOD__, $this->_aPageCache);
+        // echo "</pre>";
+        
+        foreach ( $this->_aPageCache as $sCacheKey => $aCache ) {
+            if ( $aCache ) {
+                $aCache['pages'] = array_map(function ($v)
+                {
+                    return serialize($v);
+                }, $aCache['pages']);
+                
+                $this->_getMemcache()->set( $this->_getMemcacheKey($sCacheKey), $aCache );
+                
+                $this->_addPageToIndex($sCacheKey);
+            }
+        }
     }
 }

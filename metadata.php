@@ -19,11 +19,12 @@ $aModule = array(
         'modules/wh/cmsconnect/async_snippet.tpl'   => 'wh/cmsconnect/application/views/tpl/async_snippet.tpl',
         
         // Admin
-        'modules/wh/cmsconnect/admin/setup_list.tpl'             => 'wh/cmsconnect/application/views/admin/tpl/setup_list.tpl',
-        'modules/wh/cmsconnect/admin/setup_main.tpl'             => 'wh/cmsconnect/application/views/admin/tpl/setup_main.tpl',
-        'modules/wh/cmsconnect/admin/setup_testcontent.tpl'      => 'wh/cmsconnect/application/views/admin/tpl/setup_testcontent.tpl',
-        'modules/wh/cmsconnect/admin/setup_cache_localpages.tpl' => 'wh/cmsconnect/application/views/admin/tpl/setup_cache_localpages.tpl',
-        'modules/wh/cmsconnect/admin/setup_cache_cmspages.tpl'   => 'wh/cmsconnect/application/views/admin/tpl/setup_cache_cmspages.tpl',
+        'modules/wh/cmsconnect/admin/setup_list.tpl'                        => 'wh/cmsconnect/application/views/admin/tpl/setup_list.tpl',
+        'modules/wh/cmsconnect/admin/setup_main.tpl'                        => 'wh/cmsconnect/application/views/admin/tpl/setup_main.tpl',
+        'modules/wh/cmsconnect/admin/setup_testcontent.tpl'                 => 'wh/cmsconnect/application/views/admin/tpl/setup_testcontent.tpl',
+        'modules/wh/cmsconnect/admin/setup_cache_localpages.tpl'            => 'wh/cmsconnect/application/views/admin/tpl/setup_cache_localpages.tpl',
+        'modules/wh/cmsconnect/admin/setup_cache_cmspages.tpl'              => 'wh/cmsconnect/application/views/admin/tpl/setup_cache_cmspages.tpl',
+        'modules/wh/cmsconnect/admin/includes/cache_list_pagination.tpl'    => 'wh/cmsconnect/application/views/admin/tpl/includes/cache_list_pagination.tpl',
     ),
     
     'blocks'    => array(
@@ -38,6 +39,7 @@ $aModule = array(
         'oxconfig'      => 'wh/cmsconnect/application/models/cmsconnect_oxconfig',
         'oxcontent'     => 'wh/cmsconnect/application/models/cmsconnect_oxcontent',
         'oxutilsview'   => 'wh/cmsconnect/application/models/cmsconnect_oxutilsview',
+        'oxutils'       => 'wh/cmsconnect/application/models/cmsconnect_oxutils',
         'oxseodecoder'  => 'wh/cmsconnect/application/models/cmsconnect_oxseodecoder',
         'oxseoencoder'  => 'wh/cmsconnect/application/models/cmsconnect_oxseoencoder',
         'oxviewconfig'  => 'wh/cmsconnect/application/models/cmsconnect_oxviewconfig',

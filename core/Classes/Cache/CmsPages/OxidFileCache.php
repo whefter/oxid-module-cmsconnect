@@ -68,9 +68,24 @@ class CMSc_Cache_CmsPages_OxidFileCache extends CMSc_Cache_CmsPages
     }
     
     /**
-     * Orverride
+     * Override
      */
-    protected function _getList ()
+    public function _getCount ()
+    {
+        $oxUtils = oxRegistry::get('oxUtils');
+        $oxConfig = oxRegistry::getConfig();
+        
+        $sOxidCachePrefix = $this->_getCachePrefix();;
+        
+        $aFiles = glob($oxUtils->getCacheFilePath(null, true) . '*' . $sOxidCachePrefix . '*');
+        
+        return count($aFiles);
+    }
+    
+    /**
+     * Override
+     */
+    protected function _getList ($limit = null, $offset = null)
     {
         startProfile(__METHOD__);
         
@@ -80,9 +95,18 @@ class CMSc_Cache_CmsPages_OxidFileCache extends CMSc_Cache_CmsPages
         
         $aFiles = glob($oxUtils->getCacheFilePath(null, true) . '*' . $sOxidCachePrefix . '*');
 
+        $iCnt = 0;
         $aList = [];
         if ( is_array($aFiles) ) {
             foreach ( $aFiles as $sFilePath ) {
+                $iCnt++;
+                if ( $offset !== null && $iCnt <= $offset ) {
+                    continue;
+                }
+                if ( $limit !== null && $iCnt > ((int)$offset + $limit) ) {
+                    continue;
+                }
+                
                 $sOxidCacheKey = substr($sFilePath, strrpos($sFilePath, $sOxidCachePrefix));
                 $sOxidCacheKey = substr($sOxidCacheKey, 0, strrpos($sOxidCacheKey, '.'));
                 

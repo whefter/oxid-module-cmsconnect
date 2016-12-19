@@ -43,8 +43,6 @@ class cmsconnect_oxconfig extends cmsconnect_oxconfig_parent
             
             $aCmsPages = CMSc_Cache_LocalPages::get()->getCurrentLocalPageCmsPages();
             
-            // var_dump(__METHOD__, $aCmsPages);
-            
             $aPagesToFetch =  [];
             
             if ( count($aCmsPages) ) {
@@ -59,16 +57,22 @@ class cmsconnect_oxconfig extends cmsconnect_oxconfig_parent
                 }
             }
             
+            // echo "<pre>Pages to fetch";
+            // var_dump($aPagesToFetch);
+            // echo "</pre>";
+            
             if ( count($aPagesToFetch) ) {
                 $aRequests = [];
                 foreach ( $aPagesToFetch as $i => $oCmsPage ) {
                     $aRequests[] = $oCmsPage->getHttpRequest();
                 }
+                
                 $aResults = CMSc_Utils::httpMultiRequest($aRequests);
                 
                 // $aResults = [];
-                // foreach ( $aUrlsToFetch as $i => $sUrl ) {
-                    // $aResults[] = CMSc_Utils::fetchUrl($sUrl);
+                // foreach ( $aRequests as $i => $aRequest ) {
+                    // list($aResult) = CMSc_Utils::httpMultiRequest([$aRequest]);
+                    // $aResults[] = $aResult;
                 // }
                 
                 $time = microtime(true) - $start;

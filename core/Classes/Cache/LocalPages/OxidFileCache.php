@@ -12,29 +12,12 @@ class CMSc_Cache_LocalPages_OxidFileCache extends CMSc_Cache_LocalPages
 {
     const ENGINE_LABEL = 'OXID file cache';
     
-    protected $_aPageCache = [];
-    
     protected function _getCacheFilename ($sCacheKey)
     {
         $oxConfig = oxRegistry::getConfig();
         
         return $this->_getCachePrefix() . $sCacheKey;
     }
-    
-    protected function _setLocalPageCache ($sCacheKey, $aLocalPageCache)
-    {
-        $this->_aPageCache[$sCacheKey] = $aLocalPageCache;
-        
-        if ( $aLocalPageCache ) {
-            $aLocalPageCache['pages'] = array_map(function ($v)
-            {
-                return serialize($v);
-            }, $aLocalPageCache['pages']);
-        }
-        
-        $blSuccess = oxRegistry::get('oxUtils')->toFileCache( $this->_getCacheFilename($sCacheKey), $aLocalPageCache );
-    }
-    
     
     protected function _getLocalPageCacheFromFileCache ($sCacheKey)
     {
@@ -54,7 +37,7 @@ class CMSc_Cache_LocalPages_OxidFileCache extends CMSc_Cache_LocalPages
                     }, $aCache['pages']);
                 }
                 
-                $this->_aPageCache[$sCacheKey] = $aCache;
+                $this->_aPageCache[$sCacheKey] = $aCache ?: false;
             }
         }
     }
@@ -63,42 +46,7 @@ class CMSc_Cache_LocalPages_OxidFileCache extends CMSc_Cache_LocalPages
     {
         $this->_getLocalPageCacheFromFileCache($sCacheKey);
         
-        // This evaluates to true if there was no OXID file cache or it was
-        // invalid
-        if ( !$this->_aPageCache[$sCacheKey] ) {
-            $this->_aPageCache[$sCacheKey] = [
-                'pages' => [],
-                'data' => $this->_getCurrentLocalPageData(),
-            ];
-        }
-        
         return $this->_aPageCache[$sCacheKey];
-    }
-    
-    /**
-     * Override parent
-     */
-    protected function _registerCmsPage ($sLocalPageCacheKey, $oCmsPage)
-    {
-        $aLocalPageCache = $this->_getLocalPageCache($sLocalPageCacheKey);
-        
-        $aLocalPageCache['pages'][] = $oCmsPage;
-
-        $this->_setLocalPageCache($sLocalPageCacheKey, $aLocalPageCache);
-    }
-    
-    /**
-     * Override
-     */
-    protected function _getLocalPageCmsPages ($sCacheKey)
-    {
-        $_aPageCache = $this->_getLocalPageCache($sCacheKey);
-        
-        if ( !$_aPageCache ) {
-            return [];
-        } else {
-            return $_aPageCache['pages'];
-        }
     }
     
     /**
@@ -119,7 +67,7 @@ class CMSc_Cache_LocalPages_OxidFileCache extends CMSc_Cache_LocalPages
     /**
      * Override
      */
-    protected function _getList ()
+    public function _getCount ()
     {
         $oxUtils = oxRegistry::get('oxUtils');
         $oxConfig = oxRegistry::getConfig();
@@ -128,18 +76,61 @@ class CMSc_Cache_LocalPages_OxidFileCache extends CMSc_Cache_LocalPages
         
         $aFiles = glob($oxUtils->getCacheFilePath(null, true) . '*' . $sOxidCachePrefix . '*');
         
+        return count($aFiles);
+    }
+    
+    /**
+     * Override
+     */
+    protected function _getList ($limit = null, $offset = null)
+    {
+        $oxUtils = oxRegistry::get('oxUtils');
+        $oxConfig = oxRegistry::getConfig();
+        
+        $sOxidCachePrefix = $this->_getCachePrefix();;
+        
+        $aFiles = glob($oxUtils->getCacheFilePath(null, true) . '*' . $sOxidCachePrefix . '*');
+        
+        $iCnt = 0;
         $aList = [];
         if ( is_array($aFiles) ) {
             foreach ( $aFiles as $sFilePath ) {
+                $iCnt++;
+                if ( $offset !== null && $iCnt <= $offset ) {
+                    continue;
+                }
+                if ( $limit !== null && $iCnt > ((int)$offset + $limit) ) {
+                    continue;
+                }
+                
                 $sOxidCacheKey = substr($sFilePath, strrpos($sFilePath, $sOxidCachePrefix));
                 $sOxidCacheKey = substr($sOxidCacheKey, 0, strrpos($sOxidCacheKey, '.'));
                 
                 $sCacheKey = substr($sOxidCacheKey, strlen($sOxidCachePrefix));
                 
-                $aList[$sCacheKey] = $this->_getLocalPageCache($sCacheKey);
+                $aCache = $this->_getLocalPageCache($sCacheKey);
+                
+                if ( $aCache ) {
+                    $aList[$sCacheKey] = $aCache;
+                }
             }
         }
         
         return $aList;
+    }
+    
+    /**
+     * Override parent.
+     */
+    public function commit ()
+    {
+        foreach ( $this->_aPageCache as $sCacheKey => $aCache ) {
+            $aCache['pages'] = array_map(function ($v)
+            {
+                return serialize($v);
+            }, $aCache['pages']);
+            
+            $blSuccess = oxRegistry::get('oxUtils')->toFileCache( $this->_getCacheFilename($sCacheKey), $aCache );
+        }
     }
 }

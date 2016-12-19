@@ -122,16 +122,35 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
     }
     
     /**
-     * Orverride
+     * Override
      */
-    protected function _getList ()
+    public function _getCount ()
+    {
+        $aIndex = $this->_getIndex();
+
+        return count($aIndex);
+    }
+    
+    /**
+     * Override
+     */
+    protected function _getList ($limit = null, $offset = null)
     {
         startProfile(__METHOD__);
         
         $aIndex = $this->_getIndex();
         
+        $iCnt = 0;
         $aList = [];
         foreach ( $aIndex as $sCacheKey ) {
+            $iCnt++;
+            if ( $offset !== null && $iCnt <= $offset ) {
+                continue;
+            }
+            if ( $limit !== null && $iCnt > ((int)$offset + $limit) ) {
+                continue;
+            }
+            
             $aList[$sCacheKey] = $this->_fetchHttpResult($sCacheKey);
         }
         

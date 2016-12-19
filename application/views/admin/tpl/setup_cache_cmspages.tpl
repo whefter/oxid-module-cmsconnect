@@ -74,6 +74,10 @@
         Cache für ALLE SHOPS leeren (!)
     </button>
     
+    [{ include  file="modules/wh/cmsconnect/admin/includes/cache_list_pagination.tpl"
+                oCache=$oCmsPagesCache
+    }]
+    
     <table style="width: 100%;">
         <tr>
             <th style="border: 1px solid grey; border-top: none; border-left: none;">
@@ -93,7 +97,7 @@
             </th>
         </tr>
         
-        [{ foreach from=$oCmsPagesCache->getList() key=sOxidCacheKey item=oHttpResult }]
+        [{ foreach from=$oCmsPagesCache->getList($iLimit,$iOffset) key=sOxidCacheKey item=oHttpResult }]
             [{ assign var=oCmsPage value=$oHttpResult->oCmsPage }]
             <tr>
                 <td style="border: 1px solid grey; border-top: none; border-left: none;">

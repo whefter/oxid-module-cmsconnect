@@ -10,15 +10,62 @@
  */
 abstract class CMSc_Cache_LocalPages extends CMSc_Cache
 {
-    protected static $aBlacklistedParams = [
+    // These will be removed from the GET and POST arrays
+    // before cache key computation, that is, they do not affect
+    // the cache key
+    protected static $aRequestParamsIgnoreList = [
         'stoken',
         'PHPSESSID',
         'force_sid',
+        'ldtype',
+        'listtype',
+        'redirected',
+        'lgn_pwd',
+        'lgn_usr',
+        '_', // jQuery AJAX callbacks
+        'pgNr', // alist
+        '_artperpage', // alist
+        'listorder', // alist
+        'listorderby', // alist
+        'attrfilter',
+        'searchparam',
+        'maxpriceselected', // multifilter
+        'minpriceselected', // multifilter
+        'multifilter_reset', // multifilter
     ];
     
-    abstract protected function _getLocalPageCmsPages ($sCacheKey);
-    abstract protected function _registerCmsPage ($sLocalPageCacheKey, $sCmsPageKey);
+    // Any of these request params being present and (if it's an array)
+    // having one of the specified values will disable the local page
+    // cache for that page
+    protected static $aRequestParamsBlacklist = [
+        'anid',
+        'aid',
+        'force_admin_sid',
+        'fnc' => [
+            'tobasket',
+        ],
+        'cl' => [
+            'contact',
+            'suggest',
+            'user',
+            'payment',
+            'thankyou',
+            
+            'oxwreview',
+            'oxwrating',
+            'oxwarticledetails',
+            
+            'account_newsletter',
+            'account_recommlist',
+            'account_wishlist',
+            
+            'br_deliverycostlist',
+        ],
+    ];
+    
+    abstract protected function _getLocalPageCache ($sCacheKey);
     abstract protected function _deleteLocalPageCache ($sCacheKey);
+    abstract public function commit ();
     
     /**
      * Singleton instance.
@@ -26,6 +73,23 @@ abstract class CMSc_Cache_LocalPages extends CMSc_Cache
      * @var
      */
     protected static $_oInstance = null;
+    
+    /**
+     * Cache for current local page's data
+     *
+     * @var
+     */
+    protected $_aCurrentLocalPageData = null;
+    
+    /**
+     * @var
+     */
+    protected $_blIsCachable = null;
+    
+    /**
+     * @var
+     */
+    protected $_aPageCache = [];
     
     /**
      * Singleton instance getter
@@ -71,6 +135,16 @@ abstract class CMSc_Cache_LocalPages extends CMSc_Cache
     }
     
     /**
+     * Override parent
+     */
+    public function init()
+    {
+        parent::init();
+        
+        $this->_loadOrCreateCurrentLocalPageCache();
+    }
+    
+    /**
      * @return string
      */
     protected function _getCachePrefix ()
@@ -83,6 +157,10 @@ abstract class CMSc_Cache_LocalPages extends CMSc_Cache
      */
     public function registerCmsPage ($oCmsPage)
     {
+        if ( !$this->isCurrentLocalPagePageCachable() ) {
+            return;
+        }
+        
         if ( !$oCmsPage->isCacheable() ) {
             return;
         }
@@ -90,6 +168,8 @@ abstract class CMSc_Cache_LocalPages extends CMSc_Cache
         $sLocalPageCacheKey = $this->_getCurrentLocalPageCacheKey();
         $aKnownPages = $this->getLocalPageCmsPages($sLocalPageCacheKey);
         
+        // Not yet compatible with engines besides "DB"
+        // $blExists = in_array($oCmsPage->getIdent(), $aKnownPages);
         $blExists = false;
         foreach ( $aKnownPages as $oKnownPage ) {
             if ( $oKnownPage->getIdent() === $oCmsPage->getIdent() ) {
@@ -100,6 +180,41 @@ abstract class CMSc_Cache_LocalPages extends CMSc_Cache
 
         if ( !$blExists ) {
             $this->_registerCmsPage($sLocalPageCacheKey, $oCmsPage);
+        }
+    }
+    
+    /**
+     * Override parent.
+     */
+    protected function _registerCmsPage ($sLocalPageCacheKey, $oCmsPage)
+    {
+        $this->_getLocalPageCache($sLocalPageCacheKey);
+        
+        if ( $this->_aPageCache[$sLocalPageCacheKey] ) {
+            $this->_aPageCache[$sLocalPageCacheKey]['pages'][$oCmsPage->getIdent()] = $oCmsPage;
+        }
+    }
+    
+    /**
+     * 
+     */
+    protected function _loadOrCreateCurrentLocalPageCache ()
+    {
+        $sCacheKey = $this->_getCurrentLocalPageCacheKey();
+        
+        $this->_getLocalPageCache($sCacheKey);
+        
+        // This evaluates to true if there was no OXID file cache
+        // or it was invalid
+        if ( !$this->_aPageCache[$sCacheKey] ) {
+            // Cache for current page doesn't exist - create IF
+            // current page is cachable
+            if ( $this->isCurrentLocalPagePageCachable() ) {
+                $this->_aPageCache[$sCacheKey] = [
+                    'pages' => [],
+                    'data' => $this->_getCurrentLocalPageData(),
+                ];
+            }
         }
     }
     
@@ -118,38 +233,78 @@ abstract class CMSc_Cache_LocalPages extends CMSc_Cache
      */
     protected final function _getCurrentLocalPageData ()
     {
-        $sCurrentUrl = oxRegistry::get('oxUtilsUrl')->getCurrentUrl();
-        
-        
-        $aPost = $_POST;
-        
-        $aGet = [];
-        parse_str($_SERVER['QUERY_STRING'], $aGet);
-        
-        ksort($aPost);
-        ksort($aGet);
-        
-        foreach ( array_keys($aPost) as $key ) {
-            if ( in_array($key, static::$aBlacklistedParams) ) {
+        if ( !$this->_aCurrentLocalPageData ) {
+            $sCurrentUrl = oxRegistry::get('oxUtilsUrl')->getCurrentUrl();
+            
+            $aPost = $_POST;
+            
+            $aGet = [];
+            parse_str($_SERVER['QUERY_STRING'], $aGet);
+            
+            ksort($aPost);
+            ksort($aGet);
+            
+            foreach ( static::$aRequestParamsIgnoreList as $key ) {
                 unset($aPost[$key]);
-            }
-        }
-        foreach ( array_keys($aGet) as $key ) {
-            if ( in_array($key, static::$aBlacklistedParams) ) {
                 unset($aGet[$key]);
             }
+            
+            if ( trim($_SERVER['QUERY_STRING'], '?&') ) {
+                $iQueryPos = strrpos($sCurrentUrl, $_SERVER['QUERY_STRING']);
+                $sCurrentUrl = rtrim(substr($sCurrentUrl, 0, $iQueryPos), '?&');
+            }
+            
+            $this->_aCurrentLocalPageData = [
+                'url' => $sCurrentUrl,
+                'queryData' => $aGet,
+                'postData' => $aPost,
+            ];
         }
         
-        if ( trim($_SERVER['QUERY_STRING'], '?&') ) {
-            $iQueryPos = strrpos($sCurrentUrl, $_SERVER['QUERY_STRING']);
-            $sCurrentUrl = rtrim(substr($sCurrentUrl, 0, $iQueryPos), '?&');
+        return $this->_aCurrentLocalPageData;
+    }
+    
+    /**
+     *
+     */
+    protected function isCurrentLocalPagePageCachable ()
+    {
+        if ( $this->_blIsCachable === null ) {
+            $this->_blIsCachable = true;
+            
+            $aData = $this->_getCurrentLocalPageData();
+            
+            foreach ( static::$aRequestParamsBlacklist as $key => $mVal ) {
+                if ( is_string($mVal) ) {
+                    if ( isset($aData['queryData'][$mVal]) || isset($aData['postData'][$mVal]) ) {
+                        $this->_blIsCachable = false;
+                        
+                        break;
+                    }
+                } elseif ( is_array($mVal) ) {
+                    if ( isset($aData['queryData'][$key]) || isset($aData['postData'][$key]) ) {
+                        foreach ( $mVal as $sVal ) {
+                            if ( $aData['queryData'][$key] === $sVal || $aData['postData'][$key] === $sVal ) {
+                                $this->_blIsCachable = false;
+                                
+                                break 2;
+                            }
+                        }
+                    }
+                }
+            }
         }
         
-        return[
-            'url' => $sCurrentUrl,
-            'queryData' => $aGet,
-            'postData' => $aPost,
-        ];
+        return $this->_blIsCachable;
+    }
+    
+    /**
+     * Override parent.
+     */
+    protected function _setLocalPageCache ($sCacheKey, $aLocalPageCache)
+    {
+        $this->_aPageCache[$sCacheKey] = $aLocalPageCache;
+        
     }
     
     /**
@@ -165,7 +320,17 @@ abstract class CMSc_Cache_LocalPages extends CMSc_Cache
      */
     public function getLocalPageCmsPages ($sCacheKey)
     {
-        return $this->_getLocalPageCmsPages($sCacheKey);
+        $this->_getLocalPageCache($sCacheKey);
+        
+        // echo "<pre>";
+        // var_dump("aaa", $sCacheKey, in_array($sCacheKey, $this->_aPageCache), $this->_aPageCache);
+        // echo "</pre>";
+        
+        if ( $this->_aPageCache[$sCacheKey] ) {
+            return $this->_aPageCache[$sCacheKey]['pages'];
+        } else {
+            return [];
+        }
     }
     
     /**
@@ -179,6 +344,7 @@ abstract class CMSc_Cache_LocalPages extends CMSc_Cache
     {
         startProfile(__METHOD__);
         
+        unset($this->_aPageCache[$sCacheKey]);
         $mReturn = $this->_deleteLocalPageCache($sCacheKey);
         
         stopProfile(__METHOD__);

@@ -10,7 +10,8 @@
  */
 abstract class CMSc_Cache
 {
-    abstract protected function _getList ();
+    abstract protected function _getList ($limit = null, $offset = null);
+    abstract protected function _getCount ();
     
     /**
      * @var
@@ -55,13 +56,17 @@ abstract class CMSc_Cache
     }
     
     /**
-     * Returns the list of cached CmsPages
-     *
-     * @return CMSc_CmsPage[]
      */
-    public function getList ()
+    public function getCount ()
     {
-        return $this->_getList();
+        return $this->_getCount();
+    }
+    
+    /**
+     */
+    public function getList ($limit = null, $offset = null)
+    {
+        return $this->_getList($limit, $offset);
     }
     
     /**
