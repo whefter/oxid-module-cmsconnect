@@ -47,6 +47,7 @@ abstract class CMSc_Cache_LocalPages extends CMSc_Cache
         'cl' => [
             'contact',
             'suggest',
+            'basket',
             'user',
             'payment',
             'thankyou',
