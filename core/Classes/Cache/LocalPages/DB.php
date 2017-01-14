@@ -239,91 +239,92 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
             
             
             // CMS pages
-            $aCmsPagesKeys = array_keys($aCache['pages']);
-            
-            $sCmsPagesSql = "
-                SELECT
-                    `key`
-                FROM
-                    wh_cmsc_cache_cmspages
-                WHERE
-                    `key` IN (" . implode(', ', array_map([$oxDb, 'quote'], $aCmsPagesKeys)) . ")
-            ";
-            $aDbPageKeys = $oxDb->getCol($sCmsPagesSql);
-            
-            $aMissingPages = array_diff($aCmsPagesKeys, $aDbPageKeys);
-            
-            if ( count($aMissingPages) ) {
-                $sSql = "
-                    INSERT INTO
+            if ( count($aCache['pages']) ) {
+                $aCmsPagesKeys = array_keys($aCache['pages']);
+                
+                $sCmsPagesSql = "
+                    SELECT
+                        `key`
+                    FROM
                         wh_cmsc_cache_cmspages
-                    (
-                        `key`,
-                        `data`
-                    )
-                    VALUES
+                    WHERE
+                        `key` IN (" . implode(', ', array_map([$oxDb, 'quote'], $aCmsPagesKeys)) . ")
                 ";
-                $aSqls = [];
+                $aDbPageKeys = $oxDb->getCol($sCmsPagesSql);
                 
-                foreach ( $aMissingPages as $sCmsPageCacheKey ) {
-                    $oCmsPage = $aCache['pages'][$sCmsPageCacheKey];
-                    
-                    $aSqls[] = "
+                $aMissingPages = array_diff($aCmsPagesKeys, $aDbPageKeys);
+                
+                if ( count($aMissingPages) ) {
+                    $sSql = "
+                        INSERT INTO
+                            wh_cmsc_cache_cmspages
                         (
-                            " . $oxDb->quote($oCmsPage->getIdent()) . ",
-                            " . $oxDb->quote(serialize($oCmsPage)) . "
+                            `key`,
+                            `data`
                         )
+                        VALUES
                     ";
+                    $aSqls = [];
+                    
+                    foreach ( $aMissingPages as $sCmsPageCacheKey ) {
+                        $oCmsPage = $aCache['pages'][$sCmsPageCacheKey];
+                        
+                        $aSqls[] = "
+                            (
+                                " . $oxDb->quote($oCmsPage->getIdent()) . ",
+                                " . $oxDb->quote(serialize($oCmsPage)) . "
+                            )
+                        ";
+                    }
+                    
+                    $sSql .= implode(",\n", $aSqls);
+                    
+                    $oxDb->query($sSql);
                 }
                 
-                $sSql .= implode(",\n", $aSqls);
-                
-                $oxDb->query($sSql);
-            }
-            
-            
-            // Links
-            $sLinkSql = "
-                SELECT
-                    cmspagekey
-                FROM
-                    wh_cmsc_cache_localpage2cmspage
-                WHERE
-                    localpagekey = " . $oxDb->quote($sCacheKey) . "
-                    AND oxshopid = '" . $oxConfig->getShopId() . "'
-            ";
-            $aDbPageKeys = $oxDb->getCol($sLinkSql);
-            
-            $aMissingPages = array_diff($aCmsPagesKeys, $aDbPageKeys);
-            
-            if ( count($aMissingPages) ) {
-                $sSql = "
-                    INSERT INTO
+                // Links
+                $sLinkSql = "
+                    SELECT
+                        cmspagekey
+                    FROM
                         wh_cmsc_cache_localpage2cmspage
-                    (
-                        `oxshopid`,
-                        `localpagekey`,
-                        `cmspagekey`
-                    )
-                    VALUES
+                    WHERE
+                        localpagekey = " . $oxDb->quote($sCacheKey) . "
+                        AND oxshopid = '" . $oxConfig->getShopId() . "'
                 ";
-                $aSqls = [];
+                $aDbPageKeys = $oxDb->getCol($sLinkSql);
                 
-                foreach ( $aMissingPages as $sCmsPageCacheKey ) {
-                    $oCmsPage = $aCache['pages'][$sCmsPageCacheKey];
-                    
-                    $aSqls[] = "
+                $aMissingPages = array_diff($aCmsPagesKeys, $aDbPageKeys);
+                
+                if ( count($aMissingPages) ) {
+                    $sSql = "
+                        INSERT INTO
+                            wh_cmsc_cache_localpage2cmspage
                         (
-                            '" . $oxConfig->getShopId() . "',
-                            " . $oxDb->quote($sCacheKey) . ",
-                            " . $oxDb->quote($oCmsPage->getIdent()) . "
+                            `oxshopid`,
+                            `localpagekey`,
+                            `cmspagekey`
                         )
+                        VALUES
                     ";
+                    $aSqls = [];
+                    
+                    foreach ( $aMissingPages as $sCmsPageCacheKey ) {
+                        $oCmsPage = $aCache['pages'][$sCmsPageCacheKey];
+                        
+                        $aSqls[] = "
+                            (
+                                '" . $oxConfig->getShopId() . "',
+                                " . $oxDb->quote($sCacheKey) . ",
+                                " . $oxDb->quote($oCmsPage->getIdent()) . "
+                            )
+                        ";
+                    }
+                    
+                    $sSql .= implode(",\n", $aSqls);
+                    
+                    $oxDb->query($sSql);
                 }
-                
-                $sSql .= implode(",\n", $aSqls);
-                
-                $oxDb->query($sSql);
             }
         }
     }
