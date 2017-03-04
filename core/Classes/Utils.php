@@ -2,7 +2,7 @@
 /**
  * @author      William Hefter <william@whefter.de>
  * @link        http://www.whefter.de
- * @copyright   2014-2016 William Hefter
+ * @copyright   2014-2017 William Hefter
  */
 
 /**
@@ -29,6 +29,7 @@ class CMSc_Utils
         
         CONFIG_KEY_LOCAL_PAGES_CACHE_ENGINE          = 'sCMScLocalPageCacheEngine',
         VALUE_LOCAL_PAGES_CACHE_ENGINE_AUTO          = 'LOCAL_PAGE_CACHE_AUTO',
+        VALUE_LOCAL_PAGES_CACHE_ENGINE_DISABLED      = 'LOCAL_PAGE_CACHE_DISABLED',
         VALUE_LOCAL_PAGES_CACHE_ENGINE_OXIDFILECACHE = 'LOCAL_PAGE_CACHE_OXIDFILECACHE',
         VALUE_LOCAL_PAGES_CACHE_ENGINE_DB            = 'LOCAL_PAGE_CACHE_DB',
         VALUE_LOCAL_PAGES_CACHE_ENGINE_MEMCACHED     = 'LOCAL_PAGE_CACHE_MEMCACHED',

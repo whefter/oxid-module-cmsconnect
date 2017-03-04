@@ -29,6 +29,7 @@ $aLang = array(
 'CMSCONNECT_ADMIN_SETTINGS_aCMScSeoIdents'            => 'SEO-Snippet for OXID URLs',
 
 'CMSCONNECT_ADMIN_SETTINGS_GENERAL'                         => 'General Settings',
+
 'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting'               => 'Rewrite URLs',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_HELP'          => 'Sets whether URLs in CMS texts should be rewritten to point back to the OXID shop. This allows navigation of the CMS content inside the OXID shop. Setting this to "none" will lead to users being redirected away from the shop to the CMS when they click a link.
                                                             <ul>
@@ -41,6 +42,7 @@ $aLang = array(
 'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_PathOnly'      => 'Paths only',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_AllUrls'       => 'All URLs',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_None'          => 'None',
+
 'CMSCONNECT_ADMIN_SETTINGS_blCMScEnableTestContent'         => 'Serve test content',
 'CMSCONNECT_ADMIN_SETTINGS_blCMScEnableTestContent_HELP'    => 'Nothing is fetched from remote servers, the test content is used. For debug purposes.',
 'CMSCONNECT_ADMIN_SETTINGS_blCMScSslDontVerifyPeer'         => 'Don\'t verify SSL peers',
@@ -54,6 +56,7 @@ $aLang = array(
 'CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine'               => 'Cache engine for local pages',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_HELP'          => 'Caches which local page includes which CMS page. <div class="error">Can lead to errors if required modules are not loaded. Be careful with values other than "auto".</div>',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_auto'          => 'Auto (recommended)',
+'CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_Disabled'      => 'Disabled',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_OxidFileCache' => 'OXID file cache',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_DB'            => 'Database',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_memcache'      => 'memcache',
@@ -62,6 +65,7 @@ $aLang = array(
 'CMSCONNECT_ADMIN_SETTINGS_sCMScCmsPageCacheEngine_HELP'            => 'Intelligent cache for fetched CMS pages to prevent repeated calls to the CMS every time a local page is loaded. <div class="error">Can lead to errors if required modules are not loaded. Be careful with values other than "auto".</div>',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScCmsPageCacheEngine_auto'            => 'Auto (recommended)',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScCmsPageCacheEngine_OxidFileCache'   => 'OXID file cache',
+'CMSCONNECT_ADMIN_SETTINGS_sCMScCmsPageCacheEngine_memcache'        => 'memcache',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScCmsPageCacheEngine_memcached'       => 'memcached',
 
 

@@ -263,6 +263,9 @@ $.noConflict();
                         <option value="[{ "CMSc_Utils::VALUE_LOCAL_PAGES_CACHE_ENGINE_AUTO"|constant }]" [{ if $sCMScLocalPageCacheEngine === "CMSc_Utils::VALUE_LOCAL_PAGES_CACHE_ENGINE_AUTO"|constant }]selected="selected"[{ /if }]>
                             [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_auto" }]
                         </option>
+                        <option value="[{ "CMSc_Utils::VALUE_LOCAL_PAGES_CACHE_ENGINE_DISABLED"|constant }]" [{ if $sCMScLocalPageCacheEngine === "CMSc_Utils::VALUE_LOCAL_PAGES_CACHE_ENGINE_DISABLED"|constant }]selected="selected"[{ /if }]>
+                            [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_Disabled" }]
+                        </option>
                         <option value="[{ "CMSc_Utils::VALUE_LOCAL_PAGES_CACHE_ENGINE_OXIDFILECACHE"|constant }]" [{ if $sCMScLocalPageCacheEngine === "CMSc_Utils::VALUE_LOCAL_PAGES_CACHE_ENGINE_OXIDFILECACHE"|constant }]selected="selected"[{ /if }]>
                             [{ oxmultilang ident="CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_OxidFileCache" }]
                         </option>

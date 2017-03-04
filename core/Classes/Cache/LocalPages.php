@@ -2,7 +2,7 @@
 /**
  * @author      William Hefter <william@whefter.de>
  * @link        http://www.whefter.de
- * @copyright   2014-2016 William Hefter
+ * @copyright   2014-2017 William Hefter
  */
 
 /**
@@ -115,6 +115,9 @@ abstract class CMSc_Cache_LocalPages extends CMSc_Cache
                 }
             } else {
                 switch ( $sEngine ) {
+                    case CMSc_Utils::VALUE_LOCAL_PAGES_CACHE_ENGINE_DISABLED:
+                        static::$_oInstance = new CMSc_Cache_LocalPages_Disabled();
+                        break;
                     case CMSc_Utils::VALUE_LOCAL_PAGES_CACHE_ENGINE_DB:
                         static::$_oInstance = new CMSc_Cache_LocalPages_DB();
                         break;

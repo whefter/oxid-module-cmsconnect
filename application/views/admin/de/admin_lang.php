@@ -30,8 +30,8 @@ $aLang = array(
 
 'CMSCONNECT_ADMIN_SETTINGS_GENERAL'                         => 'Allgemeine Einstellungen',
 
-'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting'           => 'URLs umschreiben',
-'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_HELP'      => 'Definitiert, ob URLs, die in den CMS-Texten vorkommen, umgeschrieben werden sollen, damit sie wieder auf den OXID-Shop zeigen. Damit wird eine Navigation in den CMS-Seiten innerhalb des Shops möglich. Andernfalls werden Benutzer beim Klicken von Links auf das CMS und aus dem Shop heraus geleitet.
+'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting'               => 'URLs umschreiben',
+'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_HELP'          => 'Definitiert, ob URLs, die in den CMS-Texten vorkommen, umgeschrieben werden sollen, damit sie wieder auf den OXID-Shop zeigen. Damit wird eine Navigation in den CMS-Seiten innerhalb des Shops möglich. Andernfalls werden Benutzer beim Klicken von Links auf das CMS und aus dem Shop heraus geleitet.
                                                             <ul>
                                                                 <li><b>Nur Pfade:</b> es werden nur URLs umgeschrieben, die den eingestellten relativen Pfaden entsprechen</li>
                                                                 <!--
@@ -39,9 +39,9 @@ $aLang = array(
                                                                 -->
                                                                 <li><b>Nichts umschreiben:</b> es werden keine URLs umgeschrieben
                                                             </ul>',
-'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_PathOnly'  => 'Nur Pfade',
-'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_AllUrls'   => 'Alle URLs',
-'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_None'      => 'Nichts umschreiben',
+'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_PathOnly'      => 'Nur Pfade',
+'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_AllUrls'       => 'Alle URLs',
+'CMSCONNECT_ADMIN_SETTINGS_sCMScUrlRewriting_None'          => 'Nichts umschreiben',
 
 'CMSCONNECT_ADMIN_SETTINGS_blCMScEnableTestContent'         => 'Test-Content ausliefern',
 'CMSCONNECT_ADMIN_SETTINGS_blCMScEnableTestContent_HELP'    => 'Es werden keine Inhalte mittels cURL abgerufen, sondern der Test-Content zurückgegeben. Für Debug-Zwecke gedacht.',
@@ -56,6 +56,7 @@ $aLang = array(
 'CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine'               => 'Cache-Engine für lokale Seiten',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_HELP'          => 'Speichert, auf welcher lokalen Seite welche CMS-Seiten eingebunden sind. <div class="error">Kann zu Fehlern führen, wenn passende Module nicht geladen sind! Vorsicht bei Auswahl von Werten, die nicht "automatisch" sind!</div>',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_auto'          => 'Automatisch (empfohlen)',
+'CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_Disabled'      => 'Ausgeschaltet',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_OxidFileCache' => 'OXID File-Cache',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_DB'            => 'Datenbank',
 'CMSCONNECT_ADMIN_SETTINGS_sCMScLocalPageCacheEngine_memcache'      => 'memcache',

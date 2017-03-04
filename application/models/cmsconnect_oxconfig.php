@@ -2,7 +2,7 @@
 /**
  * @author      William Hefter <william@whefter.de>
  * @link        http://www.whefter.de
- * @copyright   2014-2016 William Hefter
+ * @copyright   2014-2017 William Hefter
  */
 
 /**
@@ -27,6 +27,7 @@ class cmsconnect_oxconfig extends cmsconnect_oxconfig_parent
             require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/Cache/LocalPages.php');
             require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/Cache/LocalPages/OxidFileCache.php');
             require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/Cache/LocalPages/DB.php');
+            require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/Cache/LocalPages/Disabled.php');
             require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/Cache/LocalPages/memcache.php');
             require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/Cache/LocalPages/memcached.php');
             require_once(OX_BASE_PATH . '/modules/wh/cmsconnect/core/Classes/Cache/CmsPages.php');

@@ -2,7 +2,7 @@
 /**
  * @author      William Hefter <william@whefter.de>
  * @link        http://www.whefter.de
- * @copyright   2014-2016 William Hefter
+ * @copyright   2014-2017 William Hefter
  */
 
 class cmsconnect_oxviewconfig extends cmsconnect_oxviewconfig_parent
