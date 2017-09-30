@@ -91,13 +91,13 @@ class cmsconnect_oxcontent extends cmsconnect_oxcontent_parent
         
         // First, try the page ID
         if ( ($sPageId = $this->_getCMSc_CmsPageId()) !== false ) {
-            if ( $sContent = $oCMSconnect->getContentById('content', $sPageId) ) {
+            if ( $sContent = $oCMSconnect->getContentById('normal', $sPageId) ) {
                 return $sContent;
             }
         }
         
         if ( ($sPage = $this->_getCMSc_CmsPage()) !== false ) {
-            if ( $sContent = $oCMSconnect->getContent('content', $sPage) ) {
+            if ( $sContent = $oCMSconnect->getContent('normal', $sPage) ) {
                 return $sContent;
             }
         }
@@ -136,7 +136,7 @@ class cmsconnect_oxcontent extends cmsconnect_oxcontent_parent
      */
     protected function _getCMSc_CmsPage()
     {
-        $sPage = $this->oxcontents__CMSc_CmsPage->rawValue;
+        $sPage = $this->oxcontents__cmsxidpage->rawValue;
         
         if ( $sPage !== null && $sPage !== false && (string)$sPage !== '' ) {
             return $sPage;
@@ -152,7 +152,7 @@ class cmsconnect_oxcontent extends cmsconnect_oxcontent_parent
      */
     protected function _getCMSc_CmsPageId()
     {
-        $sPageId = $this->oxcontents__CMSc_CmsPageid->rawValue;
+        $sPageId = $this->oxcontents__cmsxidpageid->rawValue;
         
         if ( $sPageId !== null && $sPageId !== false && $sPageId !== '' ) {
             return $sPageId;
