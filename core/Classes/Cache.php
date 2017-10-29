@@ -10,7 +10,7 @@
  */
 abstract class CMSc_Cache
 {
-    abstract protected function _getList ($limit = null, $offset = null);
+    abstract protected function _getList ($limit = null, $offset = null, $aFilters = []);
     abstract protected function _getCount ();
     
     /**
@@ -57,16 +57,16 @@ abstract class CMSc_Cache
     
     /**
      */
-    public function getCount ()
+    public function getCount ($aFilters = [])
     {
-        return $this->_getCount();
+        return $this->_getCount($aFilters);
     }
     
     /**
      */
-    public function getList ($limit = null, $offset = null)
+    public function getList ($limit = null, $offset = null, $aFilters = [])
     {
-        return $this->_getList($limit, $offset);
+        return $this->_getList($limit, $offset, $aFilters);
     }
     
     /**

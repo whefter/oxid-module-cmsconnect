@@ -134,27 +134,13 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
     /**
      * Override
      */
-    protected function _getList ($limit = null, $offset = null)
+    protected function _getStorageKeysList ()
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
-        $aIndex = $this->_getIndex();
+        $aList = $this->_getIndex();
         
-        $iCnt = 0;
-        $aList = [];
-        foreach ( $aIndex as $sCacheKey ) {
-            $iCnt++;
-            if ( $offset !== null && $iCnt <= $offset ) {
-                continue;
-            }
-            if ( $limit !== null && $iCnt > ((int)$offset + $limit) ) {
-                continue;
-            }
-            
-            $aList[$sCacheKey] = $this->_fetchHttpResult($sCacheKey);
-        }
-        
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $aList;
     }

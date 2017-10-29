@@ -12,8 +12,16 @@ class cmsconnect_oxutils extends cmsconnect_oxutils_parent
 {
     public function commitFileCache()
     {
-        CMSc_Cache_LocalPages::get()->commit();
+        $mRet = call_user_func_array('parent::commitFileCache', func_get_args());
         
-        return call_user_func_array('parent::commitFileCache', func_get_args());
+        try {
+            CMSc_Cache_LocalPages::get()->commit();
+            CMSc_Cache_CmsPages::get()->commit();
+        } catch (Exception $ex) {
+//            var_dump(__METHOD__, $ex->getMessage(), $ex->getTraceAsString());
+            // Don't endanger the shop
+        }
+        
+        return $mRet;
     }
 }

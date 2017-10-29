@@ -115,7 +115,7 @@ class CMSc_Cache_LocalPages_memcache extends CMSc_Cache_LocalPages
     /**
      * Override
      */
-    protected function _getList ($limit = null, $offset = null)
+    protected function _getList ($limit = null, $offset = null, $aFilters = [])
     {
         $aIndex = $this->_getIndex();
         

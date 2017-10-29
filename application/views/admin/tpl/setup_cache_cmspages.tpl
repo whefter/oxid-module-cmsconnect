@@ -28,6 +28,8 @@
     <input type="hidden" name="key" value="">
     <input type="hidden" name="language" value="[{ $actlang }]">
     
+    <input type="submit" value="submit" style="display: none;" />
+    
     <h1>
         [{ oxmultilang ident="cmsconnect_setup_cache_cmspages" }]
     </h1>
@@ -41,11 +43,19 @@
     $(document).ready( function () {
         var $editForm = $('#myedit');
         
+        /*
+        $editForm.submit(function (e) {
+            console.warn('submit', e);
+        });
+        */
+        
         var $fncInput = $('[name="fnc"]', $editForm);
         var $keyInput = $('[name="key"]', $editForm);
         
+        var $deleteSelectedBtn = $('#deleteSelected');
         var $deleteAllBtn = $('#deleteAll');
         var $deleteAllGlobalBtn = $('#deleteAllGlobal');
+        var $toggleAllCheckbox = $('#toggleAllCheckbox');
         
         window.deleteCmsPage = function (key)
         {
@@ -53,6 +63,22 @@
             $fncInput.val('deleteCmsPage');
             $editForm.submit();
         };
+        
+        $deleteSelectedBtn.click(function () {
+            var cacheKeys = [];
+            
+            $('[id^="cacheEntrySelect_"]').each( function (index, checkbox) {
+                var $checkbox = $(checkbox);
+                
+                if ($checkbox.attr('checked')) {
+                    cacheKeys.push($checkbox.attr('id').substr('cacheEntrySelect_'.length));
+                }
+            });
+            $('[name="selectedCacheKeysList"]').val(JSON.stringify(cacheKeys));
+            
+            $fncInput.val('deleteCmsPages');
+            $editForm.submit();
+        });
         
         $deleteAllBtn.click(function () {
             $fncInput.val('deleteAllCmsPages');
@@ -63,8 +89,23 @@
             $fncInput.val('deleteAllCmsPagesGlobal');
             $editForm.submit();
         });
+        
+        $toggleAllCheckbox.click(function () {
+            $('[id^="cacheEntrySelect_"]').each( function (index, checkbox) {
+                if ($toggleAllCheckbox.attr('checked')) {
+                    $(checkbox).attr('checked', 'checked');
+                } else {
+                    $(checkbox).attr('checked', false);
+                }
+            });
+        });
     });
     </script>
+    
+    <input type="hidden" name="selectedCacheKeysList" value="" />
+    <button type="button" id="deleteSelected">
+        Ausgewählte Löschen
+    </button>
     
     <button type="button" id="deleteAll">
         Cache leeren
@@ -81,13 +122,37 @@
     <table style="width: 100%;">
         <tr>
             <th style="border: 1px solid grey; border-top: none; border-left: none;">
+                <input type="checkbox" id="toggleAllCheckbox" />
+            </th>
+            <th style="border: 1px solid grey; border-top: none; border-left: none;">
                 URL
+                <div>
+                    <input type="text" name="filters[url]" value="[{ $aFilters.url }]" />
+                </div>
             </th>
             <th style="border: 1px solid grey; border-top: none; border-left: none;">
                 HTTP-Methode
+                <div>
+                    <input type="text" name="filters[http_method]" value="[{ $aFilters.http_method }]" />
+                </div>
             </th>
             <th style="border: 1px solid grey; border-top: none; border-left: none;">
                 POST-Parameter
+                <div>
+                    <input type="text" name="filters[post_params]" value="[{ $aFilters.post_params }]" />
+                </div>
+            </th>
+            <th style="border: 1px solid grey; border-top: none; border-left: none;">
+                ID
+                <div>
+                    <input type="text" name="filters[pageid]" value="[{ $aFilters.pageid }]" />
+                </div>
+            </th>
+            <th style="border: 1px solid grey; border-top: none; border-left: none;">
+                HTTP-Code
+                <div>
+                    <input type="text" name="filters[http_code]" value="[{ $aFilters.http_code }]" />
+                </div>
             </th>
             <th style="border: 1px solid grey; border-top: none; border-left: none;">
                 Cache läuft ab in (hh:mm:ss)
@@ -97,11 +162,16 @@
             </th>
         </tr>
         
-        [{ foreach from=$oCmsPagesCache->getList($iLimit,$iOffset) key=sOxidCacheKey item=oHttpResult }]
+        [{ foreach from=$aList key=sCacheKey item=oHttpResult }]
             [{ assign var=oCmsPage value=$oHttpResult->oCmsPage }]
             <tr>
                 <td style="border: 1px solid grey; border-top: none; border-left: none;">
-                    [{ $oCmsPage->getUrl() }]
+                    <input type="checkbox" id="cacheEntrySelect_[{ $sCacheKey }]" value="1" />
+                </td>
+                <td style="border: 1px solid grey; border-top: none; border-left: none;">
+                    <a href="javascript:showDialog('&cl=cmsconnect_setup_cache_cmspages&fnc=showCacheEntryContent&cacheKey=[{ $sCacheKey }]')">
+                        [{ $oCmsPage->getUrl() }]
+                    </a>
                 </td>
                 <td style="border: 1px solid grey; border-top: none; border-left: none;">
                     [{ if $oCmsPage->isPostPage() }]
@@ -112,6 +182,12 @@
                 </td>
                 <td style="border: 1px solid grey; border-top: none; border-left: none;">
                     [{ $oCmsPage->getPostParams()|@print_r:1 }]
+                </td>
+                <td style="border: 1px solid grey; border-top: none; border-left: none;">
+                    [{ $oCmsPage->getPageId() }]
+                </td>
+                <td style="border: 1px solid grey; border-top: none; border-left: none;">
+                    [{ $oHttpResult->info.http_code }]
                 </td>
                 <td style="border: 1px solid grey; border-top: none; border-left: none;">
                     [{ php }]
@@ -128,12 +204,16 @@
                     [{ $sRemainingTime }]
                 </td>
                 <td style="border: 1px solid grey; border-top: none; border-left: none;">
-                    <a href="javascript:deleteCmsPage('[{ $oCmsPage->getIdent() }]');">Löschen</a>
+                    <a href="javascript:deleteCmsPage('[{ $oCmsPage->getCacheKey() }]');">Löschen</a>
                 </td>
             </tr>
         [{ /foreach }]
     </table>
 </form>
+
+[{ php }]
+t::dAll();
+[{ /php }]
 
 [{ include file="bottomnaviitem.tpl" }]
 [{ include file="bottomitem.tpl" }]

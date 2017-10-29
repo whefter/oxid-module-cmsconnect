@@ -82,7 +82,7 @@ class CMSc_Cache_LocalPages_OxidFileCache extends CMSc_Cache_LocalPages
     /**
      * Override
      */
-    protected function _getList ($limit = null, $offset = null)
+    protected function _getList ($limit = null, $offset = null, $aFilters = [])
     {
         $oxUtils = oxRegistry::get('oxUtils');
         $oxConfig = oxRegistry::getConfig();

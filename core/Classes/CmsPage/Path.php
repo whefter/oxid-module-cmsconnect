@@ -47,7 +47,7 @@ class CMSc_CmsPage_Path extends CMSc_CmsPage
      */
     private function setPagePath ($sCmsPagePath)
     {
-        $this->_sPath = $sCmsPagePath;
+        $this->_sPath = CMSc_Utils::sanitizePageTitle($sCmsPagePath);
     }
     
     /**
@@ -95,5 +95,22 @@ class CMSc_CmsPage_Path extends CMSc_CmsPage
         $aData = unserialize($data);
         
         $this->setPagePath($aData['sPath']);
+    }
+    
+    /**
+     * Attempts to get the page ID by loading the content and accessing the "ID" node
+     *
+     * @return int
+     */
+    public function getPageId ()
+    {
+        $oXml = $this->_getXmlObject();
+        
+        $mValue = false;
+        if ( is_object($oXml) && $oXml->id ) {
+            $mValue = (string) $oXml->id;
+        }
+        
+        return $mValue;
     }
 }

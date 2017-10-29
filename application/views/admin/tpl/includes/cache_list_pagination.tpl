@@ -21,16 +21,18 @@ $(document).ready( function () {
 </script>
 
 <span id="pagination">
-    [{ assign var=iCount value=$oCache->getCount() }]
+    [{ assign var=iCount value=$oCache->getCount($aFilters) }]
     [{ assign var=iTotalPages value=$iCount/$iLimit }]
     [{ assign var=iTotalPages value=$iTotalPages|ceil }]
 
-    [{ if $iCount < ($iOffset + $iLimit) }]
-        [{ assign var=iCurMax value=$iCount }]
-    [{ else }]
-        [{ assign var=iCurMax value=$iOffset+$iLimit }]
+    [{ if $iCount }]
+        [{ if $iCount < ($iOffset + $iLimit) }]
+            [{ assign var=iCurMax value=$iCount }]
+        [{ else }]
+            [{ assign var=iCurMax value=$iOffset+$iLimit }]
+        [{ /if }]
+        ([{ $iOffset+1 }] - [{ $iCurMax }] / [{ $iCount }])
     [{ /if }]
-    ([{ $iOffset+1 }] - [{ $iCurMax }])
     
     [{ assign var=blDotsPrinted value=false }]
     [{ section name=pagination start=1 loop=$iTotalPages+1 step=1 }]

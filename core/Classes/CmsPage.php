@@ -95,7 +95,7 @@ abstract class CMSc_CmsPage implements \Serializable
 
         if ( $oXml instanceof SimpleXMLElement ) {
             try {
-                $aNodes = $oXml->xpath( '/' . $oXml->getName() . '/content/' . $sContentIdent );
+                $aNodes = CMSc_Utils::safeExecuteXPath($oXml, '/' . $oXml->getName() . '/content/' . $sContentIdent );
                 
                 if ( $aNodes !== false && count($aNodes) ) {
                     $oNodeXml = $aNodes[0];
@@ -133,14 +133,14 @@ abstract class CMSc_CmsPage implements \Serializable
             $aContentIdents = array();
         }
         
-        $oXml = $this->_getXmlObject( $oCmsPage );
+        $oXml = $this->_getXmlObject();
         
         $aContents = array();
         
         // Check if returned object is actually valid and has not returned an error,
         // else return empty array.
         if ( is_object($oXml) ) {
-            $aXpathContents = $oXml->xpath('/' . $oXml->getName() . '/content'); 
+            $aXpathContents = CMSc_Utils::safeExecuteXPath($oXml, '/' . $oXml->getName() . '/content');
             
             if ( $aXpathContents !== false && count($aXpathContents) ) {
                 foreach ( $aXpathContents[0] as $sContentIdent => $oCmsPageXml ) {
@@ -189,7 +189,7 @@ abstract class CMSc_CmsPage implements \Serializable
         $oReturnXml = false;
         
         if ( is_object($oXml) ) {
-            $aContents = $oXml->xpath( '/' . $oXml->getName() . '/content/' . $sContentIdent );
+            $aContents = CMSc_Utils::safeExecuteXPath($oXml, '/' . $oXml->getName() . '/content/' . $sContentIdent);
             
             if ( $aContents !== false && count($aContents) ) {
                 $oCmsPageXml = $aContents[0];
@@ -213,8 +213,10 @@ abstract class CMSc_CmsPage implements \Serializable
     protected function _getXmlObject ()
     {
         $sXml = $this->_getXmlSource();
+
+        $oXml = CMSc_Utils::createXmlObjectFromSource($sXml);
         
-        return CMSc_Utils::createXmlObjectFromSource($sXml);
+        return $oXml;
     }
     
     /**
@@ -226,6 +228,18 @@ abstract class CMSc_CmsPage implements \Serializable
     {
         startProfile(__METHOD__);
         
+        $oHttpResult = $this->getHttpResult();
+        
+        // Return an empty string so as not to break anything upstream
+        $sXml = is_object($oHttpResult) ? $oHttpResult->content : '';
+        
+        stopProfile(__METHOD__);
+        
+        return $sXml;
+    }
+    
+    public function getHttpResult ()
+    {
         if ( !$this->getUrl() ) {
             $oHttpResult = false;
         } elseif ( CMSc_Utils::getConfigValue(CMSc_Utils::CONFIG_KEY_ENABLE_TEST_CONTENT) ) {
@@ -238,12 +252,12 @@ abstract class CMSc_CmsPage implements \Serializable
                 CMSc_Cache_LocalPages::get()->registerCmsPage($this);
             }
             
-            // var_dump("Retrieving " . $sSessionCacheUrl . " from session cache");
+//             var_dump("Retrieving " . $sSessionCacheKey . " from session cache");
             $oHttpResult = CMSc_SessionCache::get('results', $sSessionCacheKey);
             
             // No result so far and caching enabled for this content, attempt to read from file cache
             if ( !is_object($oHttpResult) && $blIsCacheable ) {
-                // var_dump("Retrieving " . $oCmsPage->getUrl() . " from file cache");
+//                 var_dump("Retrieving " . $this->getUrl() . " from file cache");
                 
                 // This is URL-based. We want our cache to be dumb; in turn, we have
                 // to be smart about which URL to pass it (see above)
@@ -252,30 +266,23 @@ abstract class CMSc_CmsPage implements \Serializable
             
             // Still no result, fetch from remote
             if ( !is_object($oHttpResult) ) {
-                // var_dump("No cache result, fetching " . $oCmsPage->getUrl() . " from remote");
+//                 var_dump("No cache result, fetching " . $this->getUrl() . " from remote");
                 
                 // If false, we need to fetch from remote
                 $oHttpResult = $this->fetchHttpResultFromRemote();
                 
                 if ( $blIsCacheable ) {
-                    // var_dump("Saving " . $oCmsPage->getUrl() . " to file cache");
+//                     var_dump("Saving " . $this->getUrl() . " to file cache");
                     CMSc_Cache_CmsPages::get()->saveHttpResult($this, $oHttpResult);
                 }
             }
             
             // Save to session cache
-            // var_dump("Saving " . $sSessionCacheKey . " to session cache");
+//             var_dump("Saving " . $sSessionCacheKey . " to session cache");
             CMSc_SessionCache::set('results', $sSessionCacheKey, $oHttpResult);
         }
         
-        // Return an empty string so as not to break anything upstream
-        $sXml = is_object($oHttpResult) ? $oHttpResult->content : '';
-        
-        // echo "</pre>";
-        
-        stopProfile(__METHOD__);
-        
-        return $sXml;
+        return $oHttpResult;
     }
     
     public function fetchHttpResultFromRemote()
@@ -315,7 +322,7 @@ abstract class CMSc_CmsPage implements \Serializable
         $sValue = false;
         
         if ( is_object($oXml) ) {
-            $aXpathResults = $oXml->xpath( '/' . $oXml->getName() . '/metadata/' . $sField );
+            $aXpathResults = CMSc_Utils::safeExecuteXPath($oXml, '/' . $oXml->getName() . '/metadata/' . $sField);
             
             if ( $aXpathResults !== false && count($aXpathResults) == 1 ) {
                 $sValue = CMSc_Utils::getTextContentFromXmlObject( $aXpathResults[0] );
@@ -354,9 +361,9 @@ abstract class CMSc_CmsPage implements \Serializable
         
         $oXml = $this->_getXmlObject();
         if ( is_object($oXml) ) {
-            $aNode = $oXml->xpath( '/' . $oXml->getName() . '/navigation' );
+            $aNode = CMSc_Utils::safeExecuteXPath($oXml, '/' . $oXml->getName() . '/navigation');
             
-            if ( count($aNode) ) {
+            if ( $aNode !== false && count($aNode) ) {
                 $mValue = CMSc_Utils::getTextContentFromXmlObject( $aNode[0] );
                 $mValue = $this->_processTextContent( $mValue );
             }
@@ -472,8 +479,12 @@ abstract class CMSc_CmsPage implements \Serializable
     
     /**
      */
-    public function setPostParams ($aParams)
+    public function setPostParams ($aParams = [])
     {
+        if (!$aParams || !is_array($aParams)) {
+            return;
+        }
+        
         foreach ( $aParams as $sKey => $mVal ) {
             $this->setPostParams($sKey, $mVal);
         }
@@ -518,9 +529,19 @@ abstract class CMSc_CmsPage implements \Serializable
     }
     
     /**
-     *
+     * Returns the cache key for the SessionCache
      */
     public function getSessionCacheKey ()
+    {
+        return $this->getIdent();
+    }
+    
+    /**
+     * Returns the cache key for the CmsPages cache
+     * 
+     * @return type
+     */
+    public function getCacheKey ()
     {
         return $this->getIdent();
     }
@@ -557,12 +578,21 @@ abstract class CMSc_CmsPage implements \Serializable
         $this->setLang($aData['sLang']);
         $this->setGetParams($aData['aGetParams']);
         $this->setPostParams($aData['aPostParams']);
-        
-        // return CMSc_CmsPage::buildFromSerializedData($serialized);
     }
     
-    public static function buildFromSerializedData ($mData)
+    /**
+     * @overridable
+     */
+    public function getPagePath ()
     {
-        return unserialize($mData);
+        return null;
+    }
+    
+    /**
+     * @overridable
+     */
+    public function getPageId ()
+    {
+        return null;
     }
 }

@@ -106,13 +106,15 @@ abstract class CMSc_Cache_LocalPages extends CMSc_Cache
             $sEngine = CMSc_Utils::getConfigValue(CMSc_Utils::CONFIG_KEY_LOCAL_PAGES_CACHE_ENGINE);
             
             if ( $sEngine === CMSc_Utils::VALUE_LOCAL_PAGES_CACHE_ENGINE_AUTO ) {
-                if ( extension_loaded('memcached') ) {
-                    static::$_oInstance = new CMSc_Cache_LocalPages_memcached();
-                } else if ( extension_loaded('memcache') ) {
-                    static::$_oInstance = new CMSc_Cache_LocalPages_memcache();
-                } else {
-                    static::$_oInstance = new CMSc_Cache_LocalPages_DB();
-                }
+                static::$_oInstance = new CMSc_Cache_LocalPages_Disabled();
+                
+//                if ( extension_loaded('memcached') ) {
+//                    static::$_oInstance = new CMSc_Cache_LocalPages_memcached();
+//                } else if ( extension_loaded('memcache') ) {
+//                    static::$_oInstance = new CMSc_Cache_LocalPages_memcache();
+//                } else {
+//                    static::$_oInstance = new CMSc_Cache_LocalPages_DB();
+//                }
             } else {
                 switch ( $sEngine ) {
                     case CMSc_Utils::VALUE_LOCAL_PAGES_CACHE_ENGINE_DISABLED:
@@ -178,10 +180,10 @@ abstract class CMSc_Cache_LocalPages extends CMSc_Cache
         $aKnownPages = $this->getLocalPageCmsPages($sLocalPageCacheKey);
         
         // Not yet compatible with engines besides "DB"
-        // $blExists = in_array($oCmsPage->getIdent(), $aKnownPages);
+        // $blExists = in_array($oCmsPage->getCacheKey(), $aKnownPages);
         $blExists = false;
         foreach ( $aKnownPages as $oKnownPage ) {
-            if ( $oKnownPage->getIdent() === $oCmsPage->getIdent() ) {
+            if ( $oKnownPage->getCacheKey() === $oCmsPage->getCacheKey() ) {
                 $blExists = true;
                 break;
             }
@@ -200,7 +202,7 @@ abstract class CMSc_Cache_LocalPages extends CMSc_Cache
         $this->_getLocalPageCache($sLocalPageCacheKey);
         
         if ( $this->_aPageCache[$sLocalPageCacheKey] ) {
-            $this->_aPageCache[$sLocalPageCacheKey]['pages'][$oCmsPage->getIdent()] = $oCmsPage;
+            $this->_aPageCache[$sLocalPageCacheKey]['pages'][$oCmsPage->getCacheKey()] = $oCmsPage;
         }
     }
     

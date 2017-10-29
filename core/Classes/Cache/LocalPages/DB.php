@@ -66,7 +66,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
     /**
      * Override parent.
      */
-    protected function _getList ($limit = null, $offset = null)
+    protected function _getList ($limit = null, $offset = null, $aFilters = [])
     {
         $oxDb = oxDb::getDb( oxDb::FETCH_MODE_ASSOC );
         $oxConfig = oxRegistry::getConfig();
@@ -174,7 +174,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
                     }
                     
                     $oCmsPage = unserialize($aPageRow['cmspagedata']);
-                    // $sCmsPageCacheKey = $oCmsPage->getIdent();
+                    // $sCmsPageCacheKey = $oCmsPage->getCacheKey();
                     
                     $aCache['pages'][$aPageRow['cmspagekey']] = $oCmsPage;
                 }
@@ -271,7 +271,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
                         
                         $aSqls[] = "
                             (
-                                " . $oxDb->quote($oCmsPage->getIdent()) . ",
+                                " . $oxDb->quote($oCmsPage->getCacheKey()) . ",
                                 " . $oxDb->quote(serialize($oCmsPage)) . "
                             )
                         ";
@@ -316,7 +316,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
                             (
                                 '" . $oxConfig->getShopId() . "',
                                 " . $oxDb->quote($sCacheKey) . ",
-                                " . $oxDb->quote($oCmsPage->getIdent()) . "
+                                " . $oxDb->quote($oCmsPage->getCacheKey()) . "
                             )
                         ";
                     }

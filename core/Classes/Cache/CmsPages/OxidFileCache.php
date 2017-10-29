@@ -20,7 +20,6 @@ class CMSc_Cache_CmsPages_OxidFileCache extends CMSc_Cache_CmsPages
         startProfile(__METHOD__);
         
         $sCacheName = $this->_getCacheFilenameFromKey($sCacheKey);
-        
         $blSuccess = oxRegistry::get('oxUtils')->toFileCache($sCacheName, $oHttpResult);
         
         stopProfile(__METHOD__);
@@ -54,7 +53,10 @@ class CMSc_Cache_CmsPages_OxidFileCache extends CMSc_Cache_CmsPages
         $sCacheName = $this->_getCacheFilenameFromKey($sCacheKey);
         
         $sFilePath = oxRegistry::get('oxUtils')->getCacheFilePath($sCacheName);
-        unlink($sFilePath);
+        
+        if (file_exists($sFilePath)) {
+            unlink($sFilePath);
+        }
     }
     
     /**
@@ -70,53 +72,29 @@ class CMSc_Cache_CmsPages_OxidFileCache extends CMSc_Cache_CmsPages
     /**
      * Override
      */
-    public function _getCount ()
+    protected function _getStorageKeysList ()
     {
-        $oxUtils = oxRegistry::get('oxUtils');
-        $oxConfig = oxRegistry::getConfig();
-        
-        $sOxidCachePrefix = $this->_getCachePrefix();;
-        
-        $aFiles = glob($oxUtils->getCacheFilePath(null, true) . '*' . $sOxidCachePrefix . '*');
-        
-        return count($aFiles);
-    }
-    
-    /**
-     * Override
-     */
-    protected function _getList ($limit = null, $offset = null)
-    {
-        startProfile(__METHOD__);
+        t::s('OxidFileCache::_getStorageKeysList');
         
         $oxUtils = oxRegistry::get('oxUtils');
         
         $sOxidCachePrefix = $this->_getCachePrefix();
-        
-        $aFiles = glob($oxUtils->getCacheFilePath(null, true) . '*' . $sOxidCachePrefix . '*');
-
-        $iCnt = 0;
         $aList = [];
-        if ( is_array($aFiles) ) {
-            foreach ( $aFiles as $sFilePath ) {
-                $iCnt++;
-                if ( $offset !== null && $iCnt <= $offset ) {
-                    continue;
-                }
-                if ( $limit !== null && $iCnt > ((int)$offset + $limit) ) {
-                    continue;
-                }
-                
-                $sOxidCacheKey = substr($sFilePath, strrpos($sFilePath, $sOxidCachePrefix));
-                $sOxidCacheKey = substr($sOxidCacheKey, 0, strrpos($sOxidCacheKey, '.'));
-                
-                $sCacheKey = substr($sOxidCacheKey, strlen($sOxidCachePrefix));
-
-                $aList[$sCacheKey] = oxRegistry::get('oxUtils')->fromFileCache( $sOxidCacheKey );
+        
+        $iterator = new DirectoryIterator($oxUtils->getCacheFilePath(null, true));
+        foreach ( $iterator as $oFileInfo ) {
+            if (strpos($oFileInfo->getFilename(), $sOxidCachePrefix) === false) {
+                continue;
             }
+            
+            $sCacheKey = substr($oFileInfo->getFilename(), strrpos($oFileInfo->getFilename(), $sOxidCachePrefix));
+            $sCacheKey = substr($sCacheKey, 0, strrpos($sCacheKey, '.'));
+            $sCacheKey = substr($sCacheKey, strlen($sOxidCachePrefix));
+
+            $aList[] = $sCacheKey;
         }
         
-        stopProfile(__METHOD__);
+        t::e('OxidFileCache::_getStorageKeysList');
         
         return $aList;
     }

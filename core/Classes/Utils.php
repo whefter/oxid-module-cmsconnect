@@ -52,7 +52,11 @@ class CMSc_Utils
         CONFIG_DEFAULTVALUE_TTL                     = 36000,
         CONFIG_DEFAULTVALUE_TTL_RND                 = 10,
         CONFIG_DEFAULTVALUE_CURL_EXECUTE_TIMEOUT    = 1000,
-        CONFIG_DEFAULTVALUE_CURL_CONNECT_TIMEOUT    = 1000
+        CONFIG_DEFAULTVALUE_CURL_CONNECT_TIMEOUT    = 1000,
+        
+        DB_TABLE_CACHE_CMSPAGES      = 'wh_cmsc_cache_cmspages',
+        DB_TABLE_CACHE_HTTPRESULTS   = 'wh_cmsc_cache_httpresults'
+        
         ;
     
     /**
@@ -585,21 +589,56 @@ class CMSc_Utils
         startProfile(__METHOD__);
         
         try {
-            libxml_use_internal_errors(true);
+            $previousValue = libxml_use_internal_errors(true);
+            libxml_clear_errors();
             
             $oXml = simplexml_load_string($sXmlSource);
             
             $aErrors = libxml_get_errors();
             if ( count($aErrors) ) {
-                throw new Exception('XML parsing error');
+                libxml_clear_errors();
+                throw new Exception('XML parsing error(s)');
             }
         } catch ( Exception $ex ) {
             $oXml = false;
+        } finally {
+            libxml_use_internal_errors($previousValue);
         }
         
         stopProfile(__METHOD__);
         
         return $oXml;
+    }
+    
+    /**
+     * Wraps the execution of ->xpath() on a SimpleXMLObject to prevent errors
+     * or warnings from popping up in the frontend
+     * 
+     * @param type $oXml
+     * @param type $sPath
+     * @return boolean
+     * @throws Exception
+     */
+    public static function safeExecuteXPath ($oXml, $sPath)
+    {
+        try {
+            $previousValue = libxml_use_internal_errors(true);
+            libxml_clear_errors();
+            
+            $mResult = $oXml->xpath($sPath);
+            
+            $aErrors = libxml_get_errors();
+            if ( count($aErrors) ) {
+                throw new Exception('XPath error(s)');
+            }
+        } catch ( Exception $ex ) {
+            $mResult = false;
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previousValue);
+        }
+        
+        return $mResult;
     }
     
     /**
@@ -944,5 +983,32 @@ class CMSc_Utils
     </breadcrumb>
 </cmsconnect>
 EOF;
+    }
+    
+    /**
+     * PHP < 7.0 has abysmal performance on array_diff. This is a wrapper
+     * that calls the native array_diff for PHP >= 7.0 and performans a different,
+     * fast algorithm for other PHP versions.
+     * 
+     * @param type $arr1
+     * @param type $arr2
+     * @return array
+     */
+    public function fastArrayDiff (&$arr1, &$arr2)
+    {
+        if (version_compare(phpversion(), '7', '>=')) {
+            return array_diff($arr1, $arr2);
+        } else {
+            $newArr = [];
+            
+            $flippedTwo = array_flip($arr2);
+            foreach ($arr1 as $item) {
+                if (!isset($flippedTwo[$item])) {
+                    $newArr[] = $item;
+                }
+            }
+            
+            return $newArr;
+        }
     }
 }
