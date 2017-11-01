@@ -6,7 +6,7 @@ $aModule = array(
     'title'             => 'CMSconnect',
     'email'             => 'william@whefter.de',
     'url'               => 'http://www.whefter.de',
-    'version'           => '1.2.1',
+    'version'           => '1.2.2',
     'author'            => 'William Hefter',
     'description'       => array(
         'de'    => 'Erlaubt das Einbinden von CMS-Inhalten im OXID eShop. <p class="warning">Benötigt das whbase (wh Module Extensions)-Modul.</p>',
