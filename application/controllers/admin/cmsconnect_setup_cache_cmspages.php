@@ -35,7 +35,11 @@ class cmsconnect_setup_cache_cmspages extends cmsconnect_setup_main
         $iOffset = ($iPage - 1) * $iLimit;
         
         $aFulltextFilters = is_array($aFilters) ? array_map( function ($filter) {
-            return '%' . $filter . '%';
+            if ($filter || $filter === 0 || $filter === '0') {
+                return '%' . $filter . '%';
+            } else {
+                return '';
+            }
         }, $aFilters) : [];
         
         $this->_aViewData['iPage'] = $iPage;
