@@ -115,9 +115,7 @@
         Cache für ALLE SHOPS leeren (!)
     </button>
     
-    [{ include  file="modules/wh/cmsconnect/admin/includes/cache_list_pagination.tpl"
-                oCache=$oCmsPagesCache
-    }]
+    [{ include  file="modules/wh/cmsconnect/admin/includes/cache_list_pagination.tpl" }]
     
     <table style="width: 100%;">
         <tr>

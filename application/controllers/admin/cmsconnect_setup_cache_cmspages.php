@@ -43,6 +43,7 @@ class cmsconnect_setup_cache_cmspages extends cmsconnect_setup_main
         $this->_aViewData['iLimit'] = $iLimit;
         $this->_aViewData['iOffset'] = $iOffset;
         $this->_aViewData['aList'] = $oCmsPagesCache->getList($iLimit, $iOffset, $aFulltextFilters);
+        $this->_aViewData['iCount'] = $oCmsPagesCache->getCount($aFulltextFilters);
         $this->_aViewData['aFilters'] = $aFilters;
 
         // return get_called_class() . '.tpl';

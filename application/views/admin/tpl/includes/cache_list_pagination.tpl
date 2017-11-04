@@ -21,7 +21,6 @@ $(document).ready( function () {
 </script>
 
 <span id="pagination">
-    [{ assign var=iCount value=$oCache->getCount($aFilters) }]
     [{ assign var=iTotalPages value=$iCount/$iLimit }]
     [{ assign var=iTotalPages value=$iTotalPages|ceil }]
 
