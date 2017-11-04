@@ -10,6 +10,13 @@
  */
 class CMSc_Utils
 {
+    /**
+     * Constant holding the module name for usage in saveShopConfVar
+     *
+     * @var string
+     */
+    const CONFIG_MODULE_NAME = 'cmsconnect';
+    
     const
         TYPE_IDENTIFIER_PATH            = 1,
         TYPE_IDENTIFIER_ID              = 2,
@@ -56,7 +63,6 @@ class CMSc_Utils
         
         DB_TABLE_CACHE_CMSPAGES      = 'wh_cmsc_cache_cmspages',
         DB_TABLE_CACHE_HTTPRESULTS   = 'wh_cmsc_cache_httpresults'
-        
         ;
     
     /**
@@ -96,19 +102,27 @@ class CMSc_Utils
      */
     public static function getConfigValue ($sKey)
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $mVal = CMSc_SessionCache::get('config', $sKey);
         
         if ( $mVal === null ) {
-            $oxConfig = oxRegistry::getConfig();
+            t::s('cache miss');
             
-            $mVal = $oxConfig->getShopConfVar($sKey, $oxConfig->getShopId(), 'module:cmsconnect');
+            $oxConfig = oxRegistry::getConfig();
+            $aSetting = static::getMetadataSetting($sKey);
+            $sShopId = $aSetting['global'] ? $oxConfig->getBaseShopId() : $oxConfig->getShopId();
+            
+//            var_dump_pre(__METHOD__, '$sKey', $sKey, '$aSetting', $aSetting, '$sShopId', $sShopId);
+            
+            $mVal = $oxConfig->getShopConfVar($sKey, $sShopId, 'module:' . static::CONFIG_MODULE_NAME);
             
             CMSc_SessionCache::set('config', $sKey, $mVal);
+            t::e('cache miss');
         }
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
+//        var_dump_pre(__METHOD__, '$sKey', $sKey, '$mVal', $mVal);
         
         return $mVal;
     }
@@ -124,7 +138,7 @@ class CMSc_Utils
      */
     public static function getLangConfigValue ($sKey, $sLang = null)
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $aVal = CMSc_Utils::getConfigValue($sKey);
         
@@ -140,7 +154,7 @@ class CMSc_Utils
             $mVal = $aVal[$sLang];
         }
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $mVal;
     }
@@ -154,7 +168,7 @@ class CMSc_Utils
      */
     protected static function _getStandardLanguageIdentifier ($sLang)
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $sLangMapped = CMSc_SessionCache::get('langIdentMap', $sLang);
 
@@ -171,7 +185,7 @@ class CMSc_Utils
             $sLangMapped = CMSc_SessionCache::get('langIdentMap', $sLang);
         }
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $sLangMapped;
     }
@@ -192,7 +206,7 @@ class CMSc_Utils
             return false;
         }
         
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $oxConfig       = oxRegistry::getConfig();
         $blSsl          = $oxConfig->isSsl();
@@ -214,7 +228,7 @@ class CMSc_Utils
                             . $sParams
                         ;
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return static::sanitizeUrl($sFullPageUrl);
     }
@@ -236,7 +250,7 @@ class CMSc_Utils
             return false;
         }
         
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $oxConfig       = oxRegistry::getConfig();
         $blSsl          = $oxConfig->isSsl();
@@ -264,7 +278,7 @@ class CMSc_Utils
                             . $sParams
                         ;
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return static::sanitizeUrl($sFullPageUrl);
     }
@@ -281,7 +295,7 @@ class CMSc_Utils
      */
     public static function sanitizeUrl ($sUnsanitizedUrl)
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $sSanitizedUrl = CMSc_SessionCache::get('urls', $sUnsanitizedUrl);
         
@@ -304,7 +318,7 @@ class CMSc_Utils
             CMSc_SessionCache::set('urls', $sUnsanitizedUrl, $sSanitizedUrl);
         }
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $sSanitizedUrl;
     }
@@ -321,7 +335,7 @@ class CMSc_Utils
      */
     public static function sanitizePageTitle ( $sUnsanitizedTitle )
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $sSanitizedTitle = CMSc_SessionCache::get('title', $sUnsanitizedTitle);
         
@@ -381,7 +395,7 @@ class CMSc_Utils
             CMSc_SessionCache::set('title', $sUnsanitizedTitle, $sSanitizedTitle);
         }
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $sSanitizedTitle;
     }
@@ -395,7 +409,7 @@ class CMSc_Utils
      */
     public static function getTextContentFromXmlObject ( $oXml )
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $sText = '';
         
@@ -422,7 +436,7 @@ class CMSc_Utils
             }
         }
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $sText;
     }
@@ -562,7 +576,7 @@ class CMSc_Utils
      */
     public static function fixXmlSourceEntities ( $sXml )
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $sXml = str_replace('&nbsp;', '&#160;', $sXml);
         
@@ -572,7 +586,7 @@ class CMSc_Utils
         // var_dump(__METHOD__, $sXml);
         // die;
 
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $sXml;
     }
@@ -586,7 +600,7 @@ class CMSc_Utils
      */
     public static function createXmlObjectFromSource ($sXmlSource)
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         try {
             $previousValue = libxml_use_internal_errors(true);
@@ -605,7 +619,7 @@ class CMSc_Utils
             libxml_use_internal_errors($previousValue);
         }
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $oXml;
     }
@@ -651,14 +665,14 @@ class CMSc_Utils
      */
     public static function unwrapCDATA( $sXml )
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $oStr = getStr();
         
         // Remove CDATA tag
         $sXml = $oStr->preg_replace( '/<!\[CDATA\[(.*?)\]\]>/ms', '\\1', $sXml );
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $sXml;
     }
@@ -684,7 +698,7 @@ class CMSc_Utils
      */
     public static function getPageSeoInfoByUrl ( $sSeoUrl )
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $oxConfig   = oxRegistry::getConfig();
         $oxLang     = oxRegistry::getLang();
@@ -712,7 +726,7 @@ class CMSc_Utils
             }
         }
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $aSeoInfo;
     }
@@ -726,13 +740,13 @@ class CMSc_Utils
      */
     public static function rewriteTextContentLinks ( $sTextContent )
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $oxConfig = oxRegistry::getConfig();
         $oxLang   = oxRegistry::getLang();
         
         if ( static::getConfigValue(CMSc_Utils::CONFIG_KEY_URL_REWRITING) === static::VALUE_URL_REWRITING_NONE ) {
-            stopProfile(__METHOD__);
+            t::e(__METHOD__);
             
             return $sTextContent;
         }
@@ -778,7 +792,7 @@ class CMSc_Utils
             // }
         }
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
 
         return $sTextContent;
     }
@@ -792,7 +806,7 @@ class CMSc_Utils
      */
     public static function rewriteUrl ( $sUrl )
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $oxConfig = oxRegistry::getConfig();
         $oxLang   = oxRegistry::getLang();
@@ -824,7 +838,7 @@ class CMSc_Utils
             }
         }
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
 
         return $sUrl;
     }
@@ -838,7 +852,7 @@ class CMSc_Utils
      */
     public static function fixTextContentEncoding ( $sContent )
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $oxConfig = oxRegistry::getConfig();
         
@@ -856,7 +870,7 @@ class CMSc_Utils
             $sContent = mb_convert_encoding( $sContent, $sContentEncoding, 'UTF-8' );
         }
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $sContent;
     }
@@ -884,7 +898,7 @@ class CMSc_Utils
      */
     public static function parseTextContentThroughSmarty ( $sContent )
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $oxUtilsView = oxRegistry::get('oxUtilsView');
         
@@ -897,7 +911,7 @@ class CMSc_Utils
             true
         );
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $sContent;
     }
@@ -994,7 +1008,7 @@ EOF;
      * @param type $arr2
      * @return array
      */
-    public function fastArrayDiff (&$arr1, &$arr2)
+    public static function fastArrayDiff (&$arr1, &$arr2)
     {
         if (version_compare(phpversion(), '7', '>=')) {
             return array_diff($arr1, $arr2);
@@ -1010,5 +1024,45 @@ EOF;
             
             return $newArr;
         }
+    }
+    
+    public static function getMetadataSettings ()
+    {
+        t::s('getMetadataSettings');
+        
+        if (!CMSc_SessionCache::get('metadata', 'settings')) {
+            t::s('cache miss');
+            
+            $oxModule = oxNew('oxmodule');
+            $oxModule->load(static::CONFIG_MODULE_NAME);
+
+            CMSc_SessionCache::set('metadata', 'settings', $oxModule->getInfo('settings'));
+            
+            t::e('cache miss');
+        }
+        
+        t::e('getMetadataSettings');
+        return CMSc_SessionCache::get('metadata', 'settings');
+    }
+    
+    public static function getMetadataSetting ($sKey)
+    {
+        t::s('getMetadataSetting');
+        
+        $sCacheKey = "setting$sKey";
+        
+        if (!CMSc_SessionCache::get('metadata', $sCacheKey)) {
+            t::s('cache miss');
+            
+            $aSettings = static::getMetadataSettings();
+            $aSetting = array_filter($aSettings, function ($aSetting) use ($sKey) { return $aSetting['name'] === $sKey; });
+            
+            CMSc_SessionCache::set('metadata', $sCacheKey, reset($aSetting));
+            
+            t::e('cache miss');
+        }
+        
+        t::e('getMetadataSetting');
+        return CMSc_SessionCache::get('metadata', $sCacheKey);
     }
 }

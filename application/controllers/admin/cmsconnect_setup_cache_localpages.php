@@ -16,7 +16,6 @@ class cmsconnect_setup_cache_localpages extends cmsconnect_setup_main
     public function render()
     {
         $oxConfig = oxRegistry::getConfig();
-        $sShopId  = $oxConfig->getShopId();
         
         $this->_aViewData['oLocalPagesCache'] = CMSc_Cache_LocalPages::get();
         $this->_aViewData['oCmsPagesCache'] = CMSc_Cache_CmsPages::get();

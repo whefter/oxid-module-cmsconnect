@@ -17,12 +17,12 @@ class CMSc_Cache_CmsPages_OxidFileCache extends CMSc_Cache_CmsPages
      */
     protected function _saveHttpResult ($sCacheKey, $oHttpResult)
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $sCacheName = $this->_getCacheFilenameFromKey($sCacheKey);
         $blSuccess = oxRegistry::get('oxUtils')->toFileCache($sCacheName, $oHttpResult);
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $blSuccess;
     }
@@ -32,13 +32,13 @@ class CMSc_Cache_CmsPages_OxidFileCache extends CMSc_Cache_CmsPages
      */
     protected function _fetchHttpResult ($sCacheKey)
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $sCacheName = $this->_getCacheFilenameFromKey($sCacheKey);
         
         $oHttpResult = oxRegistry::get('oxUtils')->fromFileCache($sCacheName);
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $oHttpResult;
     }
@@ -48,7 +48,7 @@ class CMSc_Cache_CmsPages_OxidFileCache extends CMSc_Cache_CmsPages
      */
     protected function _deleteHttpResult ($sCacheKey)
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $sCacheName = $this->_getCacheFilenameFromKey($sCacheKey);
         
@@ -57,6 +57,8 @@ class CMSc_Cache_CmsPages_OxidFileCache extends CMSc_Cache_CmsPages
         if (file_exists($sFilePath)) {
             unlink($sFilePath);
         }
+        
+        t::e(__METHOD__);
     }
     
     /**

@@ -21,7 +21,7 @@ class cmsconnect_oxseoencoder extends cmsconnect_oxseoencoder_parent
      */
     public function getStaticUrl($sStdUrl, $iLang = null, $iShopId = null)
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $oxConfig   = oxRegistry::getConfig();
         $oxLang     = oxRegistry::getLang();
@@ -55,7 +55,7 @@ class cmsconnect_oxseoencoder extends cmsconnect_oxseoencoder_parent
             $this->_aStaticUrlCache[$sStdUrl][$iLang][$iShopId] = $sSeoUrl;
         }
     
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return parent::getStaticUrl($sStdUrl, $iLang, $iShopid);
     }

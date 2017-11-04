@@ -17,7 +17,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
      */
     protected function _deleteLocalPageCache ($sCacheKey)
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $oxDb = oxDb::getDb( oxDb::FETCH_MODE_ASSOC );
         $oxConfig = oxRegistry::getConfig();
@@ -28,7 +28,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
                 wh_cmsc_cache_localpages
             WHERE
                 `key` = " . $oxDb->quote($sCacheKey) . "
-                AND oxshopid = '" . $oxConfig->getShopId() . "'
+                AND oxshopid = '" . $this->getShopId() . "'
             ;
         ";
         $sSql2 = "
@@ -37,13 +37,13 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
                 wh_cmsc_cache_localpage2cmspage
             WHERE
                 `localpagekey` = " . $oxDb->quote($sCacheKey) . "
-                AND oxshopid = '" . $oxConfig->getShopId() . "'
+                AND oxshopid = '" . $this->getShopId() . "'
             ;
         ";
         $oxDb->query($sSql1);
         $oxDb->query($sSql2);
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
     }
     
     public function _getCount ()
@@ -57,7 +57,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
             FROM
                 wh_cmsc_cache_localpages
             WHERE
-                oxshopid = '" . $oxConfig->getShopId() . "'
+                oxshopid = '" . $this->getShopId() . "'
         ";
         
         return $oxDb->getOne($sSql);
@@ -78,7 +78,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
             FROM
                 wh_cmsc_cache_localpages as localpages
             WHERE
-                localpages.oxshopid = '" . $oxConfig->getShopId() . "'
+                localpages.oxshopid = '" . $this->getShopId() . "'
             " . ($offset !== null
                     ? ("LIMIT $offset" . ($limit !== null ? ",$limit" : ""))
                     : ""
@@ -114,7 +114,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
                     cmspages.key = l2c.cmspagekey
             WHERE
                 l2c.localpagekey IN (" . (count($aKeys) ? implode(',', $aKeys) : 'NULL') . ")
-                AND l2c.oxshopid = '" . $oxConfig->getShopId() . "'
+                AND l2c.oxshopid = '" . $this->getShopId() . "'
         ";
         $aCmsPages = $oxDb->getAll($sSql);
         
@@ -150,7 +150,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
                     wh_cmsc_cache_cmspages as cmspages
                     ON
                         cmspages.key = l2c.cmspagekey
-                        AND l2c.oxshopid = '" . $oxConfig->getShopId() . "'
+                        AND l2c.oxshopid = '" . $this->getShopId() . "'
                 WHERE
                     l2c.localpagekey = " . $oxDb->quote($sCacheKey) . "
             ";
@@ -212,7 +212,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
                     wh_cmsc_cache_localpages
                 WHERE
                     `key` = " . $oxDb->quote($sCacheKey) . "
-                    AND oxshopid = '" . $oxConfig->getShopId() . "'
+                    AND oxshopid = '" . $this->getShopId() . "'
                 ;
             ";
             $blExists = (bool)$oxDb->getOne($sSql);
@@ -228,7 +228,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
                     )
                     VALUES
                     (
-                        '" . $oxConfig->getShopId() . "',
+                        '" . $this->getShopId() . "',
                         " . $oxDb->quote($sCacheKey) . ",
                         " . $oxDb->quote(serialize( $this->_getCurrentLocalPageData() )) . "
                     );
@@ -290,7 +290,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
                         wh_cmsc_cache_localpage2cmspage
                     WHERE
                         localpagekey = " . $oxDb->quote($sCacheKey) . "
-                        AND oxshopid = '" . $oxConfig->getShopId() . "'
+                        AND oxshopid = '" . $this->getShopId() . "'
                 ";
                 $aDbPageKeys = $oxDb->getCol($sLinkSql);
                 
@@ -314,7 +314,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
                         
                         $aSqls[] = "
                             (
-                                '" . $oxConfig->getShopId() . "',
+                                '" . $this->getShopId() . "',
                                 " . $oxDb->quote($sCacheKey) . ",
                                 " . $oxDb->quote($oCmsPage->getCacheKey()) . "
                             )

@@ -11,85 +11,6 @@
 class cmsconnect_setup_main extends oxAdminView
 {
     /**
-     * Configures the variables used by this module.
-     *
-     * @var mixed[]
-     */
-    protected $_aModuleSettings = array(
-        array(  'name'      => 'aCMScBaseUrls',
-                'type'      => 'arr',
-                'global'    => false,
-            ),
-        array(  'name'      => 'aCMScBaseSslUrls',
-                'type'      => 'arr',
-                'global'    => false,
-            ),
-        array(  'name'      => 'aCMScPagePaths',
-                'type'      => 'arr',
-                'global'    => false,
-            ),
-        array(  'name'      => 'aCMScLangParams',
-                'type'      => 'arr',
-                'global'    => false,
-            ),
-        array(  'name'      => 'aCMScIdParams',
-                'type'      => 'arr',
-                'global'    => false,
-            ),
-        array(  'name'      => 'aCMScParams',
-                'type'      => 'arr',
-                'global'    => false,
-            ),
-        array(  'name'      => 'aCMScSeoIdents',
-                'type'      => 'arr',
-                'global'    => false,
-            ),
-        array(  'name'      => 'sCMScUrlRewriting',
-                'type'      => 'str',
-                'global'    => false,
-            ),
-        array(  'name'      => 'sCMScTtlDefault',
-                'type'      => 'str',
-                'global'    => false,
-            ),
-        array(  'name'      => 'sCMScTtlDefaultRnd',
-                'type'      => 'str',
-                'global'    => false,
-            ),
-        array(  'name'      => 'sCMScCurlConnectTimeout',
-                'type'      => 'str',
-                'global'    => false,
-            ),
-        array(  'name'      => 'sCMScCurlExecuteTimeout',
-                'type'      => 'str',
-                'global'    => false,
-            ),
-        array(  'name'      => 'blCMScEnableTestContent',
-                'type'      => 'bool',
-                'global'    => false,
-            ),
-        array(  'name'      => 'blCMScSslDontVerifyPeer',
-                'type'      => 'bool',
-                'global'    => false,
-            ),
-        array(  'name'      => 'sCMScLocalPageCacheEngine',
-                'type'      => 'str',
-                'global'    => false,
-            ),
-        array(  'name'      => 'sCMScCmsPageCacheEngine',
-                'type'      => 'str',
-                'global'    => false,
-            ),
-    );
-
-    /**
-     * Constant holding the module name for usage in saveShopConfVar
-     *
-     * @var string
-     */
-    const CONFIG_MODULE_NAME = 'cmsconnect';
-    
-    /**
      * Constructor. Sets the template variable to the current class name with .tpl suffix
      *
      * @return string
@@ -112,10 +33,10 @@ class cmsconnect_setup_main extends oxAdminView
         $oxConfig   = oxRegistry::getConfig();
         $sShopId    = $oxConfig->getShopId();
         
-        foreach ( $this->_aModuleSettings as $aSetting ) {
+        foreach ( CMSc_Utils::getMetadataSettings() as $aSetting ) {
             // For global settings, the associated shop id is the base shop id.
             $iTargetShopId = $aSetting['global'] ? $oxConfig->getBaseShopId() : $sShopId;
-            $this->_aViewData[ $aSetting['name'] ] = $oxConfig->getShopConfVar( $aSetting['name'], $iTargetShopId, 'module:' . static::CONFIG_MODULE_NAME );
+            $this->_aViewData[ $aSetting['name'] ] = $oxConfig->getShopConfVar( $aSetting['name'], $iTargetShopId, 'module:' . CMSc_Utils::CONFIG_MODULE_NAME );
         }
 
         return parent::render();
@@ -137,7 +58,7 @@ class cmsconnect_setup_main extends oxAdminView
             $aParams = array();
         }
         
-        foreach ( $this->_aModuleSettings as $aSetting ) {
+        foreach ( CMSc_Utils::getMetadataSettings() as $aSetting ) {
             // Don't overwrite params just because they're not implemented in the current page
             if ( !array_key_exists($aSetting['name'], $aParams) ) {
                 continue;
@@ -152,7 +73,7 @@ class cmsconnect_setup_main extends oxAdminView
             
             // For global settings, the associated shop id is the base shop id.
             $iTargetShopId = $aSetting['global'] ? $oxConfig->getBaseShopId() : $sShopId;
-            $oxConfig->saveShopConfVar( $aSetting['type'], $aSetting['name'], $aParams[ $aSetting['name'] ], $iTargetShopId, 'module:' . self::CONFIG_MODULE_NAME );
+            $oxConfig->saveShopConfVar( $aSetting['type'], $aSetting['name'], $aParams[ $aSetting['name'] ], $iTargetShopId, 'module:' . CMSc_Utils::CONFIG_MODULE_NAME );
         }
     }
 }

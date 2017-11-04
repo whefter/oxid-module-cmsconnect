@@ -27,10 +27,7 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
      *
      * @var
      */
-    protected $_aIndexCommitCache = [
-        'add' => [],
-        'delete' => [],
-    ];
+    protected $_aIndexCommitCache = [];
     
     /**
      * Singleton instance getter
@@ -91,7 +88,7 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
      */
     public function saveHttpResult ($oCmsPage, $oHttpResult, $iTtl = null)
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         // Figure out cache TTL
         if ( $iTtl === null ) {
@@ -118,7 +115,7 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
             $this->_storePageIndexEntry($oCmsPage, $oHttpResult);
         }
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $blSuccess;
     }
@@ -144,7 +141,7 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
      */
     public function fetchHttpResultByCacheKey ($sCacheKey)
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $oResult = $this->_fetchHttpResult($sCacheKey);
         
@@ -156,7 +153,7 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
             }
         }
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $oResult;
     }
@@ -182,13 +179,13 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
      */
     public function deleteHttpResultByCacheKey ($sCacheKey)
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $mReturn = $this->_deleteHttpResult($sCacheKey);
         
         $this->_deletePageIndexEntryByCacheKey($sCacheKey);
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $mReturn;
     }
@@ -201,7 +198,9 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
      */
     protected function _storePageIndexEntry ($oCmsPage)
     {
-        $this->_aIndexCommitCache['add'][] = $oCmsPage;
+        $this->_initIndexCommitCache();
+        
+        $this->_aIndexCommitCache[$this->getShopId()]['add'][] = $oCmsPage;
     }
     
     /**
@@ -212,7 +211,19 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
      */
     protected function _deletePageIndexEntryByCacheKey ($sCacheKey)
     {
-        $this->_aIndexCommitCache['deleteCacheKeys'][] = $sCacheKey;
+        $this->_initIndexCommitCache();
+        
+        $this->_aIndexCommitCache[$this->getShopId()]['deleteCacheKeys'][] = $sCacheKey;
+    }
+    
+    protected function _initIndexCommitCache ()
+    {
+        if (!is_array($this->_aIndexCommitCache[$this->getShopId()])) {
+            $this->_aIndexCommitCache[$this->getShopId()] = [
+                'add' => [],
+                'deleteCacheKeys' => [],
+            ];
+        }
     }
     
     /**
@@ -315,7 +326,7 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
             FROM
                 `" . CMSc_Utils::DB_TABLE_CACHE_HTTPRESULTS . "`
             WHERE 1
-                AND oxshopid = " . $oxDb->quote($oxConfig->getShopId()) . "
+                AND oxshopid = " . $oxDb->quote($this->getShopId()) . "
         ";
         
         if ($aFilters && is_array($aFilters) && count($aFilters)) {
@@ -362,106 +373,113 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
         t::s(__METHOD__);
         
         $oxDb = oxDb::getDb( oxDb::FETCH_MODE_ASSOC );
-        $oxConfig = oxRegistry::getConfig();
         
-        if (count($this->_aIndexCommitCache['deleteCacheKeys'])) {
-            t::s('delete');
-            $oxDb->query("
-                DELETE FROM
-                    `" . CMSc_Utils::DB_TABLE_CACHE_HTTPRESULTS . "`
-                WHERE 1
-                    AND `key` IN (" . implode(', ', array_map([$oxDb, 'quote'], $this->_aIndexCommitCache['deleteCacheKeys'])) . ")
-                    AND oxshopid = " . $oxDb->quote($oxConfig->getShopId()) . "
-            ");
-            
-            $this->_aIndexCommitCache['deleteCacheKeys'] = [];
-            t::e('delete');
-        }
-        
-        if (count($this->_aIndexCommitCache['add'])) {
-            t::s('add');
-            
-            $aKeysToAdd = [];
-            foreach ($this->_aIndexCommitCache['add'] as $oCmsPage) {
-                $aKeysToAdd[] = $oCmsPage->getCacheKey();
+        foreach ($this->_aIndexCommitCache as $sShopId => &$aCache) {
+            if (count($aCache['deleteCacheKeys'])) {
+                t::s('delete');
+                $oxDb->query("
+                    DELETE FROM
+                        `" . CMSc_Utils::DB_TABLE_CACHE_HTTPRESULTS . "`
+                    WHERE 1
+                        AND `key` IN (" . implode(', ', array_map([$oxDb, 'quote'], $aCache['deleteCacheKeys'])) . ")
+                        AND oxshopid = " . $oxDb->quote($sShopId) . "
+                ");
+
+                $aCache['deleteCacheKeys'] = [];
+                t::e('delete');
             }
-            
-            $sSql = "
-                SELECT
-                    `key`
-                FROM
-                    `" . CMSc_Utils::DB_TABLE_CACHE_HTTPRESULTS . "`
-                WHERE 1
-                    AND `key` IN (" . implode(', ', array_map([$oxDb, 'quote'], $aKeysToAdd)) . ")
-                    AND oxshopid = " . $oxDb->quote($oxConfig->getShopId()) . "
-            ";
-            $aExistingCacheKeys = $oxDb->getCol($sSql);
-            
-//            var_dump(__METHOD__, '$aPresentIds', $aPresentIds);
-            
-            $sInsertSql = "
-                INSERT INTO
-                    `" . CMSc_Utils::DB_TABLE_CACHE_HTTPRESULTS . "`
 
-                (
-                    `key`,
-                    `oxshopid`,
-                    `url`,
-                    `pageid`,
-                    `pagepath`,
-                    `http_code`,
-                    `http_method`,
-                    `post_params`
-                )
-            ";
+            if (count($aCache['add'])) {
+                t::s('add');
 
-            $aInsertPieces = [];
-            foreach ($this->_aIndexCommitCache['add'] as $oCmsPage) {
-//                echo "<pre>";
-//                var_dump(__METHOD__, 'ADDING', $oCmsPage->getCacheKey(), $oCmsPage->getPageId());
-//                echo "</pre>";
-                
-                if (in_array($oCmsPage->getCacheKey(), $aExistingCacheKeys)) {
-//                    var_dump(__METHOD__, "Skipping " . $oCmsPage->getCacheKey() . " because it is already in the database");
-                    continue;
-                }
-                
-                $oHttpResult = $oCmsPage->getHttpResult();
-
-                $iHttpCode = 0;
-                if ($oHttpResult && $oHttpResult->info) {
-                    $iHttpCode = $oHttpResult->info['http_code'];
+                $aKeysToAdd = [];
+                foreach ($aCache['add'] as $oCmsPage) {
+                    $aKeysToAdd[] = $oCmsPage->getCacheKey();
                 }
 
-                $aInsertPieces[] = "
+                t::s('get existing cache keys');
+                $sSql = "
+                    SELECT
+                        `key`
+                    FROM
+                        `" . CMSc_Utils::DB_TABLE_CACHE_HTTPRESULTS . "`
+                    WHERE 1
+                        AND `key` IN (" . implode(', ', array_map([$oxDb, 'quote'], $aKeysToAdd)) . ")
+                        AND oxshopid = " . $oxDb->quote($sShopId) . "
+                ";
+                $aExistingCacheKeys = $oxDb->getCol($sSql);
+                t::e('get existing cache keys');
+
+    //            var_dump(__METHOD__, '$aPresentIds', $aPresentIds);
+
+                t::s('build insert sql');
+                $sInsertSql = "
+                    INSERT INTO
+                        `" . CMSc_Utils::DB_TABLE_CACHE_HTTPRESULTS . "`
+
                     (
-                        " . $oxDb->quote($oCmsPage->getCacheKey()) . ",
-                        " . $oxDb->quote($oxConfig->getShopId()) . ",
-                        " . $oxDb->quote($oCmsPage->getUrl()) . ",
-                        " . ($oCmsPage->getPageId() ? $oxDb->quote($oCmsPage->getPageId()) : 'NULL') . ",
-                        " . ($oCmsPage->getPagePath() ? $oxDb->quote($oCmsPage->getPagePath()) : 'NULL') . ",
-                        " . $iHttpCode . ",
-                        " . $oxDb->quote(($oCmsPage->isPostPage() ? 'POST' : 'GET')) . ",
-                        " . $oxDb->quote(json_encode($oCmsPage->getPostParams(), JSON_PRETTY_PRINT)) . "
+                        `key`,
+                        `oxshopid`,
+                        `url`,
+                        `pageid`,
+                        `pagepath`,
+                        `http_code`,
+                        `http_method`,
+                        `post_params`
                     )
                 ";
-            }
 
-            $sInsertSql .= "
-                VALUES
+                $aInsertPieces = [];
+                foreach ($aCache['add'] as $oCmsPage) {
+    //                echo "<pre>";
+    //                var_dump(__METHOD__, 'ADDING', $oCmsPage->getCacheKey(), $oCmsPage->getPageId());
+    //                echo "</pre>";
 
-                " . implode(', ', $aInsertPieces) . "
-            ";
-            
-            try {
-                $oxDb->query($sInsertSql);
-            } catch (Exception $ex) {
-                // Catch duplicate key error
+                    if (in_array($oCmsPage->getCacheKey(), $aExistingCacheKeys)) {
+    //                    var_dump(__METHOD__, "Skipping " . $oCmsPage->getCacheKey() . " because it is already in the database");
+                        continue;
+                    }
+
+                    $oHttpResult = $oCmsPage->getHttpResult();
+
+                    $iHttpCode = 0;
+                    if ($oHttpResult && $oHttpResult->info) {
+                        $iHttpCode = $oHttpResult->info['http_code'];
+                    }
+
+                    $aInsertPieces[] = "
+                        (
+                            " . $oxDb->quote($oCmsPage->getCacheKey()) . ",
+                            " . $oxDb->quote($sShopId) . ",
+                            " . $oxDb->quote($oCmsPage->getUrl()) . ",
+                            " . ($oCmsPage->getPageId() ? $oxDb->quote($oCmsPage->getPageId()) : 'NULL') . ",
+                            " . ($oCmsPage->getPagePath() ? $oxDb->quote($oCmsPage->getPagePath()) : 'NULL') . ",
+                            " . $iHttpCode . ",
+                            " . $oxDb->quote(($oCmsPage->isPostPage() ? 'POST' : 'GET')) . ",
+                            " . $oxDb->quote(json_encode($oCmsPage->getPostParams(), JSON_PRETTY_PRINT)) . "
+                        )
+                    ";
+                }
+
+                $sInsertSql .= "
+                    VALUES
+
+                    " . implode(', ', $aInsertPieces) . "
+                ";
+                t::e('build insert sql');
+
+                t::s('execute insert sql');
+                try {
+                    $oxDb->query($sInsertSql);
+                } catch (Exception $ex) {
+                    // Catch duplicate key error
+                }
+                t::e('execute insert sql');
+
+                $aCache['add'] = [];
+
+                t::e('add');
             }
-            
-            $this->_aIndexCommitCache['add'] = [];
-            
-            t::e('add');
         }
         
         t::e(__METHOD__);
@@ -489,7 +507,6 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
         t::s('_synchronizeIndex');
         
         $oxDb = oxDb::getDb( oxDb::FETCH_MODE_ASSOC );
-        $oxConfig = oxRegistry::getConfig();
         
         
         t::s('get storage keys');
@@ -503,12 +520,11 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
             FROM
                 `" . CMSc_Utils::DB_TABLE_CACHE_HTTPRESULTS . "`
             WHERE 1
-                AND oxshopid = " . $oxDb->quote($oxConfig->getShopId()) . "
+                AND oxshopid = " . $oxDb->quote($this->getShopId()) . "
         ");
         t::e('get index keys');
         
 //        var_dump_pre(__METHOD__, '$aStorageKeys', $aStorageKeys, '$aDbKeys', $aDbKeys);
-        
         
         t::s('delete obsolete index items');
         t::s('diff cache to db');
@@ -522,7 +538,7 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
                 DELETE FROM
                     `" . CMSc_Utils::DB_TABLE_CACHE_HTTPRESULTS . "`
                 WHERE 1
-                    AND oxshopid = " . $oxDb->quote($oxConfig->getShopId()) . "
+                    AND oxshopid = " . $oxDb->quote($this->getShopId()) . "
                     AND `key` IN (" . implode(', ', array_map([$oxDb, 'quote'], $aDeleteFromIndex)) . ")
             ";
             

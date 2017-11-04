@@ -121,5 +121,9 @@
     
 </form>
 
+[{ php }]
+t::dAll();
+[{ /php }]
+
 [{ include file="bottomnaviitem.tpl" }]
 [{ include file="bottomitem.tpl" }]

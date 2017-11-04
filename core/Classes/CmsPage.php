@@ -94,19 +94,15 @@ abstract class CMSc_CmsPage implements \Serializable
         $sContent = false;
 
         if ( $oXml instanceof SimpleXMLElement ) {
-            try {
-                $aNodes = CMSc_Utils::safeExecuteXPath($oXml, '/' . $oXml->getName() . '/content/' . $sContentIdent );
-                
-                if ( $aNodes !== false && count($aNodes) ) {
-                    $oNodeXml = $aNodes[0];
-                    
-                    if ($oNodeXml instanceof SimpleXMLElement) {
-                        $sContent = CMSc_Utils::getTextContentFromXmlObject( $oNodeXml );
-                        $sContent = $this->_processTextContent( $sContent );
-                    }
+            $aNodes = CMSc_Utils::safeExecuteXPath($oXml, '/' . $oXml->getName() . '/content/' . $sContentIdent );
+
+            if ( $aNodes !== false && count($aNodes) ) {
+                $oNodeXml = $aNodes[0];
+
+                if ($oNodeXml instanceof SimpleXMLElement) {
+                    $sContent = CMSc_Utils::getTextContentFromXmlObject( $oNodeXml );
+                    $sContent = $this->_processTextContent( $sContent );
                 }
-            } catch ( Exception $e) {
-                //var_dump($e->getMessage());
             }
         }
         
@@ -226,14 +222,14 @@ abstract class CMSc_CmsPage implements \Serializable
      */
     protected function _getXmlSource ()
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $oHttpResult = $this->getHttpResult();
         
         // Return an empty string so as not to break anything upstream
         $sXml = is_object($oHttpResult) ? $oHttpResult->content : '';
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $sXml;
     }
@@ -396,7 +392,7 @@ abstract class CMSc_CmsPage implements \Serializable
      */
     protected function getTestContentXmlSource ()
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $sTestContent = CMSc_Utils::getConfigValue(CMSc_Utils::CONFIG_KEY_TEST_CONTENT);
         
@@ -404,7 +400,7 @@ abstract class CMSc_CmsPage implements \Serializable
             $sTestContent = CMSc_Utils::getDefaultTestContent();
         }
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $sTestContent;
     }

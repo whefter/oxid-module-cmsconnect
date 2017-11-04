@@ -17,9 +17,9 @@ class CMSc_Cache_LocalPages_Disabled extends CMSc_Cache_LocalPages
      */
     protected function _deleteLocalPageCache ($sCacheKey)
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
     }
     
     public function _getCount ()

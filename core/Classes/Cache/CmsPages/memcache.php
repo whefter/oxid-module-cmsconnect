@@ -26,8 +26,6 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
     
     protected function _addPageToIndex ($sCacheKey)
     {
-        $oxConfig = oxRegistry::getConfig();
-        
         $aIndex = $this->_getIndex();
         
         if ( !in_array($sCacheKey, $aIndex) ) {
@@ -38,8 +36,6 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
     
     protected function _deletePageFromIndex ($sCacheKey)
     {
-        $oxConfig = oxRegistry::getConfig();
-        
         $aIndex = $this->_getIndex();
         
         if ( in_array($sCacheKey, $aIndex) ) {
@@ -50,8 +46,6 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
     
     protected function _getIndex ()
     {
-        $oxConfig = oxRegistry::getConfig();
-        
         $aIndex = $this->_getMemcache()->get($this->_getCachePrefix());
         
         if ( !$aIndex ) {
@@ -66,14 +60,14 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
      */
     protected function _saveHttpResult ($sCacheKey, $oHttpResult)
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $sCacheName = $this->_getMemcacheKeyFromCacheKey($sCacheKey);
         
         $blSuccess = $this->_getMemcache()->set($sCacheName, $oHttpResult);
         $this->_addPageToIndex($sCacheKey);
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $blSuccess;
     }
@@ -83,13 +77,13 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
      */
     protected function _fetchHttpResult ($sCacheKey)
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $sCacheName = $this->_getMemcacheKeyFromCacheKey($sCacheKey);
         
         $oHttpResult = $this->_getMemcache()->get($sCacheName);
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $oHttpResult;
     }
@@ -99,7 +93,7 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
      */
     protected function _deleteHttpResult ($sCacheKey)
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $sCacheName = $this->_getMemcacheKeyFromCacheKey($sCacheKey);
         
@@ -108,7 +102,7 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
         $this->_getMemcache()->set($sCacheName, false);
         $this->_deletePageFromIndex($sCacheKey);
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
     }
     
     /**
@@ -118,7 +112,7 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
      */
     protected function _getMemcacheKeyFromCacheKey ($sCacheKey)
     {
-        return 'CMSc_CmsPage__' . $sCacheKey;
+        return 'CMSc_CmsPage__' . $this->getShopId() . '__' . $sCacheKey;
     }
     
     /**
@@ -139,6 +133,8 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
         t::s(__METHOD__);
         
         $aList = $this->_getIndex();
+        
+        var_dump_pre(__METHOD__, $aList);
         
         t::e(__METHOD__);
         

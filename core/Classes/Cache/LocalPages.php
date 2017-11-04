@@ -353,12 +353,12 @@ abstract class CMSc_Cache_LocalPages extends CMSc_Cache
      */
     public function deleteLocalPageCache ($sCacheKey)
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         unset($this->_aPageCache[$sCacheKey]);
         $mReturn = $this->_deleteLocalPageCache($sCacheKey);
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         return $mReturn;
     }

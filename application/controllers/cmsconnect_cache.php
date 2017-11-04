@@ -28,38 +28,63 @@ class cmsconnect_cache extends oxUBase
         
         $oCmsPagesCache = CMSc_Cache_CmsPages::get();
         
-        $oCmsPagesCache->synchronizeIndex();
-        
         $sPageId = $oxConfig->getRequestParameter('pageId');
         $sPagePath = $oxConfig->getRequestParameter('pagePath');
-        
         if ($sPagePath && ($sPageId || $sPageId === '0' || $sPageId === 0)) {
-            echo 'ERROR: Cannot specify both pageId and pagePath.';
+            echo 'ERROR: cannot specify both pageId and pagePath.';
+            die;
+        }
+        if (!$sPagePath && (!$sPageId && $sPageId !== '0' && $sPageId !== 0)) {
+            echo 'ERROR: must specify either pageId or pagePath.';
             die;
         }
         
-        if ($sPagePath) {
-            $aList = $oCmsPagesCache->getList(0, 0, ['pagepath' => $sPagePath]);
-            
-        } else if ($sPageId || $sPageId === '0' || $sPageId === 0) {
-            $aList = $oCmsPagesCache->getList(0, 0, ['pageid' => $sPageId]);
-            
-            foreach ($aList as $sCacheKey => $oHttpResult) {
-                $oCmsPagesCache->deleteHttpResultByCacheKey($sCacheKey);
-            }
+        $sShopId = $oxConfig->getRequestParameter('shopId');
+        if ($sShopId === 'current') {
+            $aShopIds = [$oxConfig->getShopId()];
+        } else {
+            $aShopIds = $oxConfig->getShopIds();
         }
-        
-        if ($aList && is_array($aList)) {
-            foreach ($aList as $sCacheKey => $oHttpResult) {
-                $oCmsPagesCache->deleteHttpResultByCacheKey($sCacheKey);
+
+        t::s(__METHOD__);
+
+        $iCount = 0;
+        foreach ( $aShopIds as $sShopId ) {
+//            var_dump_pre(__METHOD__, '$sShopId', $sShopId);
+
+            t::s("shop $sShopId");
+
+            $oCmsPagesCache->setShopId($sShopId);
+            $oCmsPagesCache->synchronizeIndex();
+
+            if ($sPagePath) {
+                $aList = $oCmsPagesCache->getList(0, 0, ['pagepath' => $sPagePath]);
+            } else if ($sPageId || $sPageId === '0' || $sPageId === 0) {
+                $aList = $oCmsPagesCache->getList(0, 0, ['pageid' => $sPageId]);
             }
 
-            echo count($aList);
-        } else {
-            echo "0";
+            if ($aList && is_array($aList)) {
+                foreach ($aList as $sCacheKey => $oHttpResult) {
+//                    echo "Deleting: $sCacheKey " . $oHttpResult->info['url'] . "\n<br>";
+
+                    $oCmsPagesCache->deleteHttpResultByCacheKey($sCacheKey);
+                }
+
+                $iCount += count($aList);
+            }
+
+            t::e("shop $sShopId");
         }
-        
+
+        $oCmsPagesCache->setShopId(null);
+
         oxRegistry::get('oxUtils')->commitFileCache();
+        
+        echo $iCount;
+        
+        t::e(__METHOD__);
+        
+        t::dAll();
         
         die;
     }

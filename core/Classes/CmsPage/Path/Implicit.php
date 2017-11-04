@@ -43,7 +43,7 @@ class CMSc_CmsPage_Path_Implicit extends CMSc_CmsPage_Path
      */
     public function getUrl ()
     {
-        startProfile(__METHOD__);
+        t::s(__METHOD__);
         
         $sBaseUrl = parent::getUrl();
         $sFullUrl = false;
@@ -68,7 +68,7 @@ class CMSc_CmsPage_Path_Implicit extends CMSc_CmsPage_Path
             $sFullUrl = rtrim( $sFullUrl, '?&' );
         }
         
-        stopProfile(__METHOD__);
+        t::e(__METHOD__);
         
         // var_dump(__METHOD__);
         // var_dump($sFullUrl);

@@ -6,7 +6,7 @@ $aModule = array(
     'title'             => 'CMSconnect',
     'email'             => 'william@whefter.de',
     'url'               => 'http://www.whefter.de',
-    'version'           => '1.2.2',
+    'version'           => '1.3.0',
     'author'            => 'William Hefter',
     'description'       => array(
         'de'    => 'Erlaubt das Einbinden von CMS-Inhalten im OXID eShop. <p class="warning">Benötigt das whbase (wh Module Extensions)-Modul.</p>',
@@ -117,12 +117,14 @@ $aModule = array(
             'name'      => 'sCMScLocalPageCacheEngine',
             'type'      => 'str',
             'value'     => 'LOCAL_PAGE_CACHE_AUTO',
+            'global'    => true,
         ),
         array(
             'group'     => 'DONOTMODIFY',
             'name'      => 'sCMScCmsPageCacheEngine',
             'type'      => 'str',
             'value'     => 'CMS_PAGE_CACHE_AUTO',
+            'global'    => true,
         ),
         array(
             'group'     => 'DONOTMODIFY',

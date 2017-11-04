@@ -15,10 +15,7 @@ class cmsconnect_setup_cache_cmspages extends cmsconnect_setup_main
      */
     public function render()
     {
-//        t::enable();
-        
         $oxConfig = oxRegistry::getConfig();
-        $sShopId  = $oxConfig->getShopId();
         
         $aFilters = $oxConfig->getRequestParameter('filters');
         
@@ -144,6 +141,10 @@ class cmsconnect_setup_cache_cmspages extends cmsconnect_setup_main
                 libxml_clear_errors();
                 libxml_use_internal_errors($previousValue);
             }
+        } else {
+            echo "<pre>";
+            echo "No content.";
+            echo "</pre>";
         }
         
         die;
