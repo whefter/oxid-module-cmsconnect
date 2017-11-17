@@ -379,7 +379,7 @@ abstract class CMSc_CmsPage implements \Serializable
     {
         $sContent = CMSc_Utils::rewriteTextContentLinks( $sContent );
         $sContent = CMSc_Utils::fixTextContentEncoding( $sContent );
-        $sContent = CMSc_Utils::decodeTextContentEntities( $sContent );
+//        $sContent = CMSc_Utils::decodeTextContentEntities( $sContent );
         $sContent = CMSc_Utils::parseTextContentThroughSmarty( $sContent );
         
         return $sContent;

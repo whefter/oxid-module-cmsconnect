@@ -118,6 +118,7 @@ class cmsconnect_setup_cache_cmspages extends cmsconnect_setup_main
         $oHttpResult = CMSc_Cache_CmsPages::get()->fetchHttpResultByCacheKey($sCacheKey);
         $sContent = $oHttpResult->content;
         
+        echo '<h1>Content</h1>';
         if ($sContent) {
             try {
                 $previousValue = libxml_use_internal_errors(true);
@@ -133,20 +134,23 @@ class cmsconnect_setup_cache_cmspages extends cmsconnect_setup_main
                     throw new Exception('Error loading XML');
                 }
 
-                echo "<pre>";
+                echo '<pre>';
                 echo htmlentities($dom->saveXML());
-                echo "</pre>";
+                echo '</pre>';
             } catch (Exception $ex) {
                 // Nothing
             } finally {
                 libxml_clear_errors();
                 libxml_use_internal_errors($previousValue);
             }
-        } else {
-            echo "<pre>";
-            echo "No content.";
-            echo "</pre>";
+            
         }
+        
+        echo '<br /><br />';
+        echo '<h1>cURL info</h1>';
+        echo '<pre>';
+        print_r($oHttpResult->info);
+        echo '</pre>';
         
         die;
     }

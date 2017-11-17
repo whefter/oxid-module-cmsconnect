@@ -502,7 +502,7 @@ class CMSc_Utils
             
             // For POST
             if ( strtoupper($aRequest['method']) === 'POST' ) {
-                curl_setopt( $chs[$i], CURLOPT_POST, $blPost );
+                curl_setopt( $chs[$i], CURLOPT_POST, true );
                 curl_setopt( $chs[$i], CURLOPT_HTTPHEADER, array(
                     'Content-Type: application/x-www-form-urlencoded'
                 ) );
@@ -767,7 +767,7 @@ class CMSc_Utils
                 
                 // Replace all links
                 unset($aMatches);
-                $sLinkPattern = '/href=(\'|")' . preg_quote($sFullBaseUrl, '/') . '[^"\']*(.|\/|\.html|\.php|\.asp)(\?[^"\']*)?(\'|")/';
+                $sLinkPattern = '/(href|action)=(\'|")' . preg_quote($sFullBaseUrl, '/') . '[^"\']*(\'|")/';
                 preg_match_all( $sLinkPattern, $sTextContent, $aMatches, PREG_SET_ORDER );
                 
                 foreach ( $aMatches as $aMatch ) {

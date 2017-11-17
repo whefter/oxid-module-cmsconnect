@@ -94,22 +94,6 @@ class CMSc_CmsPage_Path_Implicit extends CMSc_CmsPage_Path
         return $aParams;
     }
     
-    /**
-     * Returns the implicit post params. Mostly these are 
-     *
-     * @return string[]
-     */
-    protected function getImplicitPostParams ()
-    {
-        $aParams = CMSc_Utils::getImplicitQueryParams();
-        
-        // Remove parameters specified in the static blacklist
-        foreach ( $this->getExtraBlacklistedQueryParams() as $sBlacklistedParam ) {
-            unset( $aParams[$sBlacklistedParam] );
-        }
-        
-        return $aParams;
-    }
     
     /**
      * Returns the explicit query params; that is, the ones specified in the URL.
@@ -136,10 +120,15 @@ class CMSc_CmsPage_Path_Implicit extends CMSc_CmsPage_Path
         // has been requested.
         //
         // Additionally, we now use the full page URL for session cache
-        if ( count(CMSc_Utils::getImplicitQueryParams()) ) {
+        if ( count(CMSc_Utils::getImplicitQueryParams()) || $this->isPostPage() ) {
             return false;
         } else {
             return true;
         }
+    }
+    
+    public function getPostParams ()
+    {
+        return array_merge($_POST, parent::getPostParams());
     }
 }
