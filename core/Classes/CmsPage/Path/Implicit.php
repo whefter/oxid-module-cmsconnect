@@ -94,12 +94,26 @@ class CMSc_CmsPage_Path_Implicit extends CMSc_CmsPage_Path
         return $aParams;
     }
     
+    /**
+     * Returns the implicit post params; that is, the ones specified in the URL, minus the
+     * ones blacklisted in the current page class.
+     *
+     * @return string[]
+     */
+    protected function getImplicitPostParams ()
+    {
+        $aParams = CMSc_Utils::getImplicitPostParams();
+        
+        // Remove parameters specified in the static blacklist
+        foreach ( $this->getExtraBlacklistedQueryParams() as $sBlacklistedParam ) {
+            unset( $aParams[$sBlacklistedParam] );
+        }
+        
+        return $aParams;
+    }
+    
     
     /**
-     * Returns the explicit query params; that is, the ones specified in the URL.
-     *
-     * Meant to be overridden.
-     *
      * @return string[]
      */
     protected function getExtraBlacklistedQueryParams ()
@@ -129,6 +143,6 @@ class CMSc_CmsPage_Path_Implicit extends CMSc_CmsPage_Path
     
     public function getPostParams ()
     {
-        return array_merge($_POST, parent::getPostParams());
+        return array_merge($this->getImplicitPostParams(), parent::getPostParams());
     }
 }

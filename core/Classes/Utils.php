@@ -80,6 +80,7 @@ class CMSc_Utils
         'force_sid',
         'force_admin_sid',
         'editlanguage',
+        '',
     );
     
     /**
@@ -565,6 +566,34 @@ class CMSc_Utils
         }
         // var_dump(__METHOD__, $aImplicitQueryParams);
         return $aImplicitQueryParams;
+    }
+    
+    /**
+     * Returns an array of explicit post parameters, i.e. parameters that could have been
+     * passed by CMS plugins. Excludes all implicit parameters set by OXID when it resolves
+     * SEO URLs and excludes well-known OXID parameters (see top of file)
+     *
+     * @return array()
+     */
+    public static function getImplicitPostParams ()
+    {
+        // HOTFIX
+        if (defined('OX_IS_ADMIN') && OX_IS_ADMIN) {
+            return [];
+        }
+        
+        $aImplicitParams = $_POST;
+        
+//         var_dump_pre(__METHOD__, '$aImplicitParams', $aImplicitParams);
+        
+        // Remove parameters specified in the static blacklist
+        foreach ( self::$_aImplicitParamsBlacklist as $sBlacklistedParam ) {
+            unset( $aImplicitParams[$sBlacklistedParam] );
+        }
+        
+//        var_dump_pre(__METHOD__, '$aImplicitParams', $aImplicitParams);
+        
+        return $aImplicitParams;
     }
     
     /**
