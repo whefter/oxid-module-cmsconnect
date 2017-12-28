@@ -34,6 +34,7 @@ class cmsconnect_oxseoencoder extends cmsconnect_oxseoencoder_parent
         }
         
         if ( isset($this->_aStaticUrlCache[$sStdUrl][$iLang][$iShopId]) ) {
+            t::e(__METHOD__);
             return $this->_aStaticUrlCache[$sStdUrl][$iLang][$iShopId];
         }
         
@@ -57,6 +58,6 @@ class cmsconnect_oxseoencoder extends cmsconnect_oxseoencoder_parent
     
         t::e(__METHOD__);
         
-        return parent::getStaticUrl($sStdUrl, $iLang, $iShopid);
+        return parent::getStaticUrl($sStdUrl, $iLang, $iShopId);
     }
 }
