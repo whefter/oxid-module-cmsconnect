@@ -17,12 +17,12 @@ class CMSc_Cache_CmsPages_OxidFileCache extends CMSc_Cache_CmsPages
      */
     protected function _saveHttpResult ($sCacheKey, $oHttpResult)
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $sCacheName = $this->_getCacheFilenameFromKey($sCacheKey);
         $blSuccess = oxRegistry::get('oxUtils')->toFileCache($sCacheName, $oHttpResult);
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return $blSuccess;
     }
@@ -32,13 +32,13 @@ class CMSc_Cache_CmsPages_OxidFileCache extends CMSc_Cache_CmsPages
      */
     protected function _fetchHttpResult ($sCacheKey)
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $sCacheName = $this->_getCacheFilenameFromKey($sCacheKey);
         
         $oHttpResult = oxRegistry::get('oxUtils')->fromFileCache($sCacheName);
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return $oHttpResult;
     }
@@ -48,7 +48,7 @@ class CMSc_Cache_CmsPages_OxidFileCache extends CMSc_Cache_CmsPages
      */
     protected function _deleteHttpResult ($sCacheKey)
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $sCacheName = $this->_getCacheFilenameFromKey($sCacheKey);
         
@@ -58,7 +58,7 @@ class CMSc_Cache_CmsPages_OxidFileCache extends CMSc_Cache_CmsPages
             unlink($sFilePath);
         }
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
     }
     
     /**
@@ -76,7 +76,7 @@ class CMSc_Cache_CmsPages_OxidFileCache extends CMSc_Cache_CmsPages
      */
     protected function _getStorageKeysList ()
     {
-        t::s('OxidFileCache::_getStorageKeysList');
+       class_exists('t') && t::s('OxidFileCache::_getStorageKeysList');
         
         $oxUtils = oxRegistry::get('oxUtils');
         
@@ -96,7 +96,7 @@ class CMSc_Cache_CmsPages_OxidFileCache extends CMSc_Cache_CmsPages
             $aList[] = $sCacheKey;
         }
         
-        t::e('OxidFileCache::_getStorageKeysList');
+       class_exists('t') && t::e('OxidFileCache::_getStorageKeysList');
         
         return $aList;
     }

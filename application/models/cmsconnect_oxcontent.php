@@ -17,18 +17,18 @@ class cmsconnect_oxcontent extends cmsconnect_oxcontent_parent
      * @var string
      */
     protected $_sOriginalContent = null;
-    
+
     /**
-     * Loads Content by using field oxloadid instead of oxid. We also use this function to ignore
-     * the cache backend used by the EE version, since CMSconnect handles caching.
+     * Loads Content by using field oxloadid instead of oxid.
      *
-     * @param   string      $sLoadId    Content load ID
+     * @param string $loadId     content load ID
+     * @param string $onlyActive selection state - active/inactive
      *
      * @return bool
      */
-    public function loadByIdent( $sLoadId )
+    public function loadByIdent($loadId, $onlyActive = false)
     {
-        $blRes = parent::loadByIdent($sLoadId);
+        $blRes = parent::loadByIdent($loadId, $onlyActive);
         
         if ( $this->_hasCMScContent() ) {
             $this->_assignCMSconnectContent( $this->_getCMSconnectContent() );

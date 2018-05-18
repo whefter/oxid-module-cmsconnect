@@ -17,9 +17,9 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
      */
     protected function _deleteLocalPageCache ($sCacheKey)
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
-        $oxDb = oxDb::getDb( oxDb::FETCH_MODE_ASSOC );
+        $oxDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb( \OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC );
         $oxConfig = oxRegistry::getConfig();
         
         $sSql1 = "
@@ -40,15 +40,15 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
                 AND oxshopid = '" . $this->getShopId() . "'
             ;
         ";
-        $oxDb->query($sSql1);
-        $oxDb->query($sSql2);
+        $oxDb->execute($sSql1);
+        $oxDb->execute($sSql2);
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
     }
     
     public function _getCount ()
     {
-        $oxDb = oxDb::getDb( oxDb::FETCH_MODE_ASSOC );
+        $oxDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb( \OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC );
         $oxConfig = oxRegistry::getConfig();
         
         $sSql = "
@@ -68,7 +68,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
      */
     protected function _getList ($limit = null, $offset = null, $aFilters = [])
     {
-        $oxDb = oxDb::getDb( oxDb::FETCH_MODE_ASSOC );
+        $oxDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb( \OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC );
         $oxConfig = oxRegistry::getConfig();
         
         $sSql = "
@@ -137,7 +137,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
     protected function _getLocalPageCache ($sCacheKey)
     {
         if ( !isset($this->_aPageCache[$sCacheKey]) ) {
-            $oxDb = oxDb::getDb( oxDb::FETCH_MODE_ASSOC );
+            $oxDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb( \OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC );
             $oxConfig = oxRegistry::getConfig();
             
             $sPagesSql = "
@@ -191,7 +191,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
      */
     public function commit ()
     {
-        $oxDb = oxDb::getDb( oxDb::FETCH_MODE_ASSOC );
+        $oxDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb( \OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC );
         $oxConfig = oxRegistry::getConfig();
         
         // echo "<pre>";
@@ -234,7 +234,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
                     );
                 ";
                 
-                $oxDb->query($sSql);
+                $oxDb->execute($sSql);
             }
             
             
@@ -279,7 +279,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
                     
                     $sSql .= implode(",\n", $aSqls);
                     
-                    $oxDb->query($sSql);
+                    $oxDb->execute($sSql);
                 }
                 
                 // Links
@@ -323,7 +323,7 @@ class CMSc_Cache_LocalPages_DB extends CMSc_Cache_LocalPages
                     
                     $sSql .= implode(",\n", $aSqls);
                     
-                    $oxDb->query($sSql);
+                    $oxDb->execute($sSql);
                 }
             }
         }

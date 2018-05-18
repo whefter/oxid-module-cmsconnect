@@ -88,7 +88,7 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
      */
     public function saveHttpResult ($oCmsPage, $oHttpResult, $iTtl = null)
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         // Figure out cache TTL
         if ( $iTtl === null ) {
@@ -115,7 +115,7 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
             $this->_storePageIndexEntry($oCmsPage, $oHttpResult);
         }
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return $blSuccess;
     }
@@ -141,7 +141,7 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
      */
     public function fetchHttpResultByCacheKey ($sCacheKey)
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $oResult = $this->_fetchHttpResult($sCacheKey);
         
@@ -153,7 +153,7 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
             }
         }
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return $oResult;
     }
@@ -179,13 +179,13 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
      */
     public function deleteHttpResultByCacheKey ($sCacheKey)
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $mReturn = $this->_deleteHttpResult($sCacheKey);
         
         $this->_deletePageIndexEntryByCacheKey($sCacheKey);
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return $mReturn;
     }
@@ -238,9 +238,9 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
      */
     protected function _getList ($limit = null, $offset = null, $aFilters = [])
     {
-        t::s('Cache_CmsPages::_getList');
+       class_exists('t') && t::s('Cache_CmsPages::_getList');
         
-        $oxDb = oxDb::getDb( oxDb::FETCH_MODE_ASSOC );
+        $oxDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb( \OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC );
         
         $aHttpResults = [];
         $sSelectSql = $this->_getSqlBaseQuery($aFilters);
@@ -256,14 +256,14 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
             ";
         }
             
-        t::s('getCol');
+       class_exists('t') && t::s('getCol');
         $aCacheKeys = $oxDb->getCol($sSelectSql);
-        t::e('getCol');
+       class_exists('t') && t::e('getCol');
 
         foreach ($aCacheKeys as $sCacheKey) {
-            t::s('fetchHttpResult');
+           class_exists('t') && t::s('fetchHttpResult');
             $oHttpResult = $this->_fetchHttpResult($sCacheKey);
-            t::e('fetchHttpResult');
+           class_exists('t') && t::e('fetchHttpResult');
 
             if ($oHttpResult) {
                 $aHttpResults[$sCacheKey] = $oHttpResult;
@@ -274,7 +274,7 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
         }
 //        echo "</pre>";
         
-        t::e('Cache_CmsPages::_getList');
+       class_exists('t') && t::e('Cache_CmsPages::_getList');
         
         return $aHttpResults;
     }
@@ -288,9 +288,9 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
      */
     protected function _getCount ($aFilters = [])
     {
-        t::s('Cache_CmsPages::_getCount');
+       class_exists('t') && t::s('Cache_CmsPages::_getCount');
         
-        $oxDb = oxDb::getDb( oxDb::FETCH_MODE_ASSOC );
+        $oxDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb( \OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC );
         
         $sBaseSql = $this->_getSqlBaseQuery($aFilters);
         
@@ -303,7 +303,7 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
         
         $iCount = (int)$oxDb->getOne($sCountSql);
         
-        t::e('Cache_CmsPages::_getCount');
+       class_exists('t') && t::e('Cache_CmsPages::_getCount');
         
         return $iCount;
     }
@@ -317,7 +317,7 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
      */
     protected function _getSqlBaseQuery ($aFilters)
     {
-        $oxDb = oxDb::getDb( oxDb::FETCH_MODE_ASSOC );
+        $oxDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb( \OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC );
         $oxConfig = oxRegistry::getConfig();
         
         $sBaseSql = "
@@ -370,14 +370,14 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
      */
     public function commit ()
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
-        $oxDb = oxDb::getDb( oxDb::FETCH_MODE_ASSOC );
+        $oxDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb( \OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC );
         
         foreach ($this->_aIndexCommitCache as $sShopId => &$aCache) {
             if (count($aCache['deleteCacheKeys'])) {
-                t::s('delete');
-                $oxDb->query("
+               class_exists('t') && t::s('delete');
+                $oxDb->execute("
                     DELETE FROM
                         `" . CMSc_Utils::DB_TABLE_CACHE_HTTPRESULTS . "`
                     WHERE 1
@@ -386,18 +386,18 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
                 ");
 
                 $aCache['deleteCacheKeys'] = [];
-                t::e('delete');
+               class_exists('t') && t::e('delete');
             }
 
             if (count($aCache['add'])) {
-                t::s('add');
+               class_exists('t') && t::s('add');
 
                 $aKeysToAdd = [];
                 foreach ($aCache['add'] as $oCmsPage) {
                     $aKeysToAdd[] = $oCmsPage->getCacheKey();
                 }
 
-                t::s('get existing cache keys');
+               class_exists('t') && t::s('get existing cache keys');
                 $sSql = "
                     SELECT
                         `key`
@@ -408,11 +408,11 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
                         AND oxshopid = " . $oxDb->quote($sShopId) . "
                 ";
                 $aExistingCacheKeys = $oxDb->getCol($sSql);
-                t::e('get existing cache keys');
+               class_exists('t') && t::e('get existing cache keys');
 
     //            var_dump(__METHOD__, '$aPresentIds', $aPresentIds);
 
-                t::s('build insert sql');
+               class_exists('t') && t::s('build insert sql');
                 $sInsertSql = "
                     INSERT INTO
                         `" . CMSc_Utils::DB_TABLE_CACHE_HTTPRESULTS . "`
@@ -466,23 +466,23 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
 
                     " . implode(', ', $aInsertPieces) . "
                 ";
-                t::e('build insert sql');
+               class_exists('t') && t::e('build insert sql');
 
-                t::s('execute insert sql');
+               class_exists('t') && t::s('execute insert sql');
                 try {
-                    $oxDb->query($sInsertSql);
+                    $oxDb->execute($sInsertSql);
                 } catch (Exception $ex) {
                     // Catch duplicate key error
                 }
-                t::e('execute insert sql');
+               class_exists('t') && t::e('execute insert sql');
 
                 $aCache['add'] = [];
 
-                t::e('add');
+               class_exists('t') && t::e('add');
             }
         }
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
     }
     
     /**
@@ -504,16 +504,16 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
      */
     protected function _synchronizeIndex ()
     {
-        t::s('_synchronizeIndex');
+       class_exists('t') && t::s('_synchronizeIndex');
         
-        $oxDb = oxDb::getDb( oxDb::FETCH_MODE_ASSOC );
+        $oxDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb( \OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC );
         
         
-        t::s('get storage keys');
+       class_exists('t') && t::s('get storage keys');
         $aStorageKeys = $this->_getStorageKeysList();
-        t::e('get storage keys');
+       class_exists('t') && t::e('get storage keys');
         
-        t::s('get index keys');
+       class_exists('t') && t::s('get index keys');
         $aDbKeys = $oxDb->getCol("
             SELECT
                 `key`
@@ -522,14 +522,14 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
             WHERE 1
                 AND oxshopid = " . $oxDb->quote($this->getShopId()) . "
         ");
-        t::e('get index keys');
+       class_exists('t') && t::e('get index keys');
         
 //        var_dump_pre(__METHOD__, '$aStorageKeys', $aStorageKeys, '$aDbKeys', $aDbKeys);
         
-        t::s('delete obsolete index items');
-        t::s('diff cache to db');
+       class_exists('t') && t::s('delete obsolete index items');
+       class_exists('t') && t::s('diff cache to db');
         $aDeleteFromIndex = CMSc_Utils::fastArrayDiff($aDbKeys, $aStorageKeys);
-        t::e('diff cache to db');
+       class_exists('t') && t::e('diff cache to db');
         
         if (count($aDeleteFromIndex)) {
 //            var_dump_pre(__METHOD__, "Deleting keys from index: ", $aDeleteFromIndex);
@@ -542,32 +542,32 @@ abstract class CMSc_Cache_CmsPages extends CMSc_Cache
                     AND `key` IN (" . implode(', ', array_map([$oxDb, 'quote'], $aDeleteFromIndex)) . ")
             ";
             
-            t::s('execute');
-            $oxDb->query($sSql);
-            t::e('execute');
+           class_exists('t') && t::s('execute');
+            $oxDb->execute($sSql);
+           class_exists('t') && t::e('execute');
         }
-        t::e('delete obsolete index items');
+       class_exists('t') && t::e('delete obsolete index items');
         
         
-        t::s('delete obsolete storage items');
-        t::s('diff db to cache');
+       class_exists('t') && t::s('delete obsolete storage items');
+       class_exists('t') && t::s('diff db to cache');
         $aDeleteFromStorage = CMSc_Utils::fastArrayDiff($aStorageKeys, $aDbKeys);
-        t::e('diff db to cache');
-        t::s('diff db to deleted from index');
+       class_exists('t') && t::e('diff db to cache');
+       class_exists('t') && t::s('diff db to deleted from index');
         $aDeleteFromStorage = CMSc_Utils::fastArrayDiff($aDeleteFromStorage, $aDeleteFromIndex);
-        t::e('diff db to deleted from index');
+       class_exists('t') && t::e('diff db to deleted from index');
         
         if (count($aDeleteFromStorage)) {
 //            var_dump_pre(__METHOD__, "Deleting keys from cache: ", $aDeleteFromStorage);
             
-            t::s('execute');
+           class_exists('t') && t::s('execute');
             foreach ($aDeleteFromStorage as $sCacheKey) {
                 $this->deleteHttpResultByCacheKey($sCacheKey);
             }
-            t::e('execute');
+           class_exists('t') && t::e('execute');
         }
-        t::e('delete obsolete storage items');
+       class_exists('t') && t::e('delete obsolete storage items');
         
-        t::e('_synchronizeIndex');
+       class_exists('t') && t::e('_synchronizeIndex');
     }
 }

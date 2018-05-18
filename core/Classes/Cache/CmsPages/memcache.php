@@ -60,14 +60,14 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
      */
     protected function _saveHttpResult ($sCacheKey, $oHttpResult)
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $sCacheName = $this->_getMemcacheKeyFromCacheKey($sCacheKey);
         
         $blSuccess = $this->_getMemcache()->set($sCacheName, $oHttpResult);
         $this->_addPageToIndex($sCacheKey);
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return $blSuccess;
     }
@@ -77,13 +77,13 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
      */
     protected function _fetchHttpResult ($sCacheKey)
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $sCacheName = $this->_getMemcacheKeyFromCacheKey($sCacheKey);
         
         $oHttpResult = $this->_getMemcache()->get($sCacheName);
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return $oHttpResult;
     }
@@ -93,7 +93,7 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
      */
     protected function _deleteHttpResult ($sCacheKey)
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $sCacheName = $this->_getMemcacheKeyFromCacheKey($sCacheKey);
         
@@ -102,7 +102,7 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
         $this->_getMemcache()->set($sCacheName, false);
         $this->_deletePageFromIndex($sCacheKey);
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
     }
     
     /**
@@ -130,13 +130,13 @@ class CMSc_Cache_CmsPages_memcache extends CMSc_Cache_CmsPages
      */
     protected function _getStorageKeysList ()
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $aList = $this->_getIndex();
         
         var_dump_pre(__METHOD__, $aList);
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return $aList;
     }

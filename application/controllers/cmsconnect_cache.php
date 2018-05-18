@@ -46,13 +46,13 @@ class cmsconnect_cache extends oxUBase
             $aShopIds = $oxConfig->getShopIds();
         }
 
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
 
         $iCount = 0;
         foreach ( $aShopIds as $sShopId ) {
 //            var_dump_pre(__METHOD__, '$sShopId', $sShopId);
 
-            t::s("shop $sShopId");
+           class_exists('t') && t::s("shop $sShopId");
 
             $oCmsPagesCache->setShopId($sShopId);
             $oCmsPagesCache->synchronizeIndex();
@@ -73,7 +73,7 @@ class cmsconnect_cache extends oxUBase
                 $iCount += count($aList);
             }
 
-            t::e("shop $sShopId");
+           class_exists('t') && t::e("shop $sShopId");
         }
 
         $oCmsPagesCache->setShopId(null);
@@ -82,9 +82,9 @@ class cmsconnect_cache extends oxUBase
         
         echo $iCount;
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
-        t::dAll();
+       class_exists('t') && t::dAll();
         
         die;
     }

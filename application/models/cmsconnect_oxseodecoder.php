@@ -19,14 +19,14 @@ class cmsconnect_oxseodecoder extends cmsconnect_oxseodecoder_parent
      */
     public function decodeUrl( $sSeoUrl )
     {   
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $oxLang     = oxRegistry::getLang();
         $oxConfig   = oxRegistry::getConfig();
         
         $aSeoInfo = CMSc_Utils::getPageSeoInfoByUrl( $sSeoUrl );
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         if ( $aSeoInfo ) {
             $oxLang->setBaseLanguage( $aSeoInfo['lang'] );

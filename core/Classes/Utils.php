@@ -103,12 +103,12 @@ class CMSc_Utils
      */
     public static function getConfigValue ($sKey)
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $mVal = CMSc_SessionCache::get('config', $sKey);
         
         if ( $mVal === null ) {
-            t::s('cache miss');
+           class_exists('t') && t::s('cache miss');
             
             $oxConfig = oxRegistry::getConfig();
             $aSetting = static::getMetadataSetting($sKey);
@@ -119,10 +119,10 @@ class CMSc_Utils
             $mVal = $oxConfig->getShopConfVar($sKey, $sShopId, 'module:' . static::CONFIG_MODULE_NAME);
             
             CMSc_SessionCache::set('config', $sKey, $mVal);
-            t::e('cache miss');
+           class_exists('t') && t::e('cache miss');
         }
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
 //        var_dump_pre(__METHOD__, '$sKey', $sKey, '$mVal', $mVal);
         
         return $mVal;
@@ -139,7 +139,7 @@ class CMSc_Utils
      */
     public static function getLangConfigValue ($sKey, $sLang = null)
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $aVal = CMSc_Utils::getConfigValue($sKey);
         
@@ -155,7 +155,7 @@ class CMSc_Utils
             $mVal = $aVal[$sLang];
         }
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return $mVal;
     }
@@ -169,7 +169,7 @@ class CMSc_Utils
      */
     protected static function _getStandardLanguageIdentifier ($sLang)
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $sLangMapped = CMSc_SessionCache::get('langIdentMap', $sLang);
 
@@ -186,7 +186,7 @@ class CMSc_Utils
             $sLangMapped = CMSc_SessionCache::get('langIdentMap', $sLang);
         }
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return $sLangMapped;
     }
@@ -207,7 +207,7 @@ class CMSc_Utils
             return false;
         }
         
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $oxConfig       = oxRegistry::getConfig();
         $blSsl          = $oxConfig->isSsl();
@@ -229,7 +229,7 @@ class CMSc_Utils
                             . $sParams
                         ;
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return static::sanitizeUrl($sFullPageUrl);
     }
@@ -251,7 +251,7 @@ class CMSc_Utils
             return false;
         }
         
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $oxConfig       = oxRegistry::getConfig();
         $blSsl          = $oxConfig->isSsl();
@@ -279,7 +279,7 @@ class CMSc_Utils
                             . $sParams
                         ;
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return static::sanitizeUrl($sFullPageUrl);
     }
@@ -296,7 +296,7 @@ class CMSc_Utils
      */
     public static function sanitizeUrl ($sUnsanitizedUrl)
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $sSanitizedUrl = CMSc_SessionCache::get('urls', $sUnsanitizedUrl);
         
@@ -319,7 +319,7 @@ class CMSc_Utils
             CMSc_SessionCache::set('urls', $sUnsanitizedUrl, $sSanitizedUrl);
         }
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return $sSanitizedUrl;
     }
@@ -336,7 +336,7 @@ class CMSc_Utils
      */
     public static function sanitizePageTitle ( $sUnsanitizedTitle )
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $sSanitizedTitle = CMSc_SessionCache::get('title', $sUnsanitizedTitle);
         
@@ -396,7 +396,7 @@ class CMSc_Utils
             CMSc_SessionCache::set('title', $sUnsanitizedTitle, $sSanitizedTitle);
         }
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return $sSanitizedTitle;
     }
@@ -410,7 +410,7 @@ class CMSc_Utils
      */
     public static function getTextContentFromXmlObject ( $oXml )
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $sText = '';
         
@@ -437,7 +437,7 @@ class CMSc_Utils
             }
         }
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return $sText;
     }
@@ -605,7 +605,7 @@ class CMSc_Utils
      */
     public static function fixXmlSourceEntities ( $sXml )
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $sXml = str_replace('&nbsp;', '&#160;', $sXml);
         
@@ -615,7 +615,7 @@ class CMSc_Utils
         // var_dump(__METHOD__, $sXml);
         // die;
 
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return $sXml;
     }
@@ -629,7 +629,7 @@ class CMSc_Utils
      */
     public static function createXmlObjectFromSource ($sXmlSource)
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         try {
             $previousValue = libxml_use_internal_errors(true);
@@ -648,7 +648,7 @@ class CMSc_Utils
             libxml_use_internal_errors($previousValue);
         }
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return $oXml;
     }
@@ -694,14 +694,14 @@ class CMSc_Utils
      */
     public static function unwrapCDATA( $sXml )
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $oStr = getStr();
         
         // Remove CDATA tag
         $sXml = $oStr->preg_replace( '/<!\[CDATA\[(.*?)\]\]>/ms', '\\1', $sXml );
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return $sXml;
     }
@@ -727,7 +727,7 @@ class CMSc_Utils
      */
     public static function getPageSeoInfoByUrl ( $sSeoUrl )
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $oxConfig   = oxRegistry::getConfig();
         $oxLang     = oxRegistry::getLang();
@@ -755,7 +755,7 @@ class CMSc_Utils
             }
         }
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return $aSeoInfo;
     }
@@ -769,13 +769,13 @@ class CMSc_Utils
      */
     public static function rewriteTextContentLinks ( $sTextContent )
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $oxConfig = oxRegistry::getConfig();
         $oxLang   = oxRegistry::getLang();
         
         if ( static::getConfigValue(CMSc_Utils::CONFIG_KEY_URL_REWRITING) === static::VALUE_URL_REWRITING_NONE ) {
-            t::e(__METHOD__);
+           class_exists('t') && t::e(__METHOD__);
             
             return $sTextContent;
         }
@@ -821,7 +821,7 @@ class CMSc_Utils
             // }
         }
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
 
         return $sTextContent;
     }
@@ -835,7 +835,7 @@ class CMSc_Utils
      */
     public static function rewriteUrl ( $sUrl )
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $oxConfig = oxRegistry::getConfig();
         $oxLang   = oxRegistry::getLang();
@@ -867,7 +867,7 @@ class CMSc_Utils
             }
         }
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
 
         return $sUrl;
     }
@@ -881,7 +881,7 @@ class CMSc_Utils
      */
     public static function fixTextContentEncoding ( $sContent )
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $oxConfig = oxRegistry::getConfig();
         
@@ -899,7 +899,7 @@ class CMSc_Utils
             $sContent = mb_convert_encoding( $sContent, $sContentEncoding, 'UTF-8' );
         }
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return $sContent;
     }
@@ -927,7 +927,7 @@ class CMSc_Utils
      */
     public static function parseTextContentThroughSmarty ( $sContent )
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         $oxUtilsView = oxRegistry::get('oxUtilsView');
         
@@ -940,7 +940,7 @@ class CMSc_Utils
             true
         );
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
         
         return $sContent;
     }
@@ -1057,41 +1057,41 @@ EOF;
     
     public static function getMetadataSettings ()
     {
-        t::s('getMetadataSettings');
+       class_exists('t') && t::s('getMetadataSettings');
         
         if (!CMSc_SessionCache::get('metadata', 'settings')) {
-            t::s('cache miss');
+           class_exists('t') && t::s('cache miss');
             
             $oxModule = oxNew('oxmodule');
             $oxModule->load(static::CONFIG_MODULE_NAME);
 
             CMSc_SessionCache::set('metadata', 'settings', $oxModule->getInfo('settings'));
             
-            t::e('cache miss');
+           class_exists('t') && t::e('cache miss');
         }
         
-        t::e('getMetadataSettings');
+       class_exists('t') && t::e('getMetadataSettings');
         return CMSc_SessionCache::get('metadata', 'settings');
     }
     
     public static function getMetadataSetting ($sKey)
     {
-        t::s('getMetadataSetting');
+       class_exists('t') && t::s('getMetadataSetting');
         
         $sCacheKey = "setting$sKey";
         
         if (!CMSc_SessionCache::get('metadata', $sCacheKey)) {
-            t::s('cache miss');
+           class_exists('t') && t::s('cache miss');
             
             $aSettings = static::getMetadataSettings();
             $aSetting = array_filter($aSettings, function ($aSetting) use ($sKey) { return $aSetting['name'] === $sKey; });
             
             CMSc_SessionCache::set('metadata', $sCacheKey, reset($aSetting));
             
-            t::e('cache miss');
+           class_exists('t') && t::e('cache miss');
         }
         
-        t::e('getMetadataSetting');
+       class_exists('t') && t::e('getMetadataSetting');
         return CMSc_SessionCache::get('metadata', $sCacheKey);
     }
 }

@@ -92,14 +92,14 @@ class CMSc_Cache_LocalPages_memcache extends CMSc_Cache_LocalPages
      */
     protected function _deleteLocalPageCache ($sCacheKey)
     {
-        t::s(__METHOD__);
+       class_exists('t') && t::s(__METHOD__);
         
         // Memcache::delete() is broken in several versions of php-memcache
         // $this->_getMemcache()->delete( $this->_getMemcacheKey($sCacheKey) );e
         $this->_getMemcache()->set($this->_getMemcacheKey($sCacheKey), false);
         $this->_deletePageFromIndex($sCacheKey);
         
-        t::e(__METHOD__);
+       class_exists('t') && t::e(__METHOD__);
     }
     
     /**
