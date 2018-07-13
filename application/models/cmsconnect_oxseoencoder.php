@@ -21,7 +21,7 @@ class cmsconnect_oxseoencoder extends cmsconnect_oxseoencoder_parent
      */
     public function getStaticUrl($sStdUrl, $iLang = null, $iShopId = null)
     {
-       class_exists('t') && t::s(__METHOD__);
+        class_exists('t') && t::s(__METHOD__);
         
         $oxConfig   = oxRegistry::getConfig();
         $oxLang     = oxRegistry::getLang();
@@ -34,7 +34,7 @@ class cmsconnect_oxseoencoder extends cmsconnect_oxseoencoder_parent
         }
         
         if ( isset($this->_aStaticUrlCache[$sStdUrl][$iLang][$iShopId]) ) {
-           class_exists('t') && t::e(__METHOD__);
+            class_exists('t') && t::e(__METHOD__);
             return $this->_aStaticUrlCache[$sStdUrl][$iLang][$iShopId];
         }
         
@@ -56,7 +56,7 @@ class cmsconnect_oxseoencoder extends cmsconnect_oxseoencoder_parent
             $this->_aStaticUrlCache[$sStdUrl][$iLang][$iShopId] = $sSeoUrl;
         }
     
-       class_exists('t') && t::e(__METHOD__);
+        class_exists('t') && t::e(__METHOD__);
         
         return parent::getStaticUrl($sStdUrl, $iLang, $iShopId);
     }

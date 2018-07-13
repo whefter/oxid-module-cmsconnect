@@ -222,14 +222,14 @@ abstract class CMSc_CmsPage implements \Serializable
      */
     protected function _getXmlSource ()
     {
-       class_exists('t') && t::s(__METHOD__);
+        class_exists('t') && t::s(__METHOD__);
         
         $oHttpResult = $this->getHttpResult();
         
         // Return an empty string so as not to break anything upstream
         $sXml = is_object($oHttpResult) ? $oHttpResult->content : '';
         
-       class_exists('t') && t::e(__METHOD__);
+        class_exists('t') && t::e(__METHOD__);
         
         return $sXml;
     }
@@ -392,7 +392,7 @@ abstract class CMSc_CmsPage implements \Serializable
      */
     protected function getTestContentXmlSource ()
     {
-       class_exists('t') && t::s(__METHOD__);
+        class_exists('t') && t::s(__METHOD__);
         
         $sTestContent = CMSc_Utils::getConfigValue(CMSc_Utils::CONFIG_KEY_TEST_CONTENT);
         
@@ -400,7 +400,7 @@ abstract class CMSc_CmsPage implements \Serializable
             $sTestContent = CMSc_Utils::getDefaultTestContent();
         }
         
-       class_exists('t') && t::e(__METHOD__);
+        class_exists('t') && t::e(__METHOD__);
         
         return $sTestContent;
     }

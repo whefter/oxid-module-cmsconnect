@@ -54,20 +54,20 @@ class CMSc_Cache_LocalPages_OxidFileCache extends CMSc_Cache_LocalPages
      */
     protected function _deleteLocalPageCache ($sCacheKey)
     {
-       class_exists('t') && t::s(__METHOD__);
+        class_exists('t') && t::s(__METHOD__);
 
         $sCacheName = $this->_getCacheFilename($sCacheKey);
         
         $sFilePath = oxRegistry::get('oxUtils')->getCacheFilePath($sCacheName);
         unlink($sFilePath);
         
-       class_exists('t') && t::e(__METHOD__);
+        class_exists('t') && t::e(__METHOD__);
     }
     
     /**
      * Override
      */
-    public function _getCount ()
+    protected function _getCount ()
     {
         $oxUtils = oxRegistry::get('oxUtils');
         $oxConfig = oxRegistry::getConfig();
