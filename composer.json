@@ -1,0 +1,30 @@
+{
+  "name": "wh/cmsconnect",
+  "description": "CMS connector for OXID eShop",
+  "type": "oxideshop-module",
+  "license": "GPL-3.0",
+  "authors": [
+    {
+      "name": "William Hefter",
+      "email": "william@whefter.de"
+    }
+  ],
+  "extra":       {
+    "oxideshop": {
+      "source-directory": "empty/"
+    }
+  },
+  "require": {
+    "php": "7.1 - 7.2",
+    "lib-curl": ">=7.34.0",
+    "lib-openssl": ">=1.0.1",
+    "ext-curl": "*",
+    "ext-openssl": "*",
+    "oxid-esales/oxideshop-metapackage-ce": "~6.0.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "wh\\CmsConnect\\": "."
+    }
+  }
+}
