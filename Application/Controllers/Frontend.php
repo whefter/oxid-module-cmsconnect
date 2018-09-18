@@ -10,6 +10,8 @@ namespace wh\CmsConnect\Application\Controllers;
 use \wh\CmsConnect;
 use \wh\CmsConnect\Core;
 use \wh\CmsConnect\Models;
+use \wh\CmsConnect\Application\Models\CmsPage;
+use \wh\CmsConnect\Application\Utils as CMSc_Utils;
 
 /**
  * cmsconnect_frontend
@@ -57,7 +59,7 @@ class frontend extends \OxidEsales\Eshop\Application\Controller\FrontendControll
     
     protected function _getCmsPage ()
     {
-        return new CMSc_CmsPage_Path_Implicit();
+        return new CmsPage\Path\Implicit();
     }
     
     /**

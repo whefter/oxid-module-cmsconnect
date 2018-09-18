@@ -759,7 +759,7 @@ class Utils
                 
                 $aSeoInfo = array(
                     'lang'  => $oLang->id,
-                    'cl'    => 'frontend',
+                    'cl'    => 'cmsconnect_frontend',
                     'page'  => $sPage,
                 );
 
