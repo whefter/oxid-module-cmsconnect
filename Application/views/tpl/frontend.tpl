@@ -10,8 +10,10 @@
 
 [{ capture append="oxidBlock_content" }]
     <div id="cms-content">
-        [{ cmsc_load content="left,normal,right,border" assign="aCmsContent" }]
-        [{ assign var="iSnippetCount" value=$aCmsContent|@count }]
+        [{ assign var=oCmsPage value=$oView->getCmsPage() }]
+        [{ assign_adv var=aContentList value="array('left', 'normal', 'right', 'border')"}]
+        [{ assign var=aCmsContent value=$oCmsPage->getContentArray($aContentList) }]
+        [{ assign var=iSnippetCount value=$aCmsContent|@count }]
         
         [{ foreach from=$aCmsContent item=sSnippet name=fCmsSnippets }]
             <div class="cms-cols-[{ $iSnippetCount }] cms-col-[{ $smarty.foreach.fCmsSnippets.iteration }]">

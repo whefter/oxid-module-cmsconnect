@@ -57,7 +57,7 @@ class SeoEncoder extends SeoEncoder_parent
         parse_str($sQueryString, $aQuery);
         
         // Check if the requested URL is a call to CMSconnect
-        if ( !empty($aQuery['cl']) && $aQuery['cl'] == 'frontend') {
+        if ( !empty($aQuery['cl']) && $aQuery['cl'] === 'cmsconnect_frontend') {
             // Construct an SEO URL that represents a call to CMSconnect from the passed page
             $sPage      = urldecode($aQuery['page']);
             $sSeoIdent  = CMSc_Utils::getLangConfigValue(CMSc_Utils::CONFIG_KEY_SEO_IDENTIFIERS, $iLang);

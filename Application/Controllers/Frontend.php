@@ -13,6 +13,9 @@ use \wh\CmsConnect\Models;
 use \wh\CmsConnect\Application\Models\CmsPage;
 use \wh\CmsConnect\Application\Utils as CMSc_Utils;
 
+use \OxidEsales\Eshop\Core\Registry as Registry;
+use \OxidEsales\Eshop\Core\Request as Request;
+
 /**
  * cmsconnect_frontend
  */
@@ -56,10 +59,28 @@ class frontend extends \OxidEsales\Eshop\Application\Controller\FrontendControll
         
         return $this->_prepareMetaDescription( $sDescription );
     }
+
+    public function getCmsPage ()
+    {
+        return $this->_getCmsPage();
+    }
     
     protected function _getCmsPage ()
     {
-        return new CmsPage\Path\Implicit();
+        if (CMSc_Utils::getCurrentLocalPageSeoPath()) {
+            return new CmsPage\Path\Implicit();
+        } else {
+            $oxRequest = Registry::get(Request::class);
+            $sLang = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
+
+            if ($id = $oxRequest->getRequestParameter('id')) {
+                return new CmsPage\Id($id, $sLang);
+            } else if ($page = $oxRequest->getRequestParameter('page')) {
+                return new CmsPage\Path($page, $sLang);
+            }
+        }
+
+        return new CmsPage\Path('/');
     }
     
     /**
