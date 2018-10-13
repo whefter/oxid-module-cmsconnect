@@ -1,4 +1,3 @@
-#+++localconf.php+++#
 $CMS_CONF_VARS['BE']['forceCharset'] = 'utf-8';
 
 config {
@@ -48,6 +47,12 @@ config {
 }
 
 [global]
+
+########## ID ##########
+lib.pageid = TEXT
+lib.pageid.field = uid
+lib.pageid.wrap = <id>|</id>
+
 ########## MAIN NAVIGATION ##########
 lib.navigation = HMENU
 lib.navigation {
@@ -219,6 +224,44 @@ lib.breadcrumbs {
   }
 }
 
+lib.languagenav = HMENU
+lib.languagenav {
+    special = language
+    special.value = 0,1,2,3,4
+    special.normalWhenNoLanguage = 0
+    wrap = <language-urls>|</language-urls>
+    1 = TMENU
+    1 {
+        noBlur = 1
+        NO = 1
+        NO {
+            doNotLinkIt = 1
+            stdWrap.override = de || en || fr || es || it
+            stdWrap {
+                wrap = <url lang="de" L="0">|</url> || <url lang="en" L="1">|</url> || <url lang="fr" L="2">|</url> || <url lang="es" L="3">|</url> || <url lang="it" L="4">|</url>
+                typolink {
+                    parameter.data = page:uid
+                    additionalParams = &L=0 || &L=1 || &L=2 || &L=3 || &L=4
+                    addQueryString = 1
+                    addQueryString.exclude = L,id,no_cache
+                    addQueryString.method = GET
+                    no_cache = 0
+                    returnLast = url
+                }
+            }
+        }
+        ACT < .NO
+        USERDEF1 < .NO
+        USERDEF1 {
+            stdWrap.typolink.additionalParams = &L=1
+        }
+        USERDEF2 < .ACT
+        USERDEF2 {
+            stdWrap.typolink.additionalParams = &L=1
+        }
+    }
+}
+
 ########## OUTPUT ##########
 page = PAGE
 page.typeNum = 0
@@ -234,9 +277,11 @@ page.config {
   xhtml_cleaning = all
 }
 
+page.9 < lib.pageid
 page.10 < lib.navigation
 page.20 < lib.content
 page.30 < lib.metadata
 page.40 < lib.breadcrumbs
+page.50 < lib.languagenav
 
 page.wrap = <?xml version="1.0" encoding="utf-8"?><cmsconnect>|</cmsconnect>

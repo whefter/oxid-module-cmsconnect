@@ -305,30 +305,30 @@ class Utils
     public static function sanitizeUrl ($sUnsanitizedUrl)
     {
         class_exists('t') && t::s(__METHOD__);
-        
+
         $sSanitizedUrl = SessionCache::get('urls', $sUnsanitizedUrl);
-        
+
         if ( !$sSanitizedUrl ) {
             // Automatic encoding handling
             $oStr = getStr();
-            
+
             // Replace multiple slashes, except for the protocol part
             $sUrl = $oStr->preg_replace( '/(?<!:)\/+/', '/', $sUnsanitizedUrl);
-            
+
             // Put through PHP's functions to ensure standardized URL
             // $sUrl = http_build_url( parse_url( $sUrl ) );
-            
+
             // Remove ending '&' or '?'
             // Do this without regular expressions (which are expensive)
             $sUrl = rtrim( $sUrl, '&?' );
-            
+
             $sSanitizedUrl = $sUrl;
-            
+
             SessionCache::set('urls', $sUnsanitizedUrl, $sSanitizedUrl);
         }
-        
+
         class_exists('t') && t::e(__METHOD__);
-        
+
         return $sSanitizedUrl;
     }
     
@@ -760,7 +760,7 @@ class Utils
                 $aSeoInfo = array(
                     'lang'  => $oLang->id,
                     'cl'    => 'cmsconnect_frontend',
-                    'page'  => $sPage,
+                    'pagePath'  => $sPage,
                 );
 
                 break;
@@ -867,7 +867,7 @@ class Utils
                 $sFullBaseUrl       = static::sanitizeUrl( $sSourceBaseUrl . '/' . $sSourcePagePath . '/' );
                 
                 // The target is defined by the current shop's SSL setting
-                $sTargetBaseUrl     = $oxConfig->isSsl() ? $oxConfig->getSslShopUrl($sLang) : $oxConfig->getShopUrl($sLang);
+                $sTargetBaseUrl     = $oxConfig->isSsl() ? $oxConfig->getSslShopUrl($oLang->id) : $oxConfig->getShopUrl($oLang->id);
                 $sTargetSeoIdent    = static::getLangConfigValue(static::CONFIG_KEY_SEO_IDENTIFIERS, $oLang->id);
                 $sFullTargetUrl     = static::sanitizeUrl( $sTargetBaseUrl . '/' . $sTargetSeoIdent . '/' );
 

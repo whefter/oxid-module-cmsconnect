@@ -73,9 +73,15 @@ class frontend extends \OxidEsales\Eshop\Application\Controller\FrontendControll
             $oxRequest = Registry::get(Request::class);
             $sLang = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
 
-            if ($id = $oxRequest->getRequestParameter('id')) {
+            if ($id = $oxRequest->getRequestParameter('pageId')) {
                 return new CmsPage\Id($id, $sLang);
+            } elseif ($id = $oxRequest->getRequestParameter('id')) {
+                // Deprecated (make sure we don't interfere with OXID variables)
+                return new CmsPage\Id($id, $sLang);
+            } else if ($page = $oxRequest->getRequestParameter('pagePath')) {
+                return new CmsPage\Path($page, $sLang);
             } else if ($page = $oxRequest->getRequestParameter('page')) {
+                // Deprecated (make sure we don't interfere with OXID variables)
                 return new CmsPage\Path($page, $sLang);
             }
         }
@@ -126,5 +132,31 @@ class frontend extends \OxidEsales\Eshop\Application\Controller\FrontendControll
     public function getNavigation ()
     {
         return $this->_getCmsPage()->getNavigation();
+    }
+
+    /**
+     * collects _GET parameters used by eShop SEO and returns uri
+     *
+     * @return string
+     */
+    protected function _getSeoRequestParams()
+    {
+        $oxRequest = Registry::get(Request::class);
+
+        $url = call_user_func_array('parent::_getSeoRequestParams', func_get_args());
+
+        if ($id = $oxRequest->getRequestEscapedParameter('pageId')) {
+            $url .= '&amp;pageId=' . $id;
+        } elseif ($id = $oxRequest->getRequestEscapedParameter('id')) {
+            // Legacy compatibility
+            $url .= '&amp;pageId=' . $id;
+        } elseif ($path = $oxRequest->getRequestEscapedParameter('pagePath')) {
+            $url .= '&amp;pagePath=' . $path;
+        } elseif ($path = $oxRequest->getRequestEscapedParameter('page')) {
+            // Legacy compatibility
+            $url .= '&amp;pagePath=' . $path;
+        }
+
+        return $url;
     }
 }
