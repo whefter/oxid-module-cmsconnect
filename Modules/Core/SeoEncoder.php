@@ -83,7 +83,7 @@ class SeoEncoder extends SeoEncoder_parent
                             continue;
                         }
 
-                        $sUrl = (string)$oUrlXml;
+                        $sUrl = CMSc_Utils::unwrapCDATA((string)$oUrlXml);
 
                         $sSeoUrl = CMSc_Utils::rewriteUrl($sUrl) . $sNewQueryString;
                         $this->_aStaticUrlCache[$sStdUrl][$oLang->id][$iShopId] = $sSeoUrl;

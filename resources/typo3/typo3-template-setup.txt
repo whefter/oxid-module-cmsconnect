@@ -238,7 +238,7 @@ lib.languagenav {
             doNotLinkIt = 1
             stdWrap.override = de || en || fr || es || it
             stdWrap {
-                wrap = <url lang="de" L="0">|</url> || <url lang="en" L="1">|</url> || <url lang="fr" L="2">|</url> || <url lang="es" L="3">|</url> || <url lang="it" L="4">|</url>
+                wrap = <url lang="de" L="0"><![CDATA[|]]></url> || <url lang="en" L="1"><![CDATA[|]]></url> || <url lang="fr" L="2"><![CDATA[|]]></url> || <url lang="es" L="3"><![CDATA[|]]></url> || <url lang="it" L="4"><![CDATA[|]]></url>
                 typolink {
                     parameter.data = page:uid
                     additionalParams = &L=0 || &L=1 || &L=2 || &L=3 || &L=4

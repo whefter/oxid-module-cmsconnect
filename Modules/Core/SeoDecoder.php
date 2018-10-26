@@ -32,12 +32,12 @@ class SeoDecoder extends SeoDecoder_parent
         $oxConfig   = Registry::getConfig();
         
         $aSeoInfo = CMSc_Utils::getPageSeoInfoByUrl( $sSeoUrl );
-        
+
         class_exists('t') && t::e(__METHOD__);
         
         if ( $aSeoInfo ) {
             $oxLang->setBaseLanguage( $aSeoInfo['lang'] );
-            $oxConfig->setConfigParam( 'sCMScCurSeoPage', $aSeoInfo['page'] );
+            $oxConfig->setConfigParam( 'sCMScCurSeoPage', $aSeoInfo['pagePath'] );
             
             return $aSeoInfo;
         } else {
