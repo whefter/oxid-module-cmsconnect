@@ -86,7 +86,7 @@ class frontend extends \OxidEsales\Eshop\Application\Controller\FrontendControll
             }
         }
 
-        return new CmsPage\Path('/');
+        return new CmsPage\Path('/', $sLang);
     }
     
     /**
