@@ -24,12 +24,12 @@ class SessionCache
     /**
      * @param string $sGroup
      * @param string $sKey
-     * @param string $sValue
+     * @param mixed $sValue
      */
     public static function set ($sGroup, $sKey, $sValue)
     {
         $sCacheKey = static::createCacheKey($sGroup, $sKey);
-        
+
         static::$_aCache[$sCacheKey] = $sValue;
     }
 
@@ -41,12 +41,28 @@ class SessionCache
     public static function get ($sGroup, $sKey)
     {
         $sCacheKey = static::createCacheKey($sGroup, $sKey);
-        
+
         if ( isset(static::$_aCache[$sCacheKey]) ) {
             return static::$_aCache[$sCacheKey];
         }
-        
+
         return null;
+    }
+
+    /**
+     * @param string $sGroup
+     * @param string $sKey
+     * @return bool
+     */
+    public static function has ($sGroup, $sKey)
+    {
+        $sCacheKey = static::createCacheKey($sGroup, $sKey);
+
+        if ( isset(static::$_aCache[$sCacheKey]) ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

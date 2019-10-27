@@ -6,7 +6,7 @@ $aModule = array(
     'title'             => 'CMSConnect',
     'email'             => 'william@whefter.de',
     'url'               => 'http://www.whefter.de',
-    'version'           => '3.1.4',
+    'version'           => '3.2.0',
     'author'            => 'William Hefter',
     'description'       => array(
         'de'    => 'Erlaubt das Einbinden von CMS-Inhalten im OXID eShop. <p class="warning">Benötigt das whbase (wh Module Extensions)-Modul.</p>',
@@ -42,7 +42,7 @@ $aModule = array(
         'modules/wh/cmsconnect/async.tpl'           => 'wh/cmsconnect/Application/views/tpl/async.tpl',
         'modules/wh/cmsconnect/async_snippet.tpl'   => 'wh/cmsconnect/Application/views/tpl/async_snippet.tpl',
         'modules/wh/cmsconnect/cache.tpl'           => 'wh/cmsconnect/Application/views/tpl/cache.tpl',
-        
+
         // Admin
         'modules/wh/cmsconnect/admin/setup_list.tpl'                        => 'wh/cmsconnect/Application/views/admin/tpl/setup_list.tpl',
         'modules/wh/cmsconnect/admin/setup_main.tpl'                        => 'wh/cmsconnect/Application/views/admin/tpl/setup_main.tpl',
@@ -51,7 +51,7 @@ $aModule = array(
         'modules/wh/cmsconnect/admin/setup_cache_cmspages.tpl'              => 'wh/cmsconnect/Application/views/admin/tpl/setup_cache_cmspages.tpl',
         'modules/wh/cmsconnect/admin/includes/cache_list_pagination.tpl'    => 'wh/cmsconnect/Application/views/admin/tpl/includes/cache_list_pagination.tpl',
     ),
-    
+
     'blocks'    => array(
         array(
             'template'  => 'content_main.tpl',
@@ -59,7 +59,7 @@ $aModule = array(
             'file'      => '/Application/views/admin/blocks/content_main.tpl/admin_content_main_form.tpl'
         ),
     ),
-    
+
     'settings' => array(
         array(
             'group'     => 'DONOTMODIFY',
@@ -166,7 +166,7 @@ $aModule = array(
             'value'     => [],
         ),
     ),
-    
+
 //    'events'    => array(
 //        'onActivate'    => 'cmsconnect_events::onActivate',
 //        'onDeactivate'  => 'cmsconnect_events::onDeactivate',
