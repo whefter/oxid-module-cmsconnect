@@ -239,21 +239,29 @@ class Utils
 
         $oxConfig->saveShopConfVar($aSetting['type'], $sKey, $mVal, $sShopId, 'module:' . static::CONFIG_MODULE_NAME);
 
-        // KNOWN FLAW: this only clears the cache for the current shop, not all of them.
-        // This is a problem for global values.
-        // Since the TTL is not very high, this will in all probability not be a problem.
-        // @TODO: Clear all caches. [wh]
-        $configCache = SessionCache::get('config', $oxShopId);
-        $configCache[$sKey] = $mVal;
-        SessionCache::set('config', $oxShopId, $configCache);
+        // Clear memory cache [wh]
+        SessionCache::delete('config');
 
-        $filecacheKey = static::_computeConfigFileCacheKey($oxShopId);
+        // Clear file cache
+        // This is a pretty brute-force/nuclear option way to make sure that every shop
+        // really does reload its config.
+        // Unfortunately, OXID's file cache seems pretty buggy and there is no other way
+        // to really clear it, since EVEN if you call commitFileCache() and delete the files,
+        // apparently OXID still keeps a copy somewhere. [wh]
+        foreach ($oxConfig->getShopIds() as $clearShopId) {
+            $clearCacheKey = static::_computeConfigFileCacheKey($clearShopId);
+            $oxUtils->toFileCache($clearCacheKey, null, 0);
+        }
+        $oxUtils->commitFileCache();
+    }
 
-        $oxUtils->toFileCache(
-            $filecacheKey,
-            $configCache,
-            static::CONFIG_FILECACHE_TTL
-        );
+    /**
+     * @param string|int $oxShopId
+     * @return string
+     */
+    protected static function _computeConfigFileCacheKey($oxShopId)
+    {
+        return static::CONFIG_MODULE_NAME . '__config__' . $oxShopId;
     }
 
     /**
@@ -1225,14 +1233,5 @@ EOF;
 
         class_exists('t') && t::e('getMetadataSetting');
         return SessionCache::get('metadata', $sCacheKey);
-    }
-
-    /**
-     * @param string|int $oxShopId
-     * @return string
-     */
-    protected static function _computeConfigFileCacheKey($oxShopId)
-    {
-        return static::CONFIG_MODULE_NAME . '__config__' . $oxShopId;
     }
 }

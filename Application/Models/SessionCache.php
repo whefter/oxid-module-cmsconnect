@@ -26,11 +26,13 @@ class SessionCache
      * @param string $sKey
      * @param mixed $sValue
      */
-    public static function set ($sGroup, $sKey, $sValue)
+    public static function set($sGroup, $sKey, $sValue)
     {
-        $sCacheKey = static::createCacheKey($sGroup, $sKey);
+        if (!array_key_exists($sGroup, static::$_aCache)) {
+            static::$_aCache[$sGroup] = [];
+        }
 
-        static::$_aCache[$sCacheKey] = $sValue;
+        static::$_aCache[$sGroup][$sKey] = $sValue;
     }
 
     /**
@@ -38,15 +40,17 @@ class SessionCache
      * @param string $sKey
      * @return mixed|null
      */
-    public static function get ($sGroup, $sKey)
+    public static function get($sGroup, $sKey)
     {
-        $sCacheKey = static::createCacheKey($sGroup, $sKey);
-
-        if ( isset(static::$_aCache[$sCacheKey]) ) {
-            return static::$_aCache[$sCacheKey];
+        if (!array_key_exists($sGroup, static::$_aCache)) {
+            return null;
         }
 
-        return null;
+        if (!array_key_exists($sKey, static::$_aCache[$sGroup])) {
+            return null;
+        }
+
+        return static::$_aCache[$sGroup][$sKey];
     }
 
     /**
@@ -54,24 +58,38 @@ class SessionCache
      * @param string $sKey
      * @return bool
      */
-    public static function has ($sGroup, $sKey)
+    public static function has($sGroup, $sKey)
     {
-        $sCacheKey = static::createCacheKey($sGroup, $sKey);
-
-        if ( isset(static::$_aCache[$sCacheKey]) ) {
-            return true;
+        if (!array_key_exists($sGroup, static::$_aCache)) {
+            return false;
         }
 
-        return false;
+        if (!array_key_exists($sKey, static::$_aCache[$sGroup])) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
-     * @param string $a
-     * @param string $b
-     * @return string
+     * @param string $sGroup
+     * @param string $sKey
+     * @return void
      */
-    protected static function createCacheKey ($a, $b)
+    public static function delete($sGroup, $sKey = null)
     {
-        return md5($a . $b);
+        if (!array_key_exists($sGroup, static::$_aCache)) {
+            return;
+        }
+
+        if ($sKey === null) {
+            unset(static::$_aCache[$sGroup]);
+        } else {
+            if (!array_key_exists($sKey, static::$_aCache[$sGroup])) {
+                return;
+            }
+
+            unset(static::$_aCache[$sGroup][$sKey]);
+        }
     }
 }
