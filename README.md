@@ -18,6 +18,10 @@ and directly by ID (e.g. `http://cms.corp.com/index.php?id=123&L=2`)
 * Provides access to the underlying XML object
 * Automagic URL rewriting
 
+## Note
+
+The automatic setup routine is currently not part of this module and will be released at a later date.
+
 ## Introduction
 
 Once configured, CMSconnect provides access to arbitrary CMS content provided the content
@@ -62,7 +66,7 @@ from the configured settings.
         <border>
             <![CDATA[ ... ]]>
         </border>
-        
+
         <!-- Further content nodes -->
         <navigation>
             <![CDATA[ ... ]]>
@@ -105,24 +109,24 @@ The `navigation` node is ignored when retrieving content node arrays from pages 
 
 The CMSconnect class can be obtained to access its methods directly:
 
-    [{ assign var=oCmsxid value=$oViewConf->getCmsxid() }]
-    
+    [{ assign var=oCMSc value=$oViewConf->getCMSconnect() }]
+
 Following this, all public methods can be used directly, e.g. the following will return
 the content of the `normal` node from the XML document returned by the page at `page/path`.
 The supplied page path is relative to the configured source URL. By default, content
 is returned from the source for the currently selected language.
 
-    [{ $oCmsxid->getContent('normal', 'page/path') }]
-    [{ $oCmsxid->getContentById('normal', 123) }]
-    
+    [{ $oCMSc->getContent('normal', 'page/path') }]
+    [{ $oCMSc->getContentById('normal', 123) }]
+
 To retrieve all content nodes as key/value array:
 
-    [{ $oCmsxid->getContentArray('page/path') }]
-    [{ $oCmsxid->getContentArrayById(123) }]
+    [{ $oCMSc->getContentArray('page/path') }]
+    [{ $oCMSc->getContentArrayById(123) }]
 
 To retrieve ALL nodes (content nodes as well as `metadata`, `navigation`, etc.):
 
-    [{ $oCmsxid->getContentArrayById(123, null, false) }]
+    [{ $oCMSc->getContentArrayById(123, null, false) }]
 
 See the public method reference below for a listing of all methods and their arguments.
 
@@ -133,31 +137,31 @@ the CMSconnect object:
 
     // Load (e.g.) http://my.domain.corp/de/page/path
     [{ cmsconnect_load page="page/path" content="normal" }]
-    
+
     // Load content from the XML node 'secondary' (e.g.) http://my.domain.corp/en/page/path
     [{ cmsconnect_load page="page/path" content="secondary" lang="en" }]
-    
+
     // Load content from the relative URL page/path and assign to variable sMyContent
     [{ cmsconnect_load page="page/path" content="normal" assign="sMyContent" }]
-    
+
     // Load the page at page/path and return all content nodes as an associative array by
     // omitting the "content" parameter
     [{ cmsconnect_load page="page/path" assign="aMyContent" }]
-    
+
     // Output content from a node in the previously fetched content array
     [{ $aMyContent.normal }]
-    
+
     // Iterate through the content nodes
     [{ foreach from=$aMyContent key=sNode item=sNodeContent }]
         Content of node [{ $sNode }]: <p>[{ $sNodeContent }]</p>
     [{ /foreach }]
-    
+
     // Load content from page with ID 123
     [{ cmsconnect_load id=123 content="normal" }]
 
-## CMSconnect public method reference
+<!-- ## CMSconnect public method reference
 
-[CMSconnect API documentation](http://whefter.github.io/cmsxid)
+[CMSconnect API documentation](http://whefter.github.io/cmsxid) -->
 
 ## TOXID compatibility
 
@@ -168,7 +172,7 @@ the CMSconnect object:
 
 # More info
 
-Copyright (c) 2014-2016 William Hefter
+Copyright (c) 2014-2020 William Hefter <william@whefter.de>
 
 This program and entire repository is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
