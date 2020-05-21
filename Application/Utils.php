@@ -1202,10 +1202,29 @@ EOF;
         if (!SessionCache::get('metadata', 'settings')) {
             class_exists('t') && t::s('cache miss');
 
-            $oxModule = oxNew('oxmodule');
+            $oxModule = \oxNew('oxmodule');
             $oxModule->load(static::CONFIG_MODULE_NAME);
+            $aSettings = $oxModule->getInfo('settings');
 
-            SessionCache::set('metadata', 'settings', $oxModule->getInfo('settings'));
+            // Fetch extended info, then merge
+            $metadataExtPath = $oxModule->getModuleFullPath() . DIRECTORY_SEPARATOR .  'metadataExt.php';
+            $metadataExt = require $metadataExtPath;
+
+            if (is_array($metadataExt['settings'])) {
+                foreach ($metadataExt['settings'] as $settingExt) {
+                    foreach ($aSettings as $key => $setting) {
+                        if ($setting['name'] === $settingExt['name']) {
+                            // These is the extended info that has to be copied
+                            $setting['global'] = $settingExt['global'];
+                        }
+
+                        $aSettings[$key] = $setting;
+                    }
+                }
+
+            }
+
+            SessionCache::set('metadata', 'settings', $aSettings);
 
             class_exists('t') && t::e('cache miss');
         }

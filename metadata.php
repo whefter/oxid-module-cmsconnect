@@ -114,14 +114,12 @@ $aModule = array(
             'name'      => 'sCMScLocalPageCacheEngine',
             'type'      => 'str',
             'value'     => 'LOCAL_PAGE_CACHE_AUTO',
-            'global'    => true,
         ),
         array(
             'group'     => 'DONOTMODIFY',
             'name'      => 'sCMScCmsPageCacheEngine',
             'type'      => 'str',
             'value'     => 'CMS_PAGE_CACHE_AUTO',
-            'global'    => true,
         ),
         array(
             'group'     => 'DONOTMODIFY',
